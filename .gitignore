@@ -5,5 +5,8 @@ secrets.h
 __pycache__/
 *.py[cod]
 *-backups/
+.history/
+~*.lck
+*.kicad_prl
 .DS_Store
 Thumbs.db

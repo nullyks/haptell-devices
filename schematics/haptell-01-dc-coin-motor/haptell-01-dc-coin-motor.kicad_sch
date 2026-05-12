@@ -78,11 +78,11 @@
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid 62a57d17-f6f0-4d3b-804c-60b79f59fb59)
   )
-  (global_label "+5V" (shape power_in) (at 25.4 76.2 180)
+  (global_label "+5V" (shape passive) (at 25.4 76.2 180)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid f4c8dc3c-1174-4a02-9d77-d0e085cb9172)
   )
-  (global_label "GND" (shape power_in) (at 25.4 109.22 180)
+  (global_label "GND" (shape passive) (at 25.4 109.22 180)
     (effects (font (size 1.27 1.27)) (justify right))
     (uuid e4bd2ec1-cfd7-48e4-9256-8f00611af829)
   )
@@ -166,4 +166,3 @@
     (path "/" (page "1"))
   )
 )
-
