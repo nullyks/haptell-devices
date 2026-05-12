@@ -2,6 +2,8 @@
 
 This firmware drives a 3-5 V DC coin vibration motor through a low-side MOSFET driver. It listens for UDP commands on port `4444` and plays predefined haptic patterns.
 
+For a beginner-friendly explanation of the firmware structure, logic, and C++ syntax, see `CODE_WALKTHROUGH.md`.
+
 ## Setup
 
 1. Install the Arduino IDE.
@@ -29,3 +31,7 @@ This firmware drives a 3-5 V DC coin vibration motor through a low-side MOSFET d
 - `stop`
 
 See `../../docs/command-protocol.md`.
+
+## Code Explanation
+
+- `CODE_WALKTHROUGH.md`: beginner-friendly walkthrough of the sketch structure, command parsing, pattern playback logic, and important C++/Arduino syntax.

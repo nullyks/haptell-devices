@@ -30,6 +30,7 @@ firmware/
     haptell_01_uno_r4_wifi_dc_coin.ino
     secrets.example.h
     README.md
+    CODE_WALKTHROUGH.md
 schematics/
   haptell-01-dc-coin-motor/
     README.md
