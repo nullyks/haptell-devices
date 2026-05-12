@@ -1,945 +1,1561 @@
-(kicad_sch (version 20230121) (generator "codex")
-  (uuid e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b)
-  (paper "A4")
-  (title_block
-    (title "haptell-01 DC Coin Motor Driver")
-    (date "2026-05-12")
-    (rev "0.2")
-    (company "Haptell")
-    (comment 1 "Arduino UNO R4 WiFi low-side MOSFET motor driver")
-  )
-  (lib_symbols
-    (symbol "R"
-    		(pin_numbers
-    			(hide yes)
-    		)
-    		(pin_names
-    			(offset 0)
-    		)
-    		(exclude_from_sim no)
-    		(in_bom yes)
-    		(on_board yes)
-    		(in_pos_files yes)
-    		(duplicate_pin_numbers_are_jumpers no)
-    		(property "Reference" "R"
-    			(at 2.032 0 90)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Value" "R"
-    			(at 0 0 90)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Footprint" ""
-    			(at -1.778 0 90)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Datasheet" ""
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Description" "Resistor"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_keywords" "R res resistor"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_fp_filters" "R_*"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(symbol "R_0_1"
-    			(rectangle
-    				(start -1.016 -2.54)
-    				(end 1.016 2.54)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    		)
-    		(symbol "R_1_1"
-    			(pin passive line
-    				(at 0 3.81 270)
-    				(length 1.27)
-    				(name ""
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "1"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    			(pin passive line
-    				(at 0 -3.81 90)
-    				(length 1.27)
-    				(name ""
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "2"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    		)
-    		(embedded_fonts no)
-    	)
-    (symbol "D_Schottky"
-    		(pin_numbers
-    			(hide yes)
-    		)
-    		(pin_names
-    			(offset 1.016)
-    			(hide yes)
-    		)
-    		(exclude_from_sim no)
-    		(in_bom yes)
-    		(on_board yes)
-    		(in_pos_files yes)
-    		(duplicate_pin_numbers_are_jumpers no)
-    		(property "Reference" "D"
-    			(at 0 2.54 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Value" "D_Schottky"
-    			(at 0 -2.54 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Footprint" ""
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Datasheet" ""
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Description" "Schottky diode"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_keywords" "diode Schottky"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(symbol "D_Schottky_0_1"
-    			(polyline
-    				(pts
-    					(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 1.27 0) (xy -1.27 0)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    		)
-    		(symbol "D_Schottky_1_1"
-    			(pin passive line
-    				(at -3.81 0 0)
-    				(length 2.54)
-    				(name "K"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "1"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    			(pin passive line
-    				(at 3.81 0 180)
-    				(length 2.54)
-    				(name "A"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "2"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    		)
-    		(embedded_fonts no)
-    	)
-    (symbol "Motor_DC"
-    		(pin_names
-    			(offset 0)
-    		)
-    		(exclude_from_sim no)
-    		(in_bom yes)
-    		(on_board yes)
-    		(in_pos_files yes)
-    		(duplicate_pin_numbers_are_jumpers no)
-    		(property "Reference" "M"
-    			(at 2.54 2.54 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    				(justify left)
-    			)
-    		)
-    		(property "Value" "Motor_DC"
-    			(at 2.54 -5.08 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    				(justify left top)
-    			)
-    		)
-    		(property "Footprint" ""
-    			(at 0 -2.286 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Datasheet" ""
-    			(at 0 -2.286 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Description" "DC Motor"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_keywords" "DC Motor"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_fp_filters" "PinHeader*P2.54mm* TerminalBlock*"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(symbol "Motor_DC_0_0"
-    			(polyline
-    				(pts
-    					(xy -1.27 -3.302) (xy -1.27 0.508) (xy 0 -2.032) (xy 1.27 0.508) (xy 1.27 -3.302)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    		)
-    		(symbol "Motor_DC_0_1"
-    			(polyline
-    				(pts
-    					(xy 0 2.032) (xy 0 2.54)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0 1.7272) (xy 0 2.0828)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(circle
-    				(center 0 -1.524)
-    				(radius 3.2512)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0 -4.7752) (xy 0 -5.1816)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0 -7.62) (xy 0 -7.112)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    		)
-    		(symbol "Motor_DC_1_1"
-    			(pin passive line
-    				(at 0 5.08 270)
-    				(length 2.54)
-    				(name "+"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "1"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    			(pin passive line
-    				(at 0 -7.62 90)
-    				(length 2.54)
-    				(name "-"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "2"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    		)
-    		(embedded_fonts no)
-    	)
-    (symbol "Q_NMOS"
-    		(pin_numbers
-    			(hide yes)
-    		)
-    		(pin_names
-    			(offset 0)
-    			(hide yes)
-    		)
-    		(exclude_from_sim no)
-    		(in_bom yes)
-    		(on_board yes)
-    		(in_pos_files yes)
-    		(duplicate_pin_numbers_are_jumpers no)
-    		(property "Reference" "Q"
-    			(at 5.08 1.27 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    				(justify left)
-    			)
-    		)
-    		(property "Value" "Q_NMOS"
-    			(at 5.08 -1.27 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    				(justify left)
-    			)
-    		)
-    		(property "Footprint" ""
-    			(at 5.08 2.54 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Datasheet" ""
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "Description" "N-MOSFET transistor"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(property "ki_keywords" "NMOS N-MOS"
-    			(at 0 0 0)
-    			(show_name no)
-    			(do_not_autoplace no)
-    			(hide yes)
-    			(effects
-    				(font
-    					(size 1.27 1.27)
-    				)
-    			)
-    		)
-    		(symbol "Q_NMOS_0_1"
-    			(polyline
-    				(pts
-    					(xy 0.254 1.905) (xy 0.254 -1.905)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0.254 0) (xy -2.54 0)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0.762 2.286) (xy 0.762 1.27)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0.762 0.508) (xy 0.762 -0.508)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0.762 -1.27) (xy 0.762 -2.286)
-    				)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 0.762 -1.778) (xy 3.302 -1.778) (xy 3.302 1.778) (xy 0.762 1.778)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 1.016 0) (xy 2.032 0.381) (xy 2.032 -0.381) (xy 1.016 0)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type outline)
-    				)
-    			)
-    			(circle
-    				(center 1.651 0)
-    				(radius 2.794)
-    				(stroke
-    					(width 0.254)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 2.54 2.54) (xy 2.54 1.778)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(circle
-    				(center 2.54 1.778)
-    				(radius 0.254)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type outline)
-    				)
-    			)
-    			(circle
-    				(center 2.54 -1.778)
-    				(radius 0.254)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type outline)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 2.54 -2.54) (xy 2.54 0) (xy 0.762 0)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 2.921 0.381) (xy 3.683 0.381)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    			(polyline
-    				(pts
-    					(xy 3.302 0.381) (xy 2.921 -0.254) (xy 3.683 -0.254) (xy 3.302 0.381)
-    				)
-    				(stroke
-    					(width 0)
-    					(type default)
-    				)
-    				(fill
-    					(type none)
-    				)
-    			)
-    		)
-    		(symbol "Q_NMOS_1_1"
-    			(pin passive line
-    				(at 2.54 5.08 270)
-    				(length 2.54)
-    				(name "D"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "D"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    			(pin input line
-    				(at -5.08 0 0)
-    				(length 2.54)
-    				(name "G"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "G"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    			(pin passive line
-    				(at 2.54 -5.08 90)
-    				(length 2.54)
-    				(name "S"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    				(number "S"
-    					(effects
-    						(font
-    							(size 1.27 1.27)
-    						)
-    					)
-    				)
-    			)
-    		)
-    		(embedded_fonts no)
-    	)
-  )
-  (text "haptell-01 DC coin vibration motor driver" (at 25.4 25.4 0)
-    (effects (font (size 3.048 3.048) (bold yes)) (justify left bottom))
-    (uuid 2f77b516-c8ca-448a-b745-d6271984d247)
-  )
-  (text "D9 PWM drives only the MOSFET gate. Motor current flows through Q1." (at 25.4 31.75 0)
-    (effects (font (size 1.778 1.778)) (justify left bottom))
-    (uuid a8567efe-569e-4280-b9a3-e0d8c05bca1d)
-  )
-  (text "D1 flyback diode: cathode / marked end to +5V, anode to drain node." (at 25.4 36.83 0)
-    (effects (font (size 1.778 1.778)) (justify left bottom))
-    (uuid 3675cb63-4a5d-4f52-97e0-f2c0e26d8c81)
-  )
-  (text "Arduino UNO R4 WiFi pins" (at 25.4 43.18 0)
-    (effects (font (size 1.778 1.778) (bold yes)) (justify left bottom))
-    (uuid 10bd2d13-70d0-43bd-b6c0-28454fc628c4)
-  )
-  (text "Motor driver stage" (at 101.6 43.18 0)
-    (effects (font (size 1.778 1.778) (bold yes)) (justify left bottom))
-    (uuid 40762625-dafe-49a2-a5df-9c423e76bf48)
-  )
-  (global_label "D9_PWM" (shape input) (at 25.4 88.9 180)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid c0afbace-d5f4-45c4-9165-67805f0adaf4)
-  )
-  (global_label "+5V" (shape passive) (at 25.4 55.88 180)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid 0b2728e3-0aa1-4324-957d-f7cbf3c791dc)
-  )
-  (global_label "GND" (shape passive) (at 25.4 127 180)
-    (effects (font (size 1.27 1.27)) (justify right))
-    (uuid 639bc142-4a6d-476a-8bb7-e25896a63556)
-  )
-  (junction (at 81.28 88.9) (diameter 0) (color 0 0 0 0) (uuid 8ff370ff-f414-4cad-bb97-72c59271d1c7))
-  (junction (at 81.28 127) (diameter 0) (color 0 0 0 0) (uuid b6ce54c8-424e-4c2c-9c5f-31c459acb9e7))
-  (junction (at 111.76 55.88) (diameter 0) (color 0 0 0 0) (uuid 18da3bdf-f8af-4a16-939e-d161b8536e1b))
-  (junction (at 139.7 78.74) (diameter 0) (color 0 0 0 0) (uuid acff899f-964c-4005-a87c-e858479c965f))
-  (junction (at 142.24 127) (diameter 0) (color 0 0 0 0) (uuid f8e2cb79-c3d5-4b6d-9f0a-ead8d796f880))
-  (wire (pts (xy 25.4 88.9) (xy 48.26 88.9)) (stroke (width 0) (type default)) (uuid 244d14bc-0f03-4d0c-85e9-79f69e18a819))
-  (wire (pts (xy 58.42 88.9) (xy 81.28 88.9)) (stroke (width 0) (type default)) (uuid 8aa2ba1c-bd19-43f7-bc11-f23e62e2102c))
-  (wire (pts (xy 81.28 88.9) (xy 99.06 88.9)) (stroke (width 0) (type default)) (uuid d3e9f431-551f-4dd2-9d05-45294fd95ba9))
-  (wire (pts (xy 99.06 88.9) (xy 99.06 109.22)) (stroke (width 0) (type default)) (uuid 61275a69-c3d1-4c54-b833-dde1ff8dfcde))
-  (wire (pts (xy 99.06 109.22) (xy 134.62 109.22)) (stroke (width 0) (type default)) (uuid f1b48691-53c8-4abe-9f64-c8a31336c205))
-  (wire (pts (xy 81.28 88.9) (xy 81.28 101.6)) (stroke (width 0) (type default)) (uuid ebba436b-419f-4def-8ba2-684a8b7ab2db))
-  (wire (pts (xy 81.28 109.22) (xy 81.28 127)) (stroke (width 0) (type default)) (uuid 955492e1-4c45-465f-b44f-393485cfc47c))
-  (wire (pts (xy 25.4 55.88) (xy 111.76 55.88)) (stroke (width 0) (type default)) (uuid 5eb8af91-3213-4f08-a3f6-e43a09c15174))
-  (wire (pts (xy 111.76 55.88) (xy 124.46 55.88)) (stroke (width 0) (type default)) (uuid cbc7e947-3b4c-41aa-a6ca-5e6dec1f65a9))
-  (wire (pts (xy 111.76 55.88) (xy 111.76 68.58)) (stroke (width 0) (type default)) (uuid 6aa414e8-9f6c-4d51-9f83-bbd73b2d8539))
-  (wire (pts (xy 111.76 68.58) (xy 124.46 68.58)) (stroke (width 0) (type default)) (uuid 2fe4a9d1-abad-4b18-b558-7411549b11c4))
-  (wire (pts (xy 124.46 78.74) (xy 139.7 78.74)) (stroke (width 0) (type default)) (uuid f06a1e24-1096-48fe-8fea-36ad0da02a87))
-  (wire (pts (xy 139.7 78.74) (xy 142.24 78.74)) (stroke (width 0) (type default)) (uuid 331589a4-10a3-45d5-9514-0834acc297d7))
-  (wire (pts (xy 142.24 78.74) (xy 142.24 104.14)) (stroke (width 0) (type default)) (uuid d1316db0-33c7-420d-a84c-cde417670c23))
-  (wire (pts (xy 142.24 114.3) (xy 142.24 127)) (stroke (width 0) (type default)) (uuid db5f781f-6c29-4cef-b740-b2ee6278736f))
-  (wire (pts (xy 142.24 127) (xy 25.4 127)) (stroke (width 0) (type default)) (uuid c47a3f48-3e4e-40c2-a828-1e62081c402d))
-  (text "gate pulldown" (at 64.77 112.395 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid e1848974-c68e-4f79-bdae-fe6f9182eccc)
-  )
-  (text "drain node: motor - / diode anode / Q1 drain" (at 142.24 80.01 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 3308fddb-1225-4d9b-99f1-769a59cdb403)
-  )
-  (text "common ground" (at 142.24 127 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 7091fcb4-f0f1-41b9-bb2b-021ec2f47438)
-  )
-  (symbol (lib_id "R") (at 53.34 88.9 90) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid d38b2962-d3ad-40b4-98bf-0fae6ac2e67a)
-    (property "Reference" "R1" (at 53.34 83.82 90) (effects (font (size 1.27 1.27))))
-    (property "Value" "220R" (at 53.34 93.98 90) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "" (at 53.34 88.9 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Datasheet" "" (at 53.34 88.9 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "1" (uuid caf38fbe-10b2-477f-8cc5-871094057896))
-    (pin "2" (uuid 5522a8ac-313c-4a1d-bf07-93dde724f351))
-  )
-  (symbol (lib_id "R") (at 81.28 105.41 0) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid b9d2c45e-977e-40a5-a093-ef3b8a8fbe8d)
-    (property "Reference" "R2" (at 86.36 102.87 0) (effects (font (size 1.27 1.27))))
-    (property "Value" "10k" (at 86.36 107.95 0) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "" (at 81.28 105.41 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Datasheet" "" (at 81.28 105.41 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "1" (uuid d9ffe590-4106-4330-8370-991e33c4e048))
-    (pin "2" (uuid bff59de1-641b-4405-9b0b-36ac8e8970a8))
-  )
-  (symbol (lib_id "Motor_DC") (at 124.46 63.5 0) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid 43d84f61-68c4-4c70-a0a9-66e4fd248aa1)
-    (property "Reference" "M1" (at 128.27 55.88 0) (effects (font (size 1.27 1.27))))
-    (property "Value" "3-5V DC coin motor" (at 128.27 71.12 0) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "" (at 124.46 63.5 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Datasheet" "" (at 124.46 63.5 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "1" (uuid 2b496473-a8df-422d-a404-7cc537ab034e))
-    (pin "2" (uuid 5d5d381e-3c38-4e53-a0db-92b57254d340))
-  )
-  (symbol (lib_id "D_Schottky") (at 111.76 73.66 90) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid 1ce6b947-3e1e-4004-9696-7865cb430741)
-    (property "Reference" "D1" (at 106.68 73.66 90) (effects (font (size 1.27 1.27))))
-    (property "Value" "1N5819" (at 116.84 73.66 90) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "" (at 111.76 73.66 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Datasheet" "" (at 111.76 73.66 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "1" (uuid 6634a923-5536-4446-9c9e-86a4a5b1894b))
-    (pin "2" (uuid c0535e71-1755-49df-8d94-07e739e042f9))
-  )
-  (symbol (lib_id "Q_NMOS") (at 139.7 109.22 0) (unit 1)
-    (in_bom yes) (on_board yes)
-    (uuid 35019320-9bc3-4bb6-8bed-a6792fa64969)
-    (property "Reference" "Q1" (at 146.05 105.41 0) (effects (font (size 1.27 1.27))))
-    (property "Value" "IRF3205" (at 146.05 110.49 0) (effects (font (size 1.27 1.27))))
-    (property "Footprint" "Package_TO_SOT_THT:TO-220-3_Vertical" (at 144.78 111.76 0) (effects (font (size 1.27 1.27)) hide))
-    (property "Datasheet" "http://www.irf.com/product-info/datasheets/data/irf3205.pdf" (at 139.7 109.22 0) (effects (font (size 1.27 1.27)) hide))
-    (pin "G" (uuid b7c00f84-e265-4c29-ab6c-134393cedd2f))
-    (pin "D" (uuid bc506ae6-3c7e-4cbd-8bce-93145637e18a))
-    (pin "S" (uuid 2611a159-d4dd-4072-9e68-b02e51d93f8e))
-  )
-  (sheet_instances
-    (path "/" (page "1"))
-  )
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b")
+	(paper "A4")
+	(title_block
+		(title "haptell-01 DC Coin Motor Driver")
+		(date "2026-05-12")
+		(rev "0.2")
+		(company "Haptell")
+		(comment 1 "Arduino UNO R4 WiFi low-side MOSFET motor driver")
+	)
+	(lib_symbols
+		(symbol "D_Schottky"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "D"
+				(at 0 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "D_Schottky"
+				(at 0 -2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Schottky diode"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "diode Schottky"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "TO-???* *_Diode_* *SingleDiode* D_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "D_Schottky_0_1"
+				(polyline
+					(pts
+						(xy -1.905 0.635) (xy -1.905 1.27) (xy -1.27 1.27) (xy -1.27 -1.27) (xy -0.635 -1.27) (xy -0.635 -0.635)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 1.27) (xy 1.27 -1.27) (xy -1.27 0) (xy 1.27 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 0) (xy -1.27 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "D_Schottky_1_1"
+				(pin passive line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "K"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 3.81 0 180)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Motor_DC"
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "M"
+				(at 2.54 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Motor_DC"
+				(at 2.54 -5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left top)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 -2.286 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 -2.286 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "DC Motor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "DC Motor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "PinHeader*P2.54mm* TerminalBlock*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Motor_DC_0_0"
+				(polyline
+					(pts
+						(xy -1.27 -3.302) (xy -1.27 0.508) (xy 0 -2.032) (xy 1.27 0.508) (xy 1.27 -3.302)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Motor_DC_0_1"
+				(polyline
+					(pts
+						(xy 0 2.032) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.7272) (xy 0 2.0828)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 -1.524)
+					(radius 3.2512)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -4.7752) (xy 0 -5.1816)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -7.62) (xy 0 -7.112)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Motor_DC_1_1"
+				(pin passive line
+					(at 0 5.08 270)
+					(length 2.54)
+					(name "+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -7.62 90)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Q_NMOS"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "Q"
+				(at 5.08 1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Q_NMOS"
+				(at 5.08 -1.27 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 5.08 2.54 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "N-MOSFET transistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "NMOS N-MOS"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "Q_NMOS_0_1"
+				(polyline
+					(pts
+						(xy 0.254 1.905) (xy 0.254 -1.905)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.254 0) (xy -2.54 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 2.286) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 0.508) (xy 0.762 -0.508)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.27) (xy 0.762 -2.286)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 -1.778) (xy 3.302 -1.778) (xy 3.302 1.778) (xy 0.762 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.016 0) (xy 2.032 0.381) (xy 2.032 -0.381) (xy 1.016 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.651 0)
+					(radius 2.794)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 2.54) (xy 2.54 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.54 1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 2.54 -1.778)
+					(radius 0.254)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -2.54) (xy 2.54 0) (xy 0.762 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.921 0.381) (xy 3.683 0.381)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.302 0.381) (xy 2.921 -0.254) (xy 3.683 -0.254) (xy 3.302 0.381)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Q_NMOS_1_1"
+				(pin passive line
+					(at 2.54 5.08 270)
+					(length 2.54)
+					(name "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "D"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "G"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "G"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 -5.08 90)
+					(length 2.54)
+					(name "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "S"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "R"
+				(at 2.032 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "R"
+				(at 0 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -1.778 0 90)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Resistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "R res resistor"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "R_*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "R_0_1"
+				(rectangle
+					(start -1.016 -2.54)
+					(end 1.016 2.54)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "R_1_1"
+				(pin passive line
+					(at 0 3.81 270)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -3.81 90)
+					(length 1.27)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(text "Arduino UNO R4 WiFi pins"
+		(exclude_from_sim no)
+		(at 12.446 46.99 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "10bd2d13-70d0-43bd-b6c0-28454fc628c4")
+	)
+	(text "haptell-01 DC coin vibration motor driver"
+		(exclude_from_sim no)
+		(at 25.4 25.4 0)
+		(effects
+			(font
+				(size 3.048 3.048)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "2f77b516-c8ca-448a-b745-d6271984d247")
+	)
+	(text "D1 flyback diode: cathode / marked end to +5V, anode to drain node."
+		(exclude_from_sim no)
+		(at 25.4 36.83 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+			)
+			(justify left bottom)
+		)
+		(uuid "3675cb63-4a5d-4f52-97e0-f2c0e26d8c81")
+	)
+	(text "Motor driver stage"
+		(exclude_from_sim no)
+		(at 113.792 46.736 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "40762625-dafe-49a2-a5df-9c423e76bf48")
+	)
+	(text "common ground"
+		(exclude_from_sim no)
+		(at 72.898 130.048 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7091fcb4-f0f1-41b9-bb2b-021ec2f47438")
+	)
+	(text "D9 PWM drives only the MOSFET gate. Motor current flows through Q1."
+		(exclude_from_sim no)
+		(at 25.4 31.75 0)
+		(effects
+			(font
+				(size 1.778 1.778)
+			)
+			(justify left bottom)
+		)
+		(uuid "a8567efe-569e-4280-b9a3-e0d8c05bca1d")
+	)
+	(text "gate pulldown"
+		(exclude_from_sim no)
+		(at 66.04 105.918 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e1848974-c68e-4f79-bdae-fe6f9182eccc")
+	)
+	(junction
+		(at 127 55.88)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "70ba132e-194e-49d6-b1b1-826c3c6b15df")
+	)
+	(junction
+		(at 127 68.58)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "84b69875-641a-4e56-a798-b55d603293bb")
+	)
+	(junction
+		(at 81.28 88.9)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "8ff370ff-f414-4cad-bb97-72c59271d1c7")
+	)
+	(junction
+		(at 81.28 127)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b6ce54c8-424e-4c2c-9c5f-31c459acb9e7")
+	)
+	(junction
+		(at 116.84 55.88)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "ce55b737-db5f-45db-aa3f-6a863f9c8382")
+	)
+	(wire
+		(pts
+			(xy 57.15 88.9) (xy 81.28 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d560a5c-1f0d-4765-a844-882a0eb6ae15")
+	)
+	(wire
+		(pts
+			(xy 25.4 88.9) (xy 49.53 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "244d14bc-0f03-4d0c-85e9-79f69e18a819")
+	)
+	(wire
+		(pts
+			(xy 116.84 68.58) (xy 127 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2fe4a9d1-abad-4b18-b558-7411549b11c4")
+	)
+	(wire
+		(pts
+			(xy 25.4 55.88) (xy 116.84 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5eb8af91-3213-4f08-a3f6-e43a09c15174")
+	)
+	(wire
+		(pts
+			(xy 116.84 55.88) (xy 116.84 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6aa414e8-9f6c-4d51-9f83-bbd73b2d8539")
+	)
+	(wire
+		(pts
+			(xy 81.28 109.22) (xy 81.28 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "955492e1-4c45-465f-b44f-393485cfc47c")
+	)
+	(wire
+		(pts
+			(xy 135.89 55.88) (xy 135.89 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ab56c27c-a736-480e-be69-bc847f93c872")
+	)
+	(wire
+		(pts
+			(xy 135.89 55.88) (xy 127 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b959a079-ee1d-412d-b072-cc47e70d75e5")
+	)
+	(wire
+		(pts
+			(xy 135.89 68.58) (xy 127 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c512b609-b5e4-4376-9e1e-07b8ce66fd09")
+	)
+	(wire
+		(pts
+			(xy 127 68.58) (xy 127 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d1316db0-33c7-420d-a84c-cde417670c23")
+	)
+	(wire
+		(pts
+			(xy 81.28 88.9) (xy 119.38 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d3e9f431-551f-4dd2-9d05-45294fd95ba9")
+	)
+	(wire
+		(pts
+			(xy 116.84 55.88) (xy 127 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d71846a0-6275-4cb6-8660-26e97a4cbab3")
+	)
+	(wire
+		(pts
+			(xy 127 93.98) (xy 127 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "db5f781f-6c29-4cef-b740-b2ee6278736f")
+	)
+	(wire
+		(pts
+			(xy 81.28 88.9) (xy 81.28 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ebba436b-419f-4def-8ba2-684a8b7ab2db")
+	)
+	(wire
+		(pts
+			(xy 135.89 68.58) (xy 135.89 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee7240fc-e870-4aef-9616-0be27c7130d1")
+	)
+	(wire
+		(pts
+			(xy 127 127) (xy 25.4 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "eed720ad-a9b3-4bc8-b33f-29da5b04e6fe")
+	)
+	(global_label "+5V"
+		(shape passive)
+		(at 25.4 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "0b2728e3-0aa1-4324-957d-f7cbf3c791dc")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 25.4 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "GND"
+		(shape passive)
+		(at 25.4 127 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "639bc142-4a6d-476a-8bb7-e25896a63556")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 25.4 127 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(global_label "D9_PWM"
+		(shape input)
+		(at 25.4 88.9 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "c0afbace-d5f4-45c4-9165-67805f0adaf4")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 25.4 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "D_Schottky")
+		(at 135.89 62.23 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "1ce6b947-3e1e-4004-9696-7865cb430741")
+		(property "Reference" "D1"
+			(at 140.97 62.23 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "1N5819"
+			(at 146.812 62.23 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 135.89 62.23 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 135.89 62.23 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 135.89 62.23 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "6634a923-5536-4446-9c9e-86a4a5b1894b")
+		)
+		(pin "2"
+			(uuid "c0535e71-1755-49df-8d94-07e739e042f9")
+		)
+		(instances
+			(project "haptell-01-dc-coin-motor"
+				(path "/e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b"
+					(reference "D1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Q_NMOS")
+		(at 124.46 88.9 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "35019320-9bc3-4bb6-8bed-a6792fa64969")
+		(property "Reference" "Q1"
+			(at 133.604 88.646 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "IRF3205"
+			(at 139.954 88.9 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_THT:TO-220-3_Vertical"
+			(at 129.54 91.44 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" "http://www.irf.com/product-info/datasheets/data/irf3205.pdf"
+			(at 124.46 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 124.46 88.9 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "G"
+			(uuid "b7c00f84-e265-4c29-ab6c-134393cedd2f")
+		)
+		(pin "D"
+			(uuid "bc506ae6-3c7e-4cbd-8bce-93145637e18a")
+		)
+		(pin "S"
+			(uuid "2611a159-d4dd-4072-9e68-b02e51d93f8e")
+		)
+		(instances
+			(project "haptell-01-dc-coin-motor"
+				(path "/e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b"
+					(reference "Q1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Motor_DC")
+		(at 127 60.96 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "43d84f61-68c4-4c70-a0a9-66e4fd248aa1")
+		(property "Reference" "M1"
+			(at 127 53.086 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "3-5V DC coin motor"
+			(at 127 50.546 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 127 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 127 60.96 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 127 60.96 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "2b496473-a8df-422d-a404-7cc537ab034e")
+		)
+		(pin "2"
+			(uuid "5d5d381e-3c38-4e53-a0db-92b57254d340")
+		)
+		(instances
+			(project "haptell-01-dc-coin-motor"
+				(path "/e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b"
+					(reference "M1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "R")
+		(at 81.28 105.41 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "b9d2c45e-977e-40a5-a093-ef3b8a8fbe8d")
+		(property "Reference" "R2"
+			(at 86.36 102.87 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "10k"
+			(at 86.36 107.95 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 81.28 105.41 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 81.28 105.41 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 81.28 105.41 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "d9ffe590-4106-4330-8370-991e33c4e048")
+		)
+		(pin "2"
+			(uuid "bff59de1-641b-4405-9b0b-36ac8e8970a8")
+		)
+		(instances
+			(project "haptell-01-dc-coin-motor"
+				(path "/e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b"
+					(reference "R2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "R")
+		(at 53.34 88.9 90)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "d38b2962-d3ad-40b4-98bf-0fae6ac2e67a")
+		(property "Reference" "R1"
+			(at 53.34 83.82 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "220R"
+			(at 53.34 93.98 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 53.34 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 53.34 88.9 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 53.34 88.9 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "caf38fbe-10b2-477f-8cc5-871094057896")
+		)
+		(pin "2"
+			(uuid "5522a8ac-313c-4a1d-bf07-93dde724f351")
+		)
+		(instances
+			(project "haptell-01-dc-coin-motor"
+				(path "/e9fd9e02-8cad-468f-9ebd-72c9fbe04f6b"
+					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
 )
-
-
