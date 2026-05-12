@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="680" viewBox="0 0 1100 680" role="img" aria-labelledby="title desc">
+  <title id="title">haptell-01 DC coin vibration motor driver circuit</title>
+  <desc id="desc">Arduino UNO R4 WiFi PWM pin drives an IRF3205 MOSFET through a 220 ohm gate resistor. A 10k pulldown holds the gate low. The motor is connected to 5V and switched on the low side. A 1N5819 diode is placed across the motor.</desc>
+  <defs>
+    <style>
+      .box { fill: #f7f9fb; stroke: #25313f; stroke-width: 2; rx: 10; }
+      .part { fill: #fffaf1; stroke: #25313f; stroke-width: 2; rx: 8; }
+      .wire { fill: none; stroke: #25313f; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+      .thin { fill: none; stroke: #25313f; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+      .label { font: 18px Arial, sans-serif; fill: #142033; }
+      .small { font: 15px Arial, sans-serif; fill: #142033; }
+      .pin { fill: #25313f; }
+      .gnd { stroke: #25313f; stroke-width: 3; }
+    </style>
+  </defs>
+
+  <rect x="52" y="72" width="260" height="430" class="box"/>
+  <text x="82" y="112" class="label">Arduino UNO R4 WiFi</text>
+  <text x="82" y="164" class="small">D9 PWM</text>
+  <text x="82" y="248" class="small">5V</text>
+  <text x="82" y="430" class="small">GND</text>
+  <circle cx="282" cy="158" r="6" class="pin"/>
+  <circle cx="282" cy="242" r="6" class="pin"/>
+  <circle cx="282" cy="424" r="6" class="pin"/>
+
+  <line x1="282" y1="158" x2="385" y2="158" class="wire"/>
+  <rect x="385" y="133" width="110" height="50" class="part"/>
+  <text x="412" y="164" class="small">R1 220R</text>
+  <line x1="495" y1="158" x2="650" y2="158" class="wire"/>
+  <text x="520" y="140" class="small">gate</text>
+
+  <rect x="610" y="210" width="110" height="50" class="part"/>
+  <text x="632" y="241" class="small">R2 10k</text>
+  <line x1="650" y1="158" x2="650" y2="210" class="thin"/>
+  <line x1="650" y1="260" x2="650" y2="424" class="thin"/>
+  <line x1="282" y1="424" x2="820" y2="424" class="wire"/>
+
+  <rect x="720" y="308" width="150" height="120" class="part"/>
+  <text x="751" y="350" class="label">Q1</text>
+  <text x="738" y="378" class="small">IRF3205</text>
+  <text x="738" y="401" class="small">N-MOSFET</text>
+  <line x1="650" y1="158" x2="720" y2="342" class="thin"/>
+  <text x="682" y="302" class="small">gate</text>
+  <line x1="795" y1="428" x2="795" y2="472" class="wire"/>
+  <text x="812" y="456" class="small">source</text>
+  <line x1="795" y1="308" x2="795" y2="264" class="wire"/>
+  <text x="812" y="286" class="small">drain</text>
+  <line x1="760" y1="472" x2="830" y2="472" class="gnd"/>
+  <line x1="772" y1="488" x2="818" y2="488" class="gnd"/>
+  <line x1="786" y1="504" x2="804" y2="504" class="gnd"/>
+
+  <line x1="282" y1="242" x2="566" y2="242" class="wire"/>
+  <rect x="566" y="194" width="155" height="96" class="part"/>
+  <text x="591" y="233" class="label">M1 motor</text>
+  <text x="588" y="260" class="small">3-5 V, 67 mA</text>
+  <line x1="721" y1="242" x2="795" y2="242" class="wire"/>
+  <line x1="795" y1="242" x2="795" y2="264" class="wire"/>
+
+  <path d="M566 196 L508 196 L508 288 L566 288" class="thin"/>
+  <path d="M721 196 L776 196 L776 288 L721 288" class="thin"/>
+  <polygon points="617,196 644,242 617,288" fill="#eaf3ff" stroke="#25313f" stroke-width="2"/>
+  <line x1="654" y1="200" x2="654" y2="284" class="thin"/>
+  <text x="579" y="183" class="small">D1 1N5819 cathode to 5V</text>
+  <text x="650" y="314" class="small">anode to drain</text>
+
+  <text x="52" y="562" class="small">Battery for first bench test: 9 V to Arduino barrel jack / VIN. Use LiPo + 5 V booster for portable artifacts.</text>
+  <text x="52" y="594" class="small">Do not connect the motor directly to an Arduino GPIO pin.</text>
+</svg>
+

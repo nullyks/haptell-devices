@@ -1,0 +1,8 @@
+secrets.h
+*.tmp
+*.bak
+*.autosave
+*-backups/
+.DS_Store
+Thumbs.db
+
