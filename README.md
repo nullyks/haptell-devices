@@ -40,6 +40,10 @@ schematics/
 docs/
   command-protocol.md
   hardware-notes.md
+tools/
+  udp_sender/
+    send_haptell_command.py
+    README.md
 ```
 
 ## Quick Start
@@ -58,6 +62,12 @@ haptell-01 pulse intensity=180 duration=800
 ```
 
 See `docs/command-protocol.md` for the supported commands.
+
+You can also use the Python sender example in `tools/udp_sender/`:
+
+```powershell
+python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180 duration=800
+```
 
 ## Hardware Warning
 

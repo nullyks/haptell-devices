@@ -119,6 +119,24 @@ all stop
 
 The first firmware was successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi`.
 
+## Command Sender Tool
+
+The repository includes a small Python sender:
+
+```text
+tools/udp_sender/send_haptell_command.py
+```
+
+It sends one UDP text command to a device IP address on port `4444`.
+
+Example:
+
+```powershell
+python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180 duration=800
+```
+
+It has no external Python dependencies.
+
 ## Schematic Context
 
 Current schematic folder:
@@ -203,4 +221,3 @@ Motor positive -> 5V
 - If adding a sender/controller, document the exact way to test commands from Windows.
 - If adding new hardware variants, keep each board/motor combination in its own firmware and schematic folder.
 - When committing, verify that `secrets.h` is ignored and not staged.
-

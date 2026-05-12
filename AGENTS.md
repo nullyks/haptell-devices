@@ -19,6 +19,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `docs/command-protocol.md`: UDP command format.
 - `docs/hardware-notes.md`: hardware decisions and cautions.
 - `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs, SVG diagram, and KiCad draft.
+- `tools/udp_sender/`: Python example for sending UDP commands from a computer.
 
 ## Development Rules
 
@@ -47,4 +48,3 @@ If working on another computer, adapt the path to `arduino-cli`.
 - Public repository: https://github.com/nullyks/haptell-devices
 - Default branch: `main`
 - Initial public repo was created from this local folder: `C:/Users/Tanel Toova/Documents/haptell-devices`
-

@@ -72,3 +72,18 @@ all stop
 - A new valid pattern command interrupts the currently playing pattern.
 - UDP does not guarantee delivery. This is acceptable for the first closed-subnet prototype, but later multi-device versions may add sequence numbers, acknowledgements, or a higher-level protocol.
 
+## Python Sender Example
+
+A small Python command-line sender is available at:
+
+```text
+tools/udp_sender/send_haptell_command.py
+```
+
+Example:
+
+```powershell
+python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180 duration=800
+```
+
+See `tools/udp_sender/README.md` for usage notes and more examples.

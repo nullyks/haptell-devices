@@ -2,7 +2,8 @@ secrets.h
 *.tmp
 *.bak
 *.autosave
+__pycache__/
+*.py[cod]
 *-backups/
 .DS_Store
 Thumbs.db
-
