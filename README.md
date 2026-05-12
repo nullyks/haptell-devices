@@ -4,6 +4,15 @@ Firmware and hardware notes for wireless handheld haptic artifacts.
 
 The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. Commands are sent over UDP on a closed WiFi subnet. Haptic patterns are defined in the device firmware and triggered with simple text commands.
 
+## AI Handoff
+
+This repo includes project memory for continuing work with Codex or another AI coding assistant:
+
+- `AGENTS.md`: repository-specific working instructions
+- `CODEX_HANDOFF.md`: project context, hardware decisions, and recommended next steps
+
+When continuing from another computer, clone the repo and ask Codex to read both files before making larger changes.
+
 ## Current Prototype
 
 - Device ID: `haptell-01`
