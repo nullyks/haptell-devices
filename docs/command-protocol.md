@@ -11,6 +11,7 @@ The initial command format is intentionally simple:
 Targets:
 
 - `haptell-01` addresses the first prototype.
+- `haptell-02` addresses the DRV2605L + LRA prototype.
 - `all` broadcasts a command to every Haptell device that receives the packet.
 
 ## Commands
@@ -21,6 +22,7 @@ Plays a single vibration pulse.
 
 ```text
 haptell-01 pulse intensity=180 duration=800
+haptell-02 pulse intensity=180 duration=800
 ```
 
 Parameters:
@@ -34,6 +36,7 @@ Plays two short taps.
 
 ```text
 haptell-01 double intensity=220 gap=120
+haptell-02 double intensity=220 gap=120
 ```
 
 Parameters:
@@ -47,6 +50,7 @@ Ramps motor intensity from one PWM value to another, then fades out.
 
 ```text
 haptell-01 ramp from=60 to=255 duration=1200
+haptell-02 ramp from=60 to=255 duration=1200
 ```
 
 Parameters:
@@ -61,8 +65,19 @@ Stops playback immediately.
 
 ```text
 haptell-01 stop
+haptell-02 stop
 all stop
 ```
+
+For `haptell-02`, the DRV2605L firmware maps these generic pattern names to DRV2605L LRA effect playback. The `intensity`, `from`, `to`, and `duration` values are kept in the command interface for compatibility and later tuning, but the exact feel depends on the selected DRV2605L effect library, actuator calibration, and module behavior.
+
+The simple blocking haptell-02 firmware example also supports:
+
+```text
+haptell-02 custom
+```
+
+This command demonstrates DRV2605L realtime playback mode by manually sending drive values instead of using a built-in effect number.
 
 ## Notes
 

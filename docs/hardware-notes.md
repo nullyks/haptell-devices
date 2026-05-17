@@ -42,3 +42,40 @@ The Vybronics LRA parts should not be treated like the DC coin motor.
 
 These parts should be driven with a suitable haptic driver IC such as DRV2605L/compatible modules, a suitable audio amplifier approach, or another circuit that can generate the required AC drive waveform.
 
+## Second Prototype
+
+The second device uses an Arduino UNO R4 WiFi, a Mavaol DRV2605L haptic motor controller module, a Vybronics VG1040003D LRA actuator, and a portable LiPo power path.
+
+Core parts:
+
+- Arduino UNO R4 WiFi
+- Mavaol DRV2605L haptic motor controller module
+- Vybronics VG1040003D LRA, 10 x 4 mm, 2.5 Vrms, 170 Hz
+- Seeed Studio LiPo Rider Plus charger/booster, 5 V output up to 2.4 A
+- 3.7 V 1S protected LiPo battery
+
+Power direction:
+
+```text
+1S protected LiPo battery -> LiPo Rider Plus -> regulated 5 V rail
+5 V rail -> Arduino UNO R4 WiFi USB-C 5 V power input
+5 V rail -> DRV2605L module VIN/VCC
+Common GND -> Arduino GND and DRV2605L GND
+```
+
+Control wiring:
+
+```text
+Arduino SDA -> DRV2605L SDA
+Arduino SCL -> DRV2605L SCL
+LiPo Rider Plus 5 V output -> DRV2605L VIN/VCC
+LiPo Rider Plus 5 V output -> Arduino UNO R4 WiFi USB-C 5 V power input
+Arduino GND -> DRV2605L GND
+DRV2605L OUT+ -> VG1040003D lead 1
+DRV2605L OUT- -> VG1040003D lead 2
+```
+
+The DRV2605L drives the LRA as a differential actuator output. Do not add the flyback diode used by the DC motor prototype across the LRA output.
+
+Do not treat the Arduino UNO R4 WiFi `5V` header pin as the normal portable power input in this prototype. Feed the board from the LiPo Rider Plus 5 V output through the Arduino USB-C power input. The `VIN` pin is intended for a higher external input voltage, not the regulated 5 V rail.
+

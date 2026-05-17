@@ -1,0 +1,84 @@
+# haptell-02 Simple Blocking Code Walkthrough
+
+This sketch is a deliberately simple version of the haptell-02 firmware. It uses the same hardware and UDP command format as the main firmware, but it plays each effect with blocking `delay()` calls so the control flow is easy to follow.
+
+## Included Libraries
+
+```cpp
+#include <Wire.h>
+#include <WiFiS3.h>
+#include <WiFiUdp.h>
+#include <Adafruit_DRV2605.h>
+#include "secrets.h"
+```
+
+- `Wire.h` starts I2C communication between the Arduino and DRV2605L.
+- `WiFiS3.h` connects the UNO R4 WiFi to the local network.
+- `WiFiUdp.h` receives text commands over UDP.
+- `Adafruit_DRV2605.h` controls the DRV2605L haptic driver.
+- `secrets.h` stores local WiFi credentials and is not committed.
+
+## Setup Flow
+
+`setup()` does four things:
+
+1. Starts Serial logging.
+2. Connects to WiFi with `connectToWiFi()`.
+3. Starts UDP listening on port `4444`.
+4. Initializes the DRV2605L in LRA mode.
+
+The WiFi helper waits until the board is connected, then waits another 3 seconds before printing the IP address. This avoids the early `0.0.0.0` IP readout seen during testing.
+
+## Command Loop
+
+`loop()` checks for one UDP packet. If a packet exists, it reads the text into `packetBuffer`, trims it, and passes it to `handleCommand()`.
+
+The command format is:
+
+```text
+haptell-02 action
+```
+
+The target can also be `all`, so `all stop` works across devices.
+
+## Built-In Effect Examples
+
+These commands use existing DRV2605L effect numbers:
+
+- `pulse`
+- `double`
+- `ramp`
+
+Each effect is played with:
+
+```cpp
+drv.setWaveform(0, effect);
+drv.setWaveform(1, 0);
+drv.go();
+delay(waitMs);
+```
+
+The zero in waveform slot 1 marks the end of the effect sequence.
+
+## Custom Effect Example
+
+The `custom` command does not use DRV2605L library effect numbers. It switches the driver into realtime playback mode:
+
+```cpp
+drv.setMode(DRV2605_MODE_REALTIME);
+```
+
+Then it manually sends drive values with `setRealtimeValue()`. The example ramps up, holds briefly, and ramps down:
+
+```cpp
+for (uint8_t value = 0; value < 180; value += 10) {
+  drv.setRealtimeValue(value);
+  delay(15);
+}
+```
+
+At the end, the sketch sets the realtime value back to zero and returns to internal trigger mode so the built-in effects still work.
+
+## Blocking Behavior
+
+While `delay()` is running, the Arduino does not read new UDP packets. That is acceptable for this example because the goal is clarity. The main haptell-02 firmware remains the better starting point when the device needs to stay responsive during playback.

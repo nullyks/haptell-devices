@@ -59,6 +59,8 @@ void connectToWiFi() {
     Serial.print(".");
   }
 
+  delay(3000);
+
   Serial.println();
   Serial.print("Connected. IP address: ");
   Serial.println(WiFi.localIP());

@@ -19,6 +19,7 @@ Repository: https://github.com/nullyks/haptell-devices
 - Use `secrets.h` locally and commit only `secrets.example.h`.
 - Start with Arduino UNO R4 WiFi.
 - First device name: `haptell-01`.
+- Second device name: `haptell-02`.
 - Use UDP for the first closed-subnet prototype.
 - UDP port: `4444`.
 - Haptic patterns are predefined in firmware at this stage.
@@ -66,6 +67,21 @@ Important: LRA motors should not be driven like the DC coin motor. Use a suitabl
 - DRV2605L haptic motor controller I2C vibration feedback module, analog/audio trigger, 3 V / 5 V input
 - PAM8403 2 x 3 W class-D amplifier boards, 2.5-5 V input
 
+## Second Prototype Architecture
+
+The second prototype is `haptell-02`:
+
+- Board: Arduino UNO R4 WiFi
+- Haptic driver: Mavaol DRV2605L haptic motor controller module over I2C
+- Actuator: Vybronics VG1040003D LRA, 10 x 4 mm, 2.5 Vrms, 170 Hz
+- Power: 3.7 V 1S protected LiPo battery -> Seeed Studio LiPo Rider Plus -> regulated 5 V rail
+- Driver power: LiPo Rider Plus 5 V rail to DRV2605L VIN/VCC
+- Controller power: LiPo Rider Plus 5 V rail to Arduino UNO R4 WiFi USB-C power input
+- Signal wiring: Arduino SDA/SCL to DRV2605L SDA/SCL
+- Actuator wiring: DRV2605L OUT+ and OUT- directly to the LRA leads
+
+Do not add the DC motor flyback diode across the LRA output. The DRV2605L output is a differential haptic-driver output, not a simple switched inductive DC load.
+
 ## First Prototype Architecture
 
 The first prototype is `haptell-01`:
@@ -90,6 +106,18 @@ Current firmware path:
 firmware/haptell_01_uno_r4_wifi_dc_coin/haptell_01_uno_r4_wifi_dc_coin.ino
 ```
 
+Second prototype firmware path:
+
+```text
+firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino
+```
+
+Simple blocking second prototype firmware example:
+
+```text
+firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
+```
+
 The firmware:
 
 - Uses `WiFiS3.h` and `WiFiUdp.h`.
@@ -99,6 +127,24 @@ The firmware:
 - Drives the motor with PWM on pin `D9`.
 - Uses a non-blocking pattern player.
 - Accepts commands addressed to `haptell-01` or `all`.
+
+The second firmware:
+
+- Uses `WiFiS3.h`, `WiFiUdp.h`, `Wire.h`, and `Adafruit_DRV2605.h`.
+- Includes local `secrets.h`.
+- Listens on UDP port `4444`.
+- Uses device ID `haptell-02`.
+- Configures the DRV2605L in LRA mode.
+- Maps the shared `pulse`, `double`, `ramp`, and `stop` commands to first-pass DRV2605L effect sequences.
+- Accepts commands addressed to `haptell-02` or `all`.
+- Requires the Adafruit DRV2605 Arduino library.
+
+The simple blocking example:
+
+- Uses the same hardware, WiFi, UDP port, and device ID.
+- Uses blocking `delay()` calls during playback for easier reading.
+- Supports `pulse`, `double`, `ramp`, `custom`, and `stop`.
+- Demonstrates a custom realtime playback shape with `DRV2605_MODE_REALTIME` and `setRealtimeValue()`.
 
 Current patterns:
 
@@ -114,10 +160,26 @@ haptell-01 pulse intensity=180 duration=800
 haptell-01 double intensity=220 gap=120
 haptell-01 ramp from=60 to=255 duration=1200
 haptell-01 stop
+haptell-02 pulse intensity=180 duration=800
+haptell-02 double intensity=220 gap=120
+haptell-02 ramp from=60 to=255 duration=1200
+haptell-02 stop
 all stop
 ```
 
-The first firmware was successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi`.
+The haptell-01 firmware, main haptell-02 firmware, and simple blocking haptell-02 example were successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi`.
+
+Installed local Arduino tooling:
+
+- `arduino-cli` 1.4.1
+- `arduino:renesas_uno` 1.5.3
+- `Adafruit DRV2605 Library` 1.2.4
+- `Adafruit BusIO` 1.17.4
+
+Installed local schematic tooling:
+
+- KiCad 10.0.2
+- `kicad-cli` at `C:/Users/Nullyks/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe`
 
 ## Command Sender Tool
 
@@ -145,13 +207,21 @@ Current schematic folder:
 schematics/haptell-01-dc-coin-motor/
 ```
 
+Second prototype schematic folder:
+
+```text
+schematics/haptell-02-drv2605l-lra/
+```
+
 Contents:
 
 - `README.md`: BOM and connection summary.
 - `diagram.md`: text and Mermaid circuit diagram.
 - `circuit-diagram.svg`: visual documentation diagram.
-- `haptell-01-dc-coin-motor.kicad_pro`: KiCad project draft.
-- `haptell-01-dc-coin-motor.kicad_sch`: KiCad schematic draft.
+- `haptell-01-dc-coin-motor.kicad_pro`: first prototype KiCad project draft.
+- `haptell-01-dc-coin-motor.kicad_sch`: first prototype KiCad schematic draft.
+- `haptell-02-drv2605l-lra.kicad_pro`: second prototype KiCad project file.
+- `haptell-02-drv2605l-lra.kicad_sch`: second prototype KiCad schematic draft with embedded documentation symbols.
 
 The first circuit:
 
@@ -164,6 +234,18 @@ Motor positive -> 5V
 1N5819 across motor:
   cathode / marked end -> motor positive / 5V
   anode -> motor negative / MOSFET drain
+```
+
+The second circuit:
+
+```text
+LiPo battery -> LiPo Rider Plus battery connector
+LiPo Rider Plus 5V -> Arduino USB-C 5V power input and DRV2605L VIN/VCC
+LiPo Rider Plus GND -> Arduino GND and DRV2605L GND
+Arduino SDA -> DRV2605L SDA
+Arduino SCL -> DRV2605L SCL
+DRV2605L OUT+ -> VG1040003D lead 1
+DRV2605L OUT- -> VG1040003D lead 2
 ```
 
 ## How to Continue on Another Computer
@@ -203,8 +285,10 @@ Motor positive -> 5V
 5. Measure whether IRF3205 switches the small motor reliably at the selected PWM levels.
 6. Add a small client tool or web controller for sending UDP commands.
 7. After LiPo hardware arrives, document and test the portable 5 V power path.
-8. Prototype DRV2605L support for the LRA motors as a separate firmware/schematic variant.
-9. Decide how device discovery and addressing should work for up to 10 artifacts.
+8. Install the Adafruit DRV2605 Arduino library and compile `haptell-02`.
+9. Physically build and test the DRV2605L + VG1040003D LRA prototype.
+10. Tune DRV2605L library/effect mappings for the real actuator feel.
+11. Decide how device discovery and addressing should work for up to 10 artifacts.
 
 ## Open Questions
 
@@ -213,6 +297,7 @@ Motor positive -> 5V
 - Should multi-device synchronization require acknowledgements or timed commands?
 - What physical enclosure or handheld artifact form factor will the first device use?
 - Which exact logic-level MOSFET should replace IRF3205 for future ESP32/ESP8266 variants?
+- Which DRV2605L LRA library/effect mapping feels best with the VG1040003D in the final enclosure?
 
 ## Notes for Future Codex Sessions
 
