@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell UDP Sender</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell UDP Sender</h1>
+          <p>Send local UDP commands to haptell-01 or haptell-02.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" min="1" max="65535" value="4444">
+        </label>
+        <label>
+          Target
+          <select id="target">
+            <option value="haptell-02">haptell-02</option>
+            <option value="haptell-01">haptell-01</option>
+            <option value="all">all</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="commands" aria-label="Commands">
+        <article class="command">
+          <div>
+            <h2>Pulse</h2>
+            <p>Single vibration pulse.</p>
+          </div>
+          <div class="params">
+            <label>
+              intensity
+              <input id="pulseIntensity" type="number" min="0" max="255" value="180">
+            </label>
+            <label>
+              duration
+              <input id="pulseDuration" type="number" min="0" value="800">
+            </label>
+          </div>
+          <button data-command="pulse">Send Pulse</button>
+        </article>
+
+        <article class="command">
+          <div>
+            <h2>Double</h2>
+            <p>Two short taps.</p>
+          </div>
+          <div class="params">
+            <label>
+              intensity
+              <input id="doubleIntensity" type="number" min="0" max="255" value="220">
+            </label>
+            <label>
+              gap
+              <input id="doubleGap" type="number" min="0" value="120">
+            </label>
+          </div>
+          <button data-command="double">Send Double</button>
+        </article>
+
+        <article class="command">
+          <div>
+            <h2>Ramp</h2>
+            <p>Ramp from low to high intensity.</p>
+          </div>
+          <div class="params">
+            <label>
+              from
+              <input id="rampFrom" type="number" min="0" max="255" value="60">
+            </label>
+            <label>
+              to
+              <input id="rampTo" type="number" min="0" max="255" value="255">
+            </label>
+            <label>
+              duration
+              <input id="rampDuration" type="number" min="0" value="1200">
+            </label>
+          </div>
+          <button data-command="ramp">Send Ramp</button>
+        </article>
+
+        <article class="command">
+          <div>
+            <h2>Custom</h2>
+            <p>haptell-02 realtime DRV2605L example.</p>
+          </div>
+          <button data-command="custom">Send Custom</button>
+        </article>
+
+        <article class="command stop">
+          <div>
+            <h2>Stop</h2>
+            <p>Stop playback immediately.</p>
+          </div>
+          <button data-command="stop">Send Stop</button>
+        </article>
+      </section>
+
+      <section class="preview" aria-label="Command preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly value="haptell-02 pulse intensity=180 duration=800">
+        </label>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

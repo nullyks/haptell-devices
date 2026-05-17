@@ -69,6 +69,10 @@ tools/
   udp_sender/
     send_haptell_command.py
     README.md
+  udp_web_sender/
+    server.js
+    package.json
+    README.md
 ```
 
 ## Quick Start
@@ -93,6 +97,14 @@ You can also use the Python sender example in `tools/udp_sender/`:
 ```powershell
 python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180 duration=800
 ```
+
+Or start the local browser-based Node.js sender:
+
+```powershell
+node tools/udp_web_sender/server.js
+```
+
+Then open `http://127.0.0.1:8080`.
 
 ## Hardware Warning
 

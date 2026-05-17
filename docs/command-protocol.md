@@ -102,3 +102,19 @@ python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180
 ```
 
 See `tools/udp_sender/README.md` for usage notes and more examples.
+
+## Node.js Web Sender Example
+
+A small local browser-based sender is available at:
+
+```text
+tools/udp_web_sender/server.js
+```
+
+Start it from the repository root:
+
+```powershell
+node tools/udp_web_sender/server.js
+```
+
+Then open `http://127.0.0.1:8080`. The web UI has large buttons for `pulse`, `double`, `ramp`, `custom`, and `stop`, with default parameter fields filled in.

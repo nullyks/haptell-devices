@@ -24,6 +24,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs, SVG diagram, and KiCad draft.
 - `schematics/haptell-02-drv2605l-lra/`: second prototype wiring documentation for LiPo Rider Plus, DRV2605L, and LRA.
 - `tools/udp_sender/`: Python example for sending UDP commands from a computer.
+- `tools/udp_web_sender/`: local Node.js browser UI for sending UDP commands.
 
 ## Development Rules
 

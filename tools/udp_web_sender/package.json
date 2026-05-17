@@ -1,0 +1,10 @@
+{
+  "name": "haptell-udp-web-sender",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local web UI for sending Haptell UDP commands.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}

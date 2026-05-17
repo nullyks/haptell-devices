@@ -191,6 +191,14 @@ tools/udp_sender/send_haptell_command.py
 
 It sends one UDP text command to a device IP address on port `4444`.
 
+The repository also includes a local Node.js web sender:
+
+```text
+tools/udp_web_sender/server.js
+```
+
+It starts a local HTTP server at `http://127.0.0.1:8080` and provides large browser buttons for `pulse`, `double`, `ramp`, `custom`, and `stop`. No npm packages are required.
+
 Example:
 
 ```powershell
