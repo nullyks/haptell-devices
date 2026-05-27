@@ -1,163 +1,53 @@
 # Haptell Devices
 
-Firmware and hardware notes for wireless handheld haptic artifacts.
+Firmware, wiring notes, and local sender tools for **Haptell** wireless haptic
+artifacts.
 
-The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. The second prototype, `haptell-02`, has two LRA hardware paths: a DRV2605L driver path for the 170 Hz Vybronics VG1040003D, and a PAM8403 audio-amplifier path for the 70 Hz Vybronics VG2230001H. The third prototype, `haptell-03`, uses a PAM8403 and Tectonic TEAX13C02-8/RH audio exciter so firmware can control both amplitude and frequency. Commands are sent over UDP on a closed WiFi subnet.
+Each device uses an Arduino UNO R4 WiFi, joins a local WiFi network, listens for
+UDP text commands on port `4444`, and plays haptic patterns through the selected
+motor, LRA, or exciter driver.
 
-## AI Handoff
+## At a Glance
 
-This repo includes project memory for continuing work with Codex or another AI coding assistant:
+| Prototype | Actuator path | Main purpose | Primary firmware |
+| --- | --- | --- | --- |
+| `haptell-01` | DC coin motor + MOSFET | First simple vibration prototype | `firmware/haptell_01_uno_r4_wifi_dc_coin/` |
+| `haptell-02` | DRV2605L + VG1040003D 170 Hz LRA | LRA driver IC prototype | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` |
+| `haptell-02` | PAM8403 + VG2230001H 70 Hz actuator | 70 Hz actuator path when DRV2605L is not a good fit | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
+| `haptell-03` | PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | Experimental amplitude and frequency control | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
 
-- `AGENTS.md`: repository-specific working instructions
-- `CODEX_HANDOFF.md`: project context, hardware decisions, and recommended next steps
+Shared defaults:
 
-When continuing from another computer, clone the repo and ask Codex to read both files before making larger changes.
-
-## Current Prototypes
-
-- Device ID: `haptell-01`
 - Board: Arduino UNO R4 WiFi
-- Actuator: 8 x 3 mm 3-5 V DC coin vibration motor, 67 mA rated current
-- Driver: low-side N-channel MOSFET switch
 - UDP port: `4444`
 - WiFi credentials: local `secrets.h`, not committed
+- Public repository: https://github.com/nullyks/haptell-devices
 
-- Device ID: `haptell-02`
-- Board: Arduino UNO R4 WiFi
-- Actuator: Vybronics VG1040003D LRA, 10 x 4 mm, 2.5 Vrms, 170 Hz
-- Driver: Mavaol DRV2605L haptic motor controller module over I2C
-- Power: 3.7 V 1S protected LiPo -> Seeed Studio LiPo Rider Plus -> regulated 5 V rail
-- UDP port: `4444`
-- WiFi credentials: local `secrets.h`, not committed
+## Sender Tools
 
-- Device ID: `haptell-02`
-- Board: Arduino UNO R4 WiFi
-- Actuator: Vybronics VG2230001H LRA / voice-coil actuator, 2 Vrms, 70 Hz
-- Driver: PAM8403 class-D audio amplifier module
-- Signal path: Arduino `A0` DAC generates a 70 Hz sine carrier with an amplitude envelope
-- UDP port: `4444`
-- WiFi credentials: local `secrets.h`, not committed
+| Tool | URL | Use for |
+| --- | --- | --- |
+| `tools/udp_sender/` | command line | Sending one UDP command from Python |
+| `tools/udp_web_sender/` | `http://127.0.0.1:8080` | General `pulse`, `double`, `ramp`, `shape`, and `stop` testing |
+| `tools/haptell_shape_designer/` | `http://127.0.0.1:8082` | Large amplitude-only shape editor with JSON save/load |
+| `tools/haptell_03_frequency_web_sender/` | `http://127.0.0.1:8081` | haptell-03 amplitude and frequency pattern editor |
 
-- Device ID: `haptell-03`
-- Board: Arduino UNO R4 WiFi
-- Actuator: Tectonic TEAX13C02-8/RH 8 ohm audio exciter
-- Driver: PAM8403 class-D audio amplifier module
-- Signal path: Arduino `A0` DAC generates a sine carrier with amplitude and frequency control
-- UDP port: `4444`
-- WiFi credentials: local `secrets.h`, not committed
+Start a web tool from the repository root:
 
-## Repository Layout
-
-```text
-firmware/
-  haptell_01_uno_r4_wifi_dc_coin/
-    haptell_01_uno_r4_wifi_dc_coin.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_01_uno_r4_wifi_dc_coin_simple_blocking/
-    haptell_01_uno_r4_wifi_dc_coin_simple_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_01_uno_r4_wifi_dc_coin_shape_blocking/
-    haptell_01_uno_r4_wifi_dc_coin_shape_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_drv2605l_lra/
-    haptell_02_uno_r4_wifi_drv2605l_lra.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/
-    haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/
-    haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_pam8403_vg2230001h/
-    haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/
-    haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/
-    haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/
-    haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-  haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/
-    haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking.ino
-    secrets.example.h
-    README.md
-    CODE_WALKTHROUGH.md
-schematics/
-  haptell-01-dc-coin-motor/
-    README.md
-    diagram.md
-    circuit-diagram.svg
-    haptell-01-dc-coin-motor.kicad_pro
-    haptell-01-dc-coin-motor.kicad_sch
-  haptell-02-drv2605l-lra/
-    README.md
-    diagram.md
-    circuit-diagram.svg
-    haptell-02-drv2605l-lra.kicad_pro
-    haptell-02-drv2605l-lra.kicad_sch
-  haptell-02-pam8403-vg2230001h/
-    README.md
-    diagram.md
-  haptell-03-pam8403-teax13c02-8ohm/
-    README.md
-    diagram.md
-docs/
-  command-protocol.md
-  custom-shape-designer.md
-  firmware-variants.md
-  haptell-03-frequency-patterns.md
-  hardware-notes.md
-  lra-shape-designer.md
-  lra-vibration-strength.md
-tools/
-  udp_sender/
-    send_haptell_command.py
-    README.md
-  udp_web_sender/
-    server.js
-    package.json
-    README.md
-  haptell_03_frequency_web_sender/
-    server.js
-    package.json
-    README.md
-  haptell_shape_designer/
-    server.js
-    package.json
-    README.md
+```powershell
+node tools/haptell_shape_designer/server.js
 ```
 
 ## Quick Start
 
-1. Open `firmware/haptell_01_uno_r4_wifi_dc_coin/` in Arduino IDE.
-2. Copy `secrets.example.h` to `secrets.h`.
-3. Add the WiFi SSID and password for the closed subnet.
-4. Select **Arduino UNO R4 WiFi** as the board.
-5. Upload the firmware.
-6. Send UDP commands to the device IP address on port `4444`.
+1. Pick the firmware folder for the hardware you are testing.
+2. Copy `secrets.example.h` to `secrets.h` inside that firmware folder.
+3. Fill in the closed-subnet WiFi SSID and password.
+4. Open the sketch in Arduino IDE.
+5. Select **Arduino UNO R4 WiFi**.
+6. Upload the sketch.
+7. Open Serial Monitor and note the Arduino IP address.
+8. Send UDP commands to that IP address on port `4444`.
 
 Example command:
 
@@ -165,64 +55,156 @@ Example command:
 haptell-01 pulse intensity=180 duration=800
 ```
 
-See `docs/command-protocol.md` for the supported commands, and
-`docs/firmware-variants.md` for the non-blocking and simple blocking firmware
-pairs.
-
-You can also use the Python sender example in `tools/udp_sender/`:
+Python sender example:
 
 ```powershell
 python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180 duration=800
 ```
 
-Or start the local browser-based Node.js sender:
+## Firmware Families
 
-```powershell
-node tools/udp_web_sender/server.js
+The repository keeps firmware variants separate so each hardware path stays
+easy to inspect and upload.
+
+### Main Non-Blocking Firmware
+
+Use these for interactive testing. A new valid command or `stop` can interrupt
+an active pattern after startup WiFi connection has completed.
+
+| Hardware path | Device ID | Folder |
+| --- | --- | --- |
+| DC coin motor + MOSFET | `haptell-01` | `firmware/haptell_01_uno_r4_wifi_dc_coin/` |
+| DRV2605L + VG1040003D LRA | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` |
+| PAM8403 + VG2230001H 70 Hz actuator | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
+| PAM8403 + TEAX13C02-8/RH audio exciter | `haptell-03` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
+
+### Simple Blocking Firmware
+
+Use these for reading, teaching, and first bench tests. Playback blocks the
+sketch until the pattern finishes, so `stop` cannot interrupt an active pattern.
+
+| Hardware path | Folder |
+| --- | --- |
+| DC coin motor + MOSFET | `firmware/haptell_01_uno_r4_wifi_dc_coin_simple_blocking/` |
+| DRV2605L + VG1040003D LRA | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/` |
+| PAM8403 + VG2230001H 70 Hz actuator | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/` |
+| PAM8403 + TEAX13C02-8/RH audio exciter | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/` |
+
+### Shape-Only Blocking Firmware
+
+These sketches are intentionally minimal and beginner-friendly. They support
+only custom `shape` playback from the focused Shape Designer and an idle-state
+`stop` command.
+
+| Hardware path | UDP target | Folder |
+| --- | --- | --- |
+| DC coin motor + MOSFET | `haptell-01-dc-shape` | `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/` |
+| DRV2605L + VG1040003D LRA | `haptell-02-drv2605l-shape` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` |
+| PAM8403 + VG2230001H 70 Hz actuator | `haptell-02-pam8403-shape` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` |
+
+The unique target IDs let multiple haptell-02 variants share one WiFi network
+without both reacting to the same blocking command.
+
+These sketches do not accept `all`, because blocking playback can last up to
+15 seconds.
+
+## Command Overview
+
+General haptell-01 and haptell-02 commands:
+
+```text
+haptell-01 pulse intensity=180 duration=800
+haptell-01 double intensity=220 gap=120
+haptell-01 ramp from=60 to=255 duration=1200
+haptell-01 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+haptell-01 stop
+
+haptell-02 pulse intensity=180 duration=800
+haptell-02 double intensity=220 gap=120
+haptell-02 ramp from=60 to=255 duration=1200
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+haptell-02 stop
 ```
 
-Then open `http://127.0.0.1:8080`.
+Focused Shape Designer command:
 
-The web sender also includes a simple shape designer. It visualizes a custom
-amplitude envelope, shows the outgoing data as an array, and sends a compact
-`shape` command to the firmware. The same command format works for the DC motor,
-DRV2605L LRA, and PAM8403/VG2230001H firmware variants. See
-`docs/lra-shape-designer.md`.
-
-For longer custom amplitude patterns, use the focused Shape Designer:
-
-```powershell
-node tools/haptell_shape_designer/server.js
+```text
+haptell-02-drv2605l-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
 ```
 
-Then open `http://127.0.0.1:8082`. This tool supports up to `15 s` patterns,
-up to `30` points, numbered graph/table points, and JSON save/load for pattern
-files. It targets the shape-only blocking firmware variants. See
-`docs/custom-shape-designer.md`.
+haptell-03 frequency pattern command:
 
-For the `haptell-03` audio-exciter prototype, use the dedicated frequency
-pattern sender:
-
-```powershell
-node tools/haptell_03_frequency_web_sender/server.js
+```text
+haptell-03 tone amplitude=120 frequency=560 duration=500
+haptell-03 sweep amplitude=140 from=180 to=900 duration=1200
+haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
+haptell-03 stop
 ```
 
-Then open `http://127.0.0.1:8081`. It sends `pattern` commands with
-`timeMs:amplitude:frequencyHz` points. See
-`docs/haptell-03-frequency-patterns.md`.
+Full protocol documentation: `docs/command-protocol.md`.
 
-## Hardware Warning
+## Documentation Guide
 
-Do not drive vibration motors directly from an Arduino GPIO pin. Use the MOSFET driver circuit in `schematics/haptell-01-dc-coin-motor/` for the DC motor prototype, or the DRV2605L driver circuit in `schematics/haptell-02-drv2605l-lra/` for the LRA prototype.
+| Document | Contents |
+| --- | --- |
+| `docs/command-protocol.md` | UDP command format and examples |
+| `docs/firmware-variants.md` | Firmware family matrix and blocking/non-blocking behavior |
+| `docs/custom-shape-designer.md` | Large Shape Designer workflow, JSON format, and shape-only firmware |
+| `docs/lra-shape-designer.md` | Original shared shape designer for DC/LRA amplitude envelopes |
+| `docs/haptell-03-frequency-patterns.md` | haptell-03 amplitude/frequency pattern workflow |
+| `docs/hardware-notes.md` | Hardware decisions, wiring cautions, and power notes |
+| `docs/lra-vibration-strength.md` | How to describe LRA vibration strength scientifically |
+| `CODEX_HANDOFF.md` | Project memory for continuing work with Codex or another AI assistant |
+| `AGENTS.md` | Repository-specific working instructions for Codex |
 
-The first prototype can use the available IRF3205 MOSFET with the Arduino UNO R4 WiFi's 5 V logic output. For future ESP32/ESP8266 versions, replace it with a logic-level MOSFET that switches well at 3.3 V gate drive.
+## Repository Map
 
-LRA actuators such as the VG1040003D and VG2230001H require an appropriate AC drive path. Do not connect the LRA directly to Arduino GPIO, PWM, or a simple DC MOSFET switch. The VG2230001H 70 Hz actuator is not a good fit for the DRV2605L frequency range; use the PAM8403 firmware/wiring variant or another driver that can generate a controlled 70 Hz waveform.
+```text
+firmware/     Arduino UNO R4 WiFi sketches
+schematics/   wiring notes, diagrams, and KiCad drafts
+docs/         protocol, hardware, and workflow documentation
+tools/        UDP sender tools
+```
 
-The TEAX13C02-8/RH path is an audio-exciter experiment, not a direct LRA
-replacement. The PAM8403 output is bridged, so do not connect either speaker
-output pin to ground. Start with low amplitude and measure differential AC Vrms
-across the exciter.
+Each Arduino sketch folder includes:
+
+- matching `.ino` sketch file
+- `secrets.example.h`
+- `README.md`
+- `CODE_WALKTHROUGH.md`
+
+Arduino IDE expects the `.ino` filename to match the sketch folder name.
+
+## Hardware Safety
+
+Do not drive vibration motors directly from an Arduino GPIO pin.
+
+- DC coin motor: use the MOSFET driver circuit in
+  `schematics/haptell-01-dc-coin-motor/`.
+- DRV2605L LRA path: connect the LRA to the DRV2605L differential output.
+- PAM8403 paths: connect actuators across one bridged amplifier output channel.
+  Do not connect either PAM8403 output pin to ground.
+
+The first prototype can use the available IRF3205 MOSFET with Arduino UNO R4
+WiFi 5 V logic for small-motor bench testing. For future 3.3 V boards, use a
+logic-level MOSFET that switches well at 3.3 V gate drive.
+
+For PAM8403 variants, start with low amplitude and measure differential AC Vrms
+across the connected actuator before increasing drive.
+
+## Compile Examples
+
+```powershell
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno_r4_wifi_dc_coin
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm
+```
+
+The DRV2605L firmware requires:
+
+- `Adafruit DRV2605 Library`
+- `Adafruit BusIO`
 
 ## References
 
