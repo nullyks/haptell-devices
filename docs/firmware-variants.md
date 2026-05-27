@@ -52,6 +52,22 @@ The Shape Designer in `tools/udp_web_sender/` generates this command. Select
 `haptell-01` to send a DC motor PWM envelope, or `haptell-02` for either LRA
 hardware path.
 
+## Shape-Only Blocking Firmware
+
+The repository also includes focused beginner-friendly shape-only blocking
+sketches for the amplitude-only designer:
+
+| Hardware path | Shape-only firmware | UDP target |
+| --- | --- | --- |
+| DC coin motor + MOSFET | `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/` | `haptell-01-dc-shape` |
+| DRV2605L + VG1040003D LRA | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` | `haptell-02-drv2605l-shape` |
+| PAM8403 + VG2230001H 70 Hz actuator | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` | `haptell-02-pam8403-shape` |
+
+These sketches remove `pulse`, `double`, and `ramp` from the command surface.
+They support only `shape` and idle-state `stop`, with up to `15000 ms` duration
+and `30` points. They do not accept `all`, because blocking playback prevents
+the device from receiving new commands until the current shape is finished.
+
 ## Haptell 03 Frequency Pattern Support
 
 The `haptell-03` audio-exciter firmware uses a separate command because each

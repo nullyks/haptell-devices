@@ -320,6 +320,32 @@ and sends compact UDP commands such as
 `haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560`.
 The workflow is documented in `docs/haptell-03-frequency-patterns.md`.
 
+A focused amplitude-only Shape Designer is available at:
+
+```text
+tools/haptell_shape_designer/server.js
+```
+
+It starts at `http://127.0.0.1:8082` by default. It designs custom `shape`
+commands up to `15000 ms` and `30` points. The graph and point table both show
+point numbers to help users navigate longer shapes. JSON save/load stores only
+the pattern; on browsers with the File System Access API, Save JSON asks for a
+filename/folder and Load JSON opens a file picker. The UI shows a blocking
+playback warning after Node.js confirms that the UDP packet was sent.
+
+It targets dedicated shape-only blocking firmware:
+
+```text
+firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/              -> haptell-01-dc-shape
+firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/         -> haptell-02-drv2605l-shape
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/   -> haptell-02-pam8403-shape
+```
+
+These sketches support only `shape` and idle-state `stop`. They intentionally
+do not accept `all`, because blocking playback can last 15 seconds and should
+not be started accidentally on multiple devices sharing the same WiFi network.
+The workflow is documented in `docs/custom-shape-designer.md`.
+
 Example:
 
 ```powershell
@@ -426,6 +452,7 @@ DRV2605L OUT- -> VG1040003D lead 2
 11. Decide how device discovery and addressing should work for up to 10 artifacts.
 12. Build and bench-test the `haptell-03` PAM8403 + TEAX13C02-8/RH path.
 13. Use the haptell-03 web sender to test tone, sweep, and custom amplitude/frequency patterns.
+14. Use the focused Shape Designer to create and save longer custom amplitude patterns.
 
 ## Open Questions
 

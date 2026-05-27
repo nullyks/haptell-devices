@@ -15,13 +15,17 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `README.md`: project overview and quick start.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/`: first Arduino UNO R4 WiFi firmware.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/haptell_01_uno_r4_wifi_dc_coin.ino`: UDP-controlled DC vibration motor sketch.
+- `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/`: shape-only blocking DC coin motor sketch for the custom Shape Designer.
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/`: second Arduino UNO R4 WiFi firmware for DRV2605L + LRA.
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino`: UDP-controlled DRV2605L LRA sketch.
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/`: beginner-friendly blocking haptell-02 example sketch.
+- `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/`: shape-only blocking DRV2605L LRA sketch for the custom Shape Designer.
+- `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/`: shape-only blocking PAM8403/VG2230001H sketch for the custom Shape Designer.
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/`: third Arduino UNO R4 WiFi firmware for PAM8403 + TEAX13C02-8/RH audio exciter.
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/`: beginner-friendly blocking haptell-03 example sketch.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/secrets.example.h`: WiFi credential template.
 - `docs/command-protocol.md`: UDP command format.
+- `docs/custom-shape-designer.md`: focused amplitude-only Shape Designer workflow and JSON format.
 - `docs/hardware-notes.md`: hardware decisions and cautions.
 - `docs/haptell-03-frequency-patterns.md`: custom amplitude/frequency pattern workflow for the audio exciter path.
 - `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs, SVG diagram, and KiCad draft.
@@ -30,6 +34,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `tools/udp_sender/`: Python example for sending UDP commands from a computer.
 - `tools/udp_web_sender/`: local Node.js browser UI for sending UDP commands.
 - `tools/haptell_03_frequency_web_sender/`: local Node.js browser UI for designing haptell-03 amplitude/frequency patterns.
+- `tools/haptell_shape_designer/`: focused local Node.js browser UI for amplitude-only custom shape design, JSON save/load, and shape-only firmware sending.
 
 ## Development Rules
 
@@ -55,6 +60,9 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking
 ```
 
 The second firmware requires the `Adafruit DRV2605 Library`, which also uses `Adafruit BusIO`.

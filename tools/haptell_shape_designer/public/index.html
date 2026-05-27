@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell Shape Designer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell Shape Designer</h1>
+          <p>Custom amplitude patterns for shape-only blocking firmware.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" min="1" max="65535" value="4444">
+        </label>
+        <label>
+          Target firmware
+          <select id="target">
+            <option value="haptell-01-dc-shape">DC coin shape</option>
+            <option value="haptell-02-drv2605l-shape">DRV2605L LRA shape</option>
+            <option value="haptell-02-pam8403-shape">PAM8403 VG2230001H shape</option>
+          </select>
+        </label>
+        <button id="sendShape" type="button">Send Shape</button>
+      </section>
+
+      <section class="busy-panel hidden" id="busyPanel" aria-live="polite">
+        <strong>Blocking firmware is likely busy.</strong>
+        <span id="busyText">Waiting for playback to finish.</span>
+      </section>
+
+      <section class="designer" aria-label="Shape designer">
+        <div class="designer-head">
+          <div>
+            <h2>Envelope</h2>
+            <p>First point intensity is editable. Final point is always zero.</p>
+          </div>
+          <div class="designer-actions">
+            <button id="saveJson" class="secondary" type="button">Save JSON</button>
+            <button id="loadJsonButton" class="file-button" type="button">Load JSON</button>
+            <input id="loadJson" class="file-input" type="file" accept="application/json,.json">
+          </div>
+        </div>
+
+        <div class="designer-controls">
+          <label>
+            duration ms
+            <input id="shapeDuration" type="number" min="100" max="15000" step="10" value="3000">
+          </label>
+          <label>
+            max points
+            <input type="text" value="30" readonly>
+          </label>
+          <div class="preset-buttons" aria-label="Shape presets">
+            <button data-preset="softStart" type="button">Soft Start</button>
+            <button data-preset="longPulse" type="button">Long Pulse</button>
+            <button data-preset="steps" type="button">Steps</button>
+            <button data-preset="heartbeat" type="button">Heartbeat</button>
+          </div>
+        </div>
+
+        <div class="workbench">
+          <div class="graph-panel">
+            <svg id="envelopeGraph" viewBox="0 0 960 500" role="img" aria-label="Amplitude envelope graph">
+              <rect class="graph-bg" x="86" y="34" width="804" height="374"></rect>
+              <g id="gridLayer"></g>
+              <path id="envelopeFill"></path>
+              <polyline id="envelopeLine"></polyline>
+              <g id="pointLayer"></g>
+            </svg>
+          </div>
+
+          <aside class="points-panel">
+            <div class="points-head">
+              <h3>Points</h3>
+              <button id="addPoint" type="button">Add Point</button>
+            </div>
+            <div id="pointsList" class="points-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="preview" aria-label="Command and data preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly>
+        </label>
+        <label>
+          Data array preview
+          <textarea id="dataPreview" readonly rows="10"></textarea>
+        </label>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

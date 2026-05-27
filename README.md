@@ -60,6 +60,11 @@ firmware/
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
+  haptell_01_uno_r4_wifi_dc_coin_shape_blocking/
+    haptell_01_uno_r4_wifi_dc_coin_shape_blocking.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
   haptell_02_uno_r4_wifi_drv2605l_lra/
     haptell_02_uno_r4_wifi_drv2605l_lra.ino
     secrets.example.h
@@ -70,6 +75,11 @@ firmware/
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
+  haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/
+    haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
   haptell_02_uno_r4_wifi_pam8403_vg2230001h/
     haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
     secrets.example.h
@@ -77,6 +87,11 @@ firmware/
     CODE_WALKTHROUGH.md
   haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/
     haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
+  haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/
+    haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking.ino
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
@@ -111,6 +126,7 @@ schematics/
     diagram.md
 docs/
   command-protocol.md
+  custom-shape-designer.md
   firmware-variants.md
   haptell-03-frequency-patterns.md
   hardware-notes.md
@@ -125,6 +141,10 @@ tools/
     package.json
     README.md
   haptell_03_frequency_web_sender/
+    server.js
+    package.json
+    README.md
+  haptell_shape_designer/
     server.js
     package.json
     README.md
@@ -168,6 +188,17 @@ amplitude envelope, shows the outgoing data as an array, and sends a compact
 `shape` command to the firmware. The same command format works for the DC motor,
 DRV2605L LRA, and PAM8403/VG2230001H firmware variants. See
 `docs/lra-shape-designer.md`.
+
+For longer custom amplitude patterns, use the focused Shape Designer:
+
+```powershell
+node tools/haptell_shape_designer/server.js
+```
+
+Then open `http://127.0.0.1:8082`. This tool supports up to `15 s` patterns,
+up to `30` points, numbered graph/table points, and JSON save/load for pattern
+files. It targets the shape-only blocking firmware variants. See
+`docs/custom-shape-designer.md`.
 
 For the `haptell-03` audio-exciter prototype, use the dedicated frequency
 pattern sender:

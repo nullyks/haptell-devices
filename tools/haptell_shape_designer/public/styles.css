@@ -1,0 +1,426 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --ink: #111827;
+  --muted: #5b6675;
+  --line: #d4dce6;
+  --blue: #1f5da8;
+  --teal: #117c89;
+  --green: #287349;
+  --amber: #a15c08;
+  --red: #b72a31;
+  --focus: #f2c84b;
+  --soft: #e9f3ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(1380px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.topbar,
+.designer-head,
+.points-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.topbar {
+  margin-bottom: 18px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.status {
+  min-width: 210px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.status.ok {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.status.error {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.settings,
+.busy-panel,
+.designer,
+.preview {
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: 1.1fr 0.5fr 1.1fr 220px;
+  gap: 14px;
+  align-items: end;
+}
+
+.busy-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-color: #d8902d;
+  background: #fff8ec;
+  color: #6f3e05;
+  font-size: 18px;
+}
+
+.hidden {
+  display: none;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+input,
+select,
+button,
+textarea,
+.file-button {
+  width: 100%;
+  border-radius: 8px;
+  font: inherit;
+}
+
+input,
+select,
+button,
+.file-button {
+  min-height: 50px;
+  font-size: 19px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 12px;
+}
+
+input[readonly] {
+  background: #f8fafc;
+}
+
+textarea {
+  min-height: 220px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+button:focus,
+textarea:focus,
+.file-button:focus {
+  outline: 4px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button,
+.file-button {
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  background: var(--blue);
+  color: #fff;
+  padding: 12px 18px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+.file-button:hover {
+  filter: brightness(0.92);
+}
+
+button:disabled {
+  background: #aeb7c2;
+  cursor: default;
+}
+
+#sendShape {
+  background: var(--teal);
+}
+
+.designer-actions {
+  display: grid;
+  grid-template-columns: 160px 160px;
+  gap: 10px;
+}
+
+.secondary,
+.file-button {
+  background: #475569;
+}
+
+.file-input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.designer-controls {
+  display: grid;
+  grid-template-columns: 180px 130px minmax(420px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin: 18px 0;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+.preset-buttons button {
+  background: #566579;
+  font-size: 16px;
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(680px, 1fr) minmax(360px, 0.38fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.graph-panel,
+.points-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.graph-panel {
+  padding: 12px;
+}
+
+#envelopeGraph {
+  display: block;
+  width: 100%;
+  min-height: 500px;
+  touch-action: none;
+}
+
+.graph-bg {
+  fill: #fff;
+  stroke: var(--line);
+}
+
+.grid-line {
+  stroke: #e1e7ef;
+  stroke-width: 1;
+}
+
+.grid-text {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#envelopeFill {
+  fill: rgba(17, 124, 137, 0.16);
+  stroke: none;
+}
+
+#envelopeLine {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.shape-point {
+  fill: #fff;
+  stroke: var(--teal);
+  stroke-width: 4;
+  cursor: grab;
+}
+
+.shape-point.end {
+  fill: var(--soft);
+  stroke: var(--blue);
+  cursor: default;
+}
+
+.shape-point-label {
+  fill: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+}
+
+.points-panel {
+  padding: 12px;
+  max-height: 620px;
+  overflow: auto;
+}
+
+.points-head {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#addPoint {
+  width: 150px;
+  min-height: 40px;
+  font-size: 16px;
+  background: var(--green);
+}
+
+.points-list {
+  display: grid;
+  gap: 6px;
+}
+
+.point-row {
+  display: grid;
+  grid-template-columns: 36px minmax(76px, 1fr) minmax(84px, 1fr) 84px;
+  gap: 8px;
+  align-items: center;
+}
+
+.point-row-head {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 2px 2px;
+}
+
+.point-number {
+  display: grid;
+  min-height: 36px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #eef3f8;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.point-row input,
+.point-row button {
+  min-height: 36px;
+  font-size: 15px;
+}
+
+.point-row button {
+  background: #566579;
+  padding: 8px 10px;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+#commandPreview {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+}
+
+@media (max-width: 1040px) {
+  .topbar,
+  .designer-head,
+  .busy-panel,
+  .points-head {
+    display: grid;
+  }
+
+  .settings,
+  .designer-controls,
+  .workbench,
+  .point-row {
+    grid-template-columns: 1fr;
+  }
+
+  .designer-actions,
+  .preset-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #addPoint {
+    width: 100%;
+  }
+}

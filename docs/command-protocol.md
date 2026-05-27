@@ -105,6 +105,29 @@ as a structured array. See `lra-shape-designer.md` for the full workflow.
 In the simple blocking firmware variants, the same command works but playback
 blocks the sketch until the shape is finished.
 
+### Shape-Only Blocking Targets
+
+The focused Haptell Shape Designer uses separate beginner-friendly firmware
+targets:
+
+```text
+haptell-01-dc-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
+haptell-02-drv2605l-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
+haptell-02-pam8403-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
+```
+
+These shape-only firmware variants support:
+
+- duration up to `15000 ms`
+- up to `30` points
+- first point time fixed at `0 ms`, with any valid intensity
+- last point time fixed at `duration`, with intensity `0`
+
+They intentionally use unique target IDs and do not accept `all`, so multiple
+blocking devices can share a WiFi network without all starting at once.
+
+See `custom-shape-designer.md`.
+
 The simple blocking haptell-02 firmware example also supports:
 
 ```text
@@ -216,3 +239,19 @@ node tools/haptell_03_frequency_web_sender/server.js
 
 Then open `http://127.0.0.1:8081`. This UI designs `pattern` commands where
 each point contains time, amplitude, and frequency.
+
+The focused custom shape designer is available at:
+
+```text
+tools/haptell_shape_designer/server.js
+```
+
+Start it from the repository root:
+
+```powershell
+node tools/haptell_shape_designer/server.js
+```
+
+Then open `http://127.0.0.1:8082`. This UI designs amplitude-only `shape`
+commands, saves/loads JSON pattern files, and shows a blocking playback warning
+after Node.js confirms that it sent the UDP packet.

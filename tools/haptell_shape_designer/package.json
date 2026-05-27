@@ -1,0 +1,9 @@
+{
+  "name": "haptell-shape-designer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Large local Haptell shape designer with JSON import/export and UDP sending.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
