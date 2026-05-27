@@ -30,6 +30,8 @@ haptell-02 stop
 
 The `pulse`, `double`, and `ramp` examples use built-in DRV2605L effect numbers. The `custom` example uses DRV2605L realtime playback mode and manually sends drive values to build a simple custom vibration shape.
 
+For a deeper explanation of LRA resonance handling, built-in effect playback, and realtime playback testing, see `DRV2605L_EFFECTS_AND_RTP_NOTES.md`.
+
 ## Why This Exists
 
 Use this sketch when learning or testing the DRV2605L wiring. Use the main `haptell_02_uno_r4_wifi_drv2605l_lra` firmware when the device needs to stay responsive while a pattern is playing.

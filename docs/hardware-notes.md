@@ -42,6 +42,8 @@ The Vybronics LRA parts should not be treated like the DC coin motor.
 
 These parts should be driven with a suitable haptic driver IC such as DRV2605L/compatible modules, a suitable audio amplifier approach, or another circuit that can generate the required AC drive waveform.
 
+For measurement terminology, describe LRA vibration strength as actuator-axis acceleration, preferably peak or RMS acceleration in `g` over a defined time window. See `lra-vibration-strength.md`.
+
 ## Second Prototype
 
 The second device uses an Arduino UNO R4 WiFi, a Mavaol DRV2605L haptic motor controller module, a Vybronics VG1040003D LRA actuator, and a portable LiPo power path.
