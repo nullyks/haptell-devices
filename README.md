@@ -2,7 +2,7 @@
 
 Firmware and hardware notes for wireless handheld haptic artifacts.
 
-The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. The second prototype, `haptell-02`, uses the same board with a DRV2605L haptic driver and a Vybronics LRA actuator. Commands are sent over UDP on a closed WiFi subnet. Haptic patterns are defined in the device firmware and triggered with simple text commands.
+The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. The second prototype, `haptell-02`, has two LRA hardware paths: a DRV2605L driver path for the 170 Hz Vybronics VG1040003D, and a PAM8403 audio-amplifier path for the 70 Hz Vybronics VG2230001H. Commands are sent over UDP on a closed WiFi subnet. Haptic patterns are defined in the device firmware and triggered with simple text commands.
 
 ## AI Handoff
 
@@ -30,6 +30,14 @@ When continuing from another computer, clone the repo and ask Codex to read both
 - UDP port: `4444`
 - WiFi credentials: local `secrets.h`, not committed
 
+- Device ID: `haptell-02`
+- Board: Arduino UNO R4 WiFi
+- Actuator: Vybronics VG2230001H LRA / voice-coil actuator, 2 Vrms, 70 Hz
+- Driver: PAM8403 class-D audio amplifier module
+- Signal path: Arduino `A0` DAC generates a 70 Hz sine carrier with an amplitude envelope
+- UDP port: `4444`
+- WiFi credentials: local `secrets.h`, not committed
+
 ## Repository Layout
 
 ```text
@@ -49,6 +57,11 @@ firmware/
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
+  haptell_02_uno_r4_wifi_pam8403_vg2230001h/
+    haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
 schematics/
   haptell-01-dc-coin-motor/
     README.md
@@ -62,6 +75,9 @@ schematics/
     circuit-diagram.svg
     haptell-02-drv2605l-lra.kicad_pro
     haptell-02-drv2605l-lra.kicad_sch
+  haptell-02-pam8403-vg2230001h/
+    README.md
+    diagram.md
 docs/
   command-protocol.md
   hardware-notes.md
@@ -116,12 +132,13 @@ Do not drive vibration motors directly from an Arduino GPIO pin. Use the MOSFET 
 
 The first prototype can use the available IRF3205 MOSFET with the Arduino UNO R4 WiFi's 5 V logic output. For future ESP32/ESP8266 versions, replace it with a logic-level MOSFET that switches well at 3.3 V gate drive.
 
-LRA actuators such as the VG1040003D require an appropriate haptic driver. Do not connect the LRA directly to Arduino GPIO, PWM, or a simple DC MOSFET switch.
+LRA actuators such as the VG1040003D and VG2230001H require an appropriate AC drive path. Do not connect the LRA directly to Arduino GPIO, PWM, or a simple DC MOSFET switch. The VG2230001H 70 Hz actuator is not a good fit for the DRV2605L frequency range; use the PAM8403 firmware/wiring variant or another driver that can generate a controlled 70 Hz waveform.
 
 ## References
 
 - Arduino UNO R4 WiFi product page: https://store.arduino.cc/products/uno-r4-wifi
 - TI DRV2605L product page: https://www.ti.com/product/DRV2605L
+- PAM8403 product page: https://www.diodes.com/products/amplifiers-and-sensors/audio/part/PAM8403
 - Seeed Studio LiPo Rider Plus wiki: https://wiki.seeedstudio.com/Lipo-Rider-Plus/
 - Vybronics VG2230001H LRA: https://www.vybronics.com/coin-vibration-motors/lra/v-g2230001h
 - Vybronics VG1040003D LRA: https://www.vybronics.com/coin-vibration-motors/lra/v-g1040003d

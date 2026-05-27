@@ -11,7 +11,8 @@ The initial command format is intentionally simple:
 Targets:
 
 - `haptell-01` addresses the first prototype.
-- `haptell-02` addresses the DRV2605L + LRA prototype.
+- `haptell-02` addresses the LRA prototype. Current firmware variants include
+  the DRV2605L + VG1040003D path and the PAM8403 + VG2230001H path.
 - `all` broadcasts a command to every Haptell device that receives the packet.
 
 ## Commands
@@ -69,12 +70,16 @@ haptell-02 stop
 all stop
 ```
 
-For `haptell-02`, the DRV2605L firmware maps these generic pattern names to DRV2605L LRA effect playback. The `intensity`, `from`, `to`, and `duration` values are kept in the command interface for compatibility and later tuning, but the exact feel depends on the selected DRV2605L effect library, actuator calibration, and module behavior.
+For the DRV2605L `haptell-02` firmware, these generic pattern names map to
+DRV2605L LRA effect playback. For the PAM8403 + VG2230001H firmware, they map
+to generated 70 Hz amplitude envelopes. The exact feel depends on the selected
+hardware path, actuator mounting, and output calibration.
 
 ### Shape
 
-Plays a custom LRA realtime amplitude envelope on the main `haptell-02` firmware
-and the simple blocking `haptell-02` example.
+Plays a custom LRA amplitude envelope on the main DRV2605L `haptell-02`
+firmware, the simple blocking DRV2605L `haptell-02` example, and the PAM8403 +
+VG2230001H `haptell-02` firmware.
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
@@ -85,13 +90,15 @@ Parameters:
 - `duration`: total pattern duration in milliseconds, `1` to `5000`
 - `points`: comma-separated `time:intensity` pairs
 - `time`: point time in milliseconds, sorted from `0` to `duration`
-- `intensity`: realtime drive value from `0` to `255`
+- `intensity`: normalized envelope value from `0` to `255`
 
 The first point must be at `0 ms`, and the last point must be at `duration`.
-The firmware linearly interpolates between points and sends the resulting values
-to the DRV2605L in realtime playback mode. The web sender includes a simple
-envelope editor that generates this command and shows the outgoing data as a
-structured array. See `lra-shape-designer.md` for the full workflow.
+The firmware linearly interpolates between points. The DRV2605L variants send
+the resulting values to the DRV2605L in realtime playback mode. The PAM8403
+variant uses the values to scale a 70 Hz DAC sine carrier before amplification.
+The web sender includes a simple envelope editor that generates this command and
+shows the outgoing data as a structured array. See `lra-shape-designer.md` for
+the full workflow.
 
 In the simple blocking `haptell-02` example, the same command works but playback
 blocks the sketch until the shape is finished.

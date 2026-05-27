@@ -67,6 +67,25 @@ Important: LRA motors should not be driven like the DC coin motor. Use a suitabl
 - DRV2605L haptic motor controller I2C vibration feedback module, analog/audio trigger, 3 V / 5 V input
 - PAM8403 2 x 3 W class-D amplifier boards, 2.5-5 V input
 
+### haptell-02 PAM8403 / VG2230001H Variant
+
+The repository now includes a separate `haptell-02` firmware and wiring note for
+the Vybronics VG2230001H 70 Hz actuator:
+
+```text
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/
+schematics/haptell-02-pam8403-vg2230001h/
+```
+
+This variant uses Arduino UNO R4 WiFi `A0` / `DAC` to generate a 70 Hz sine
+carrier. A PAM8403 class-D audio amplifier drives the VG2230001H from one
+bridged output channel. The firmware accepts the same `haptell-02` UDP commands,
+including `shape`, but maps intensity to carrier amplitude instead of DRV2605L
+RTP values.
+
+The firmware default `MAX_DAC_SWING_COUNTS` is intentionally conservative and
+should be tuned only after measuring AC Vrms across the connected actuator.
+
 ## Second Prototype Architecture
 
 The second prototype is `haptell-02`:
@@ -116,6 +135,12 @@ Simple blocking second prototype firmware example:
 
 ```text
 firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
+```
+
+PAM8403 / VG2230001H firmware path:
+
+```text
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
 ```
 
 The firmware:
@@ -170,7 +195,11 @@ haptell-02 stop
 all stop
 ```
 
-The haptell-01 firmware, main haptell-02 firmware, and simple blocking haptell-02 example were successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi` before the later `shape` command addition. The updated main haptell-02 firmware and simple blocking haptell-02 example with `shape` support were also compiled on this machine using temporary dummy `secrets.h` files, then the dummy credentials files were removed.
+The same `haptell-02 shape ...` command works on the PAM8403/VG2230001H
+firmware; there it scales a fixed 70 Hz sine carrier instead of setting a
+DRV2605L realtime playback value.
+
+The haptell-01 firmware, main haptell-02 firmware, and simple blocking haptell-02 example were successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi` before the later `shape` command addition. The updated main haptell-02 firmware and simple blocking haptell-02 example with `shape` support were also compiled on this machine using temporary dummy `secrets.h` files, then the dummy credentials files were removed. The PAM8403 / VG2230001H firmware was also compiled with Arduino CLI using a temporary dummy `secrets.h`, then the dummy credentials file was removed.
 
 Installed local Arduino tooling:
 

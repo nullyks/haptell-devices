@@ -97,7 +97,7 @@ The first word of the Haptell command.
 Options:
 
 - `haptell-01`: first DC coin motor prototype
-- `haptell-02`: second DRV2605L + LRA prototype
+- `haptell-02`: LRA prototype, either DRV2605L + VG1040003D or PAM8403 + VG2230001H firmware
 - `all`: all Haptell devices that receive the UDP packet
 
 ## Command Buttons
@@ -157,7 +157,8 @@ Use `stop` to stop playback immediately.
 ## Shape Designer
 
 The Shape Designer sends a compact realtime envelope command to the main
-`haptell-02` firmware and to the simple blocking `haptell-02` example:
+DRV2605L `haptell-02` firmware, to the simple blocking DRV2605L example, and to
+the PAM8403 + VG2230001H firmware:
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
@@ -191,8 +192,9 @@ Limits:
 - first point: `0 ms`
 - last point: `duration`
 
-For the firmware behavior, unsigned realtime playback setup, and test commands,
-see `../../docs/lra-shape-designer.md`.
+For the firmware behavior, DRV2605L unsigned realtime playback setup,
+PAM8403/70 Hz carrier behavior, and test commands, see
+`../../docs/lra-shape-designer.md`.
 
 ## Command Preview
 

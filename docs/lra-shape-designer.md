@@ -7,14 +7,18 @@ The feature is intentionally small:
 
 - The browser UI lets a user design a vibration amplitude envelope.
 - The Node.js server sends one compact UDP text command.
-- The Arduino firmware parses the command and plays the envelope in DRV2605L
-  realtime playback mode.
+- The Arduino firmware parses the command and plays the envelope either in
+  DRV2605L realtime playback mode or, for the VG2230001H/PAM8403 variant, as the
+  amplitude of a 70 Hz sine carrier.
 - Patterns are limited to 5 seconds and 24 points.
 
 ## Mental Model
 
-The user is not designing the raw 170 Hz LRA waveform. The DRV2605L remains
-responsible for driving the LRA actuator.
+For the DRV2605L firmware, the user is not designing the raw 170 Hz LRA
+waveform. The DRV2605L remains responsible for driving the LRA actuator.
+
+For the PAM8403 + VG2230001H firmware, the carrier is fixed at 70 Hz and the
+same envelope controls its amplitude.
 
 The user designs an amplitude envelope:
 
@@ -63,7 +67,7 @@ The Shape Designer includes:
 The graph uses:
 
 - x-axis: time in milliseconds
-- y-axis: realtime drive intensity from `0` to `255`
+- y-axis: normalized envelope intensity from `0` to `255`
 
 Endpoints are kept fixed:
 
@@ -108,8 +112,9 @@ Command components:
 
 ## Firmware Behavior
 
-The main `haptell-02` firmware and the simple blocking `haptell-02` example both
-accept the `shape` action:
+The main DRV2605L `haptell-02` firmware, the simple blocking DRV2605L example,
+and the PAM8403 + VG2230001H `haptell-02` firmware all accept the `shape`
+action:
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
@@ -125,7 +130,7 @@ Validation rules:
 - last point time must equal `duration`
 - intensity must be `0..255`
 
-During playback, the firmware:
+During playback, the DRV2605L firmware:
 
 1. Stops any active built-in effect sequence.
 2. Configures DRV2605L realtime playback for unsigned unidirectional input.
@@ -143,6 +148,15 @@ The simple blocking example uses the same command format and interpolation logic
 but it waits inside the shape playback function until the shape is finished.
 That version is easier to read, but it cannot receive `stop` or another UDP
 command during shape playback.
+
+During playback, the PAM8403 + VG2230001H firmware:
+
+1. Starts a 70 Hz sine carrier on Arduino `A0` / `DAC`.
+2. Uses `millis()` to track elapsed time.
+3. Interpolates between the nearest envelope points.
+4. Maps the current `0..255` intensity to a limited DAC sine amplitude.
+5. Feeds that signal into one PAM8403 input channel.
+6. Stops the carrier and returns the DAC to midpoint when the shape ends.
 
 ## Why Unsigned RTP Is Used
 
@@ -237,6 +251,12 @@ Simple blocking firmware:
 
 ```text
 firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
+```
+
+PAM8403 / VG2230001H firmware:
+
+```text
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
 ```
 
 Web UI:
