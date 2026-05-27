@@ -108,7 +108,8 @@ Command components:
 
 ## Firmware Behavior
 
-The main `haptell-02` firmware accepts the `shape` action:
+The main `haptell-02` firmware and the simple blocking `haptell-02` example both
+accept the `shape` action:
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
@@ -134,9 +135,14 @@ During playback, the firmware:
 6. Sends the current drive value with `drv.setRealtimeValue(...)`.
 7. Writes `0` and returns to library effect mode when the shape ends.
 
-The firmware updates the realtime value every `12 ms` while the shape is active.
-The loop remains non-blocking, so a later UDP command such as `stop` can still be
-received.
+The main firmware updates the realtime value every `12 ms` while the shape is
+active. Its loop remains non-blocking, so a later UDP command such as `stop` can
+still be received.
+
+The simple blocking example uses the same command format and interpolation logic,
+but it waits inside the shape playback function until the shape is finished.
+That version is easier to read, but it cannot receive `stop` or another UDP
+command during shape playback.
 
 ## Why Unsigned RTP Is Used
 
@@ -221,10 +227,16 @@ window. See `lra-vibration-strength.md`.
 
 ## Files
 
-Firmware:
+Main firmware:
 
 ```text
 firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino
+```
+
+Simple blocking firmware:
+
+```text
+firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
 ```
 
 Web UI:

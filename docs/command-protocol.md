@@ -73,7 +73,8 @@ For `haptell-02`, the DRV2605L firmware maps these generic pattern names to DRV2
 
 ### Shape
 
-Plays a custom LRA realtime amplitude envelope on the main `haptell-02` firmware.
+Plays a custom LRA realtime amplitude envelope on the main `haptell-02` firmware
+and the simple blocking `haptell-02` example.
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
@@ -91,6 +92,9 @@ The firmware linearly interpolates between points and sends the resulting values
 to the DRV2605L in realtime playback mode. The web sender includes a simple
 envelope editor that generates this command and shows the outgoing data as a
 structured array. See `lra-shape-designer.md` for the full workflow.
+
+In the simple blocking `haptell-02` example, the same command works but playback
+blocks the sketch until the shape is finished.
 
 The simple blocking haptell-02 firmware example also supports:
 

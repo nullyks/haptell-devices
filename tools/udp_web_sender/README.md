@@ -157,7 +157,7 @@ Use `stop` to stop playback immediately.
 ## Shape Designer
 
 The Shape Designer sends a compact realtime envelope command to the main
-`haptell-02` firmware:
+`haptell-02` firmware and to the simple blocking `haptell-02` example:
 
 ```text
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
