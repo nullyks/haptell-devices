@@ -1,0 +1,440 @@
+:root {
+  color-scheme: light;
+  --bg: #f3f5f7;
+  --panel: #ffffff;
+  --ink: #111827;
+  --muted: #596575;
+  --line: #d5dce5;
+  --blue: #2057a7;
+  --teal: #147f8f;
+  --amber: #b45f06;
+  --green: #26724d;
+  --red: #b72b32;
+  --focus: #f2c94c;
+  --soft: #e9f2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.topbar,
+.section-head,
+.points-head,
+.stop-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.topbar {
+  margin-bottom: 18px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.status {
+  min-width: 190px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.status.ok {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.status.error {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.settings,
+.preview,
+.designer,
+.stop-row {
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr 0.8fr;
+  gap: 14px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.command {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.params {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.command:nth-child(2) .params {
+  grid-template-columns: repeat(4, minmax(96px, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+input,
+select,
+button,
+textarea {
+  width: 100%;
+  border-radius: 8px;
+  font: inherit;
+}
+
+input,
+select,
+button {
+  min-height: 50px;
+  font-size: 19px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 12px;
+}
+
+input[readonly] {
+  background: #f8fafc;
+}
+
+textarea {
+  min-height: 240px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+button:focus,
+textarea:focus {
+  outline: 4px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button {
+  border: 0;
+  background: var(--blue);
+  color: #fff;
+  padding: 12px 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+button:disabled {
+  background: #aeb7c2;
+  cursor: default;
+}
+
+#sendPattern {
+  width: min(260px, 100%);
+  background: var(--teal);
+}
+
+.designer-controls {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.3fr) minmax(140px, 0.25fr) minmax(160px, 0.3fr) minmax(420px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin: 18px 0;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(92px, 1fr));
+  gap: 10px;
+}
+
+.preset-buttons button {
+  background: #475569;
+  font-size: 16px;
+}
+
+.designer-grid {
+  display: grid;
+  grid-template-columns: minmax(520px, 1.25fr) minmax(380px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.graph-panel,
+.points-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.graph-panel {
+  padding: 12px;
+}
+
+#patternGraph {
+  display: block;
+  width: 100%;
+  min-height: 320px;
+  touch-action: none;
+}
+
+.graph-bg {
+  fill: #fff;
+  stroke: var(--line);
+}
+
+.grid-line {
+  stroke: #e2e7ee;
+  stroke-width: 1;
+}
+
+.grid-text {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#amplitudeFill {
+  fill: rgba(20, 127, 143, 0.15);
+  stroke: none;
+}
+
+#amplitudeLine {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+#frequencyLine {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-dasharray: 7 6;
+}
+
+.amp-point,
+.freq-point {
+  fill: #fff;
+  stroke-width: 4;
+  cursor: grab;
+}
+
+.amp-point {
+  stroke: var(--teal);
+}
+
+.amp-point.fixed {
+  fill: var(--soft);
+  stroke: var(--blue);
+  cursor: default;
+}
+
+.freq-point {
+  stroke: var(--amber);
+}
+
+.legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 8px 6px;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend i {
+  display: inline-block;
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+}
+
+.amp-key {
+  background: var(--teal);
+}
+
+.freq-key {
+  background: var(--amber);
+}
+
+.points-panel {
+  padding: 14px;
+}
+
+.points-head {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#addPoint {
+  width: 150px;
+  min-height: 44px;
+  font-size: 16px;
+  background: var(--green);
+}
+
+.points-list {
+  display: grid;
+  gap: 10px;
+}
+
+.point-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 96px;
+  gap: 10px;
+  align-items: end;
+}
+
+.point-row input,
+.point-row button {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+.point-row button {
+  background: #475569;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+#commandPreview {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+}
+
+.stop-row {
+  justify-content: flex-end;
+}
+
+.stop-button {
+  width: min(260px, 100%);
+  background: var(--red);
+}
+
+@media (max-width: 980px) {
+  .topbar,
+  .section-head,
+  .points-head,
+  .stop-row {
+    display: grid;
+  }
+
+  .settings,
+  .quick-grid,
+  .params,
+  .command:nth-child(2) .params,
+  .designer-controls,
+  .designer-grid,
+  .point-row {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #sendPattern,
+  #addPoint,
+  .stop-button {
+    width: 100%;
+  }
+}

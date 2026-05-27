@@ -18,13 +18,18 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/`: second Arduino UNO R4 WiFi firmware for DRV2605L + LRA.
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino`: UDP-controlled DRV2605L LRA sketch.
 - `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/`: beginner-friendly blocking haptell-02 example sketch.
+- `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/`: third Arduino UNO R4 WiFi firmware for PAM8403 + TEAX13C02-8/RH audio exciter.
+- `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/`: beginner-friendly blocking haptell-03 example sketch.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/secrets.example.h`: WiFi credential template.
 - `docs/command-protocol.md`: UDP command format.
 - `docs/hardware-notes.md`: hardware decisions and cautions.
+- `docs/haptell-03-frequency-patterns.md`: custom amplitude/frequency pattern workflow for the audio exciter path.
 - `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs, SVG diagram, and KiCad draft.
 - `schematics/haptell-02-drv2605l-lra/`: second prototype wiring documentation for LiPo Rider Plus, DRV2605L, and LRA.
+- `schematics/haptell-03-pam8403-teax13c02-8ohm/`: third prototype wiring documentation for PAM8403 and TEAX13C02-8/RH.
 - `tools/udp_sender/`: Python example for sending UDP commands from a computer.
 - `tools/udp_web_sender/`: local Node.js browser UI for sending UDP commands.
+- `tools/haptell_03_frequency_web_sender/`: local Node.js browser UI for designing haptell-03 amplitude/frequency patterns.
 
 ## Development Rules
 
@@ -35,6 +40,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - Keep UDP port `4444` unless the user changes the protocol decision.
 - Device ID for the first prototype is `haptell-01`.
 - Device ID for the second DRV2605L + LRA prototype is `haptell-02`.
+- Device ID for the third PAM8403 + TEAX13C02-8/RH audio-exciter prototype is `haptell-03`.
 - Prefer non-blocking firmware behavior so the device can receive new commands while a pattern is playing.
 - Do not drive motors directly from GPIO pins. Document and use a driver stage.
 - When adding hardware, include both human-readable documentation and schematic source files.
@@ -47,6 +53,8 @@ When possible, compile the first firmware with Arduino CLI:
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno_r4_wifi_dc_coin
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking
 ```
 
 The second firmware requires the `Adafruit DRV2605 Library`, which also uses `Adafruit BusIO`.

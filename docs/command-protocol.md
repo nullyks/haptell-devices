@@ -13,6 +13,7 @@ Targets:
 - `haptell-01` addresses the first prototype.
 - `haptell-02` addresses the LRA prototype. Current firmware variants include
   the DRV2605L + VG1040003D path and the PAM8403 + VG2230001H path.
+- `haptell-03` addresses the PAM8403 + TEAX13C02-8/RH audio-exciter prototype.
 - `all` broadcasts a command to every Haptell device that receives the packet.
 
 ## Commands
@@ -112,6 +113,55 @@ haptell-02 custom
 
 This command demonstrates DRV2605L realtime playback mode by manually sending drive values instead of using a built-in effect number.
 
+### Haptell 03 Tone
+
+Plays a fixed-frequency sine carrier through the PAM8403 + TEAX13C02-8/RH path.
+
+```text
+haptell-03 tone amplitude=120 frequency=560 duration=500
+```
+
+Parameters:
+
+- `amplitude`: normalized drive level from `0` to `255`
+- `frequency`: carrier frequency in Hz, `40` to `1500`
+- `duration`: duration in milliseconds, `1` to `5000`
+
+### Haptell 03 Sweep
+
+Plays a constant-amplitude frequency sweep.
+
+```text
+haptell-03 sweep amplitude=140 from=180 to=900 duration=1200
+```
+
+Parameters:
+
+- `amplitude`: normalized drive level from `0` to `255`
+- `from`: starting frequency in Hz, `40` to `1500`
+- `to`: ending frequency in Hz, `40` to `1500`
+- `duration`: duration in milliseconds, `1` to `5000`
+
+### Haptell 03 Pattern
+
+Plays a custom amplitude and frequency pattern.
+
+```text
+haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
+```
+
+Parameters:
+
+- `duration`: total pattern duration in milliseconds, `1` to `5000`
+- `points`: comma-separated `time:amplitude:frequency` triples
+- `time`: point time in milliseconds, sorted from `0` to `duration`
+- `amplitude`: normalized drive level from `0` to `255`
+- `frequency`: carrier frequency in Hz, `40` to `1500`
+
+The first point must be at `0 ms`, and the last point must be at `duration`.
+The firmware linearly interpolates both amplitude and frequency between points.
+See `haptell-03-frequency-patterns.md` for examples.
+
 ## Notes
 
 - Commands are case-sensitive.
@@ -151,3 +201,18 @@ node tools/udp_web_sender/server.js
 ```
 
 Then open `http://127.0.0.1:8080`. The web UI has buttons for `pulse`, `double`, `ramp`, and `stop`, plus a custom shape designer for the shared `shape` envelope command.
+
+The dedicated haptell-03 frequency sender is available at:
+
+```text
+tools/haptell_03_frequency_web_sender/server.js
+```
+
+Start it from the repository root:
+
+```powershell
+node tools/haptell_03_frequency_web_sender/server.js
+```
+
+Then open `http://127.0.0.1:8081`. This UI designs `pattern` commands where
+each point contains time, amplitude, and frequency.

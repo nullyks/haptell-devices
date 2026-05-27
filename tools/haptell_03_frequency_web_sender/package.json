@@ -1,0 +1,9 @@
+{
+  "name": "haptell-03-frequency-web-sender",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local browser-based UDP sender for haptell-03 amplitude/frequency patterns.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

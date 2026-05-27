@@ -2,7 +2,7 @@
 
 Firmware and hardware notes for wireless handheld haptic artifacts.
 
-The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. The second prototype, `haptell-02`, has two LRA hardware paths: a DRV2605L driver path for the 170 Hz Vybronics VG1040003D, and a PAM8403 audio-amplifier path for the 70 Hz Vybronics VG2230001H. Commands are sent over UDP on a closed WiFi subnet. Haptic patterns are defined in the device firmware and triggered with simple text commands.
+The first prototype, `haptell-01`, uses an Arduino UNO R4 WiFi to drive a small 3-5 V DC coin vibration motor. The second prototype, `haptell-02`, has two LRA hardware paths: a DRV2605L driver path for the 170 Hz Vybronics VG1040003D, and a PAM8403 audio-amplifier path for the 70 Hz Vybronics VG2230001H. The third prototype, `haptell-03`, uses a PAM8403 and Tectonic TEAX13C02-8/RH audio exciter so firmware can control both amplitude and frequency. Commands are sent over UDP on a closed WiFi subnet.
 
 ## AI Handoff
 
@@ -35,6 +35,14 @@ When continuing from another computer, clone the repo and ask Codex to read both
 - Actuator: Vybronics VG2230001H LRA / voice-coil actuator, 2 Vrms, 70 Hz
 - Driver: PAM8403 class-D audio amplifier module
 - Signal path: Arduino `A0` DAC generates a 70 Hz sine carrier with an amplitude envelope
+- UDP port: `4444`
+- WiFi credentials: local `secrets.h`, not committed
+
+- Device ID: `haptell-03`
+- Board: Arduino UNO R4 WiFi
+- Actuator: Tectonic TEAX13C02-8/RH 8 ohm audio exciter
+- Driver: PAM8403 class-D audio amplifier module
+- Signal path: Arduino `A0` DAC generates a sine carrier with amplitude and frequency control
 - UDP port: `4444`
 - WiFi credentials: local `secrets.h`, not committed
 
@@ -72,6 +80,16 @@ firmware/
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
+  haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/
+    haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
+  haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/
+    haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
 schematics/
   haptell-01-dc-coin-motor/
     README.md
@@ -88,9 +106,13 @@ schematics/
   haptell-02-pam8403-vg2230001h/
     README.md
     diagram.md
+  haptell-03-pam8403-teax13c02-8ohm/
+    README.md
+    diagram.md
 docs/
   command-protocol.md
   firmware-variants.md
+  haptell-03-frequency-patterns.md
   hardware-notes.md
   lra-shape-designer.md
   lra-vibration-strength.md
@@ -99,6 +121,10 @@ tools/
     send_haptell_command.py
     README.md
   udp_web_sender/
+    server.js
+    package.json
+    README.md
+  haptell_03_frequency_web_sender/
     server.js
     package.json
     README.md
@@ -143,6 +169,17 @@ amplitude envelope, shows the outgoing data as an array, and sends a compact
 DRV2605L LRA, and PAM8403/VG2230001H firmware variants. See
 `docs/lra-shape-designer.md`.
 
+For the `haptell-03` audio-exciter prototype, use the dedicated frequency
+pattern sender:
+
+```powershell
+node tools/haptell_03_frequency_web_sender/server.js
+```
+
+Then open `http://127.0.0.1:8081`. It sends `pattern` commands with
+`timeMs:amplitude:frequencyHz` points. See
+`docs/haptell-03-frequency-patterns.md`.
+
 ## Hardware Warning
 
 Do not drive vibration motors directly from an Arduino GPIO pin. Use the MOSFET driver circuit in `schematics/haptell-01-dc-coin-motor/` for the DC motor prototype, or the DRV2605L driver circuit in `schematics/haptell-02-drv2605l-lra/` for the LRA prototype.
@@ -151,11 +188,17 @@ The first prototype can use the available IRF3205 MOSFET with the Arduino UNO R4
 
 LRA actuators such as the VG1040003D and VG2230001H require an appropriate AC drive path. Do not connect the LRA directly to Arduino GPIO, PWM, or a simple DC MOSFET switch. The VG2230001H 70 Hz actuator is not a good fit for the DRV2605L frequency range; use the PAM8403 firmware/wiring variant or another driver that can generate a controlled 70 Hz waveform.
 
+The TEAX13C02-8/RH path is an audio-exciter experiment, not a direct LRA
+replacement. The PAM8403 output is bridged, so do not connect either speaker
+output pin to ground. Start with low amplitude and measure differential AC Vrms
+across the exciter.
+
 ## References
 
 - Arduino UNO R4 WiFi product page: https://store.arduino.cc/products/uno-r4-wifi
 - TI DRV2605L product page: https://www.ti.com/product/DRV2605L
 - PAM8403 product page: https://www.diodes.com/products/amplifiers-and-sensors/audio/part/PAM8403
+- Tectonic TEAX13C02-8/RH data sheet: https://www.parts-express.com/pedocs/specs/297-214--tectonic-hiax13c02-8rh-spec-sheet.pdf
 - Seeed Studio LiPo Rider Plus wiki: https://wiki.seeedstudio.com/Lipo-Rider-Plus/
 - Vybronics VG2230001H LRA: https://www.vybronics.com/coin-vibration-motors/lra/v-g2230001h
 - Vybronics VG1040003D LRA: https://www.vybronics.com/coin-vibration-motors/lra/v-g1040003d

@@ -49,6 +49,7 @@ Planned LRA actuators:
 
 - Vybronics VG2230001H: 2 Vrms, 70 Hz LRA/voice-coil style actuator
 - Vybronics VG1040003D: 2.5 Vrms, 170 Hz LRA
+- Tectonic TEAX13C02-8/RH: 8 ohm audio exciter, nominal resonance around 560 Hz, intended here for frequency-controlled haptic texture experiments
 
 Important: LRA motors should not be driven like the DC coin motor. Use a suitable haptic driver such as DRV2605L, a suitable amplifier approach, or another proper AC drive circuit.
 
@@ -85,6 +86,33 @@ RTP values.
 
 The firmware default `MAX_DAC_SWING_COUNTS` is intentionally conservative and
 should be tuned only after measuring AC Vrms across the connected actuator.
+
+### haptell-03 PAM8403 / TEAX13C02-8/RH Variant
+
+The repository now includes a separate `haptell-03` firmware and wiring note for
+the Tectonic TEAX13C02-8/RH 8 ohm audio exciter:
+
+```text
+firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/
+firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/
+schematics/haptell-03-pam8403-teax13c02-8ohm/
+tools/haptell_03_frequency_web_sender/
+```
+
+This variant uses Arduino UNO R4 WiFi `A0` / `DAC` to generate a sine carrier
+whose amplitude and frequency both change over time. A PAM8403 class-D audio
+amplifier drives the TEAX13C02-8/RH from one bridged output channel.
+
+The custom command is:
+
+```text
+haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
+```
+
+Each point is `timeMs:amplitude:frequencyHz`. The firmware linearly
+interpolates amplitude and frequency between points. The accepted frequency
+range is `40..1500 Hz`; the useful tactile range depends strongly on the
+exciter mounting and the surface it drives.
 
 ## Second Prototype Architecture
 
@@ -155,6 +183,18 @@ PAM8403 / VG2230001H simple blocking firmware path:
 firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino
 ```
 
+haptell-03 PAM8403 / TEAX13C02-8/RH firmware path:
+
+```text
+firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm.ino
+```
+
+haptell-03 PAM8403 / TEAX13C02-8/RH simple blocking firmware path:
+
+```text
+firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking.ino
+```
+
 The firmware:
 
 - Uses `WiFiS3.h` and `WiFiUdp.h`.
@@ -191,6 +231,7 @@ There are now simple blocking examples for all current hardware paths:
 - `haptell_01_uno_r4_wifi_dc_coin_simple_blocking`
 - `haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking`
 - `haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking`
+- `haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking`
 
 The blocking examples are easier to read, but they do not receive new UDP
 packets while a pattern is playing.
@@ -200,7 +241,8 @@ Current patterns:
 - `pulse`
 - `double`
 - `ramp`
-- `shape` on all current firmware variants
+- `shape` on the haptell-01 and haptell-02 firmware variants
+- `pattern`, `tone`, and `sweep` on the `haptell-03` audio-exciter variants
 - `stop`
 
 Example commands:
@@ -217,6 +259,10 @@ haptell-02 ramp from=60 to=255 duration=1200
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 haptell-02 stop
 all stop
+haptell-03 tone amplitude=120 frequency=560 duration=500
+haptell-03 sweep amplitude=140 from=180 to=900 duration=1200
+haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
+haptell-03 stop
 ```
 
 The same `shape ...` command works across the DC, DRV2605L, and
@@ -262,6 +308,18 @@ It starts a local HTTP server at `http://127.0.0.1:8080` and provides buttons fo
 
 The shape designer and firmware workflow are documented in `docs/lra-shape-designer.md`.
 
+A dedicated `haptell-03` frequency sender is available at:
+
+```text
+tools/haptell_03_frequency_web_sender/server.js
+```
+
+It starts at `http://127.0.0.1:8081` by default. The UI visualizes both the
+amplitude envelope and frequency path, shows the outgoing structured data array,
+and sends compact UDP commands such as
+`haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560`.
+The workflow is documented in `docs/haptell-03-frequency-patterns.md`.
+
 Example:
 
 ```powershell
@@ -282,6 +340,12 @@ Second prototype schematic folder:
 
 ```text
 schematics/haptell-02-drv2605l-lra/
+```
+
+haptell-03 schematic documentation folder:
+
+```text
+schematics/haptell-03-pam8403-teax13c02-8ohm/
 ```
 
 Contents:
@@ -360,6 +424,8 @@ DRV2605L OUT- -> VG1040003D lead 2
 9. Physically build and test the DRV2605L + VG1040003D LRA prototype.
 10. Tune DRV2605L library/effect mappings for the real actuator feel.
 11. Decide how device discovery and addressing should work for up to 10 artifacts.
+12. Build and bench-test the `haptell-03` PAM8403 + TEAX13C02-8/RH path.
+13. Use the haptell-03 web sender to test tone, sweep, and custom amplitude/frequency patterns.
 
 ## Open Questions
 

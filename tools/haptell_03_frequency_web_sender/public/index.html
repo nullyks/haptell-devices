@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell 03 Frequency Sender</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell 03 Frequency Sender</h1>
+          <p>PAM8403 + TEAX13C02-8/RH amplitude and frequency patterns.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" min="1" max="65535" value="4444">
+        </label>
+        <label>
+          Target
+          <select id="target">
+            <option value="haptell-03">haptell-03</option>
+            <option value="all">all</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="quick-grid" aria-label="Quick commands">
+        <article class="command">
+          <div>
+            <h2>Tone</h2>
+            <p>Fixed frequency.</p>
+          </div>
+          <div class="params">
+            <label>
+              amplitude
+              <input id="toneAmplitude" type="number" min="0" max="255" value="120">
+            </label>
+            <label>
+              frequency Hz
+              <input id="toneFrequency" type="number" min="40" max="1500" value="560">
+            </label>
+            <label>
+              duration ms
+              <input id="toneDuration" type="number" min="1" max="5000" value="500">
+            </label>
+          </div>
+          <button type="button" data-command="tone">Send Tone</button>
+        </article>
+
+        <article class="command">
+          <div>
+            <h2>Sweep</h2>
+            <p>Frequency ramp.</p>
+          </div>
+          <div class="params">
+            <label>
+              amplitude
+              <input id="sweepAmplitude" type="number" min="0" max="255" value="140">
+            </label>
+            <label>
+              from Hz
+              <input id="sweepFrom" type="number" min="40" max="1500" value="180">
+            </label>
+            <label>
+              to Hz
+              <input id="sweepTo" type="number" min="40" max="1500" value="900">
+            </label>
+            <label>
+              duration ms
+              <input id="sweepDuration" type="number" min="1" max="5000" value="1200">
+            </label>
+          </div>
+          <button type="button" data-command="sweep">Send Sweep</button>
+        </article>
+      </section>
+
+      <section class="designer" aria-label="Pattern designer">
+        <div class="section-head">
+          <div>
+            <h2>Pattern Designer</h2>
+            <p>Amplitude envelope and frequency path.</p>
+          </div>
+          <button id="sendPattern" type="button" data-command="pattern">Send Pattern</button>
+        </div>
+
+        <div class="designer-controls">
+          <label>
+            duration ms
+            <input id="patternDuration" type="number" min="100" max="5000" step="20" value="1200">
+          </label>
+          <label>
+            amplitude range
+            <input type="text" value="0..255" readonly>
+          </label>
+          <label>
+            frequency range
+            <input type="text" value="40..1500 Hz" readonly>
+          </label>
+          <div class="preset-buttons" aria-label="Pattern presets">
+            <button data-preset="resonance" type="button">Resonance</button>
+            <button data-preset="rising" type="button">Rising</button>
+            <button data-preset="chirpTap" type="button">Chirp Tap</button>
+            <button data-preset="texture" type="button">Texture</button>
+            <button data-preset="pulse" type="button">Pulse</button>
+          </div>
+        </div>
+
+        <div class="designer-grid">
+          <div class="graph-panel">
+            <svg id="patternGraph" viewBox="0 0 780 340" role="img" aria-label="Amplitude and frequency graph">
+              <rect class="graph-bg" x="70" y="30" width="640" height="248"></rect>
+              <g id="gridLayer"></g>
+              <path id="amplitudeFill"></path>
+              <polyline id="amplitudeLine"></polyline>
+              <polyline id="frequencyLine"></polyline>
+              <g id="pointLayer"></g>
+            </svg>
+            <div class="legend" aria-hidden="true">
+              <span><i class="amp-key"></i>amplitude</span>
+              <span><i class="freq-key"></i>frequency</span>
+            </div>
+          </div>
+
+          <div class="points-panel">
+            <div class="points-head">
+              <h3>Points</h3>
+              <button id="addPoint" type="button">Add Point</button>
+            </div>
+            <div id="pointsList" class="points-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview" aria-label="Command preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly value="haptell-03 pattern duration=1200 points=0:0:560,80:150:560,900:150:760,1200:0:560">
+        </label>
+        <label>
+          Data array preview
+          <textarea id="dataPreview" readonly rows="12"></textarea>
+        </label>
+      </section>
+
+      <section class="stop-row" aria-label="Stop command">
+        <button class="stop-button" type="button" data-command="stop">Send Stop</button>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

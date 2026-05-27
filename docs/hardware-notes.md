@@ -114,3 +114,33 @@ PAM8403 module with AC-coupled input or add a series input capacitor. Start with
 low volume, then measure differential AC Vrms across the actuator while it is
 connected and keep the output near the actuator's 2 Vrms rating.
 
+## haptell-03 PAM8403 / TEAX13C02-8/RH Audio Exciter Variant
+
+This variant is intended for frequency-controlled haptic texture experiments.
+
+Core parts:
+
+- Arduino UNO R4 WiFi
+- PAM8403 class-D audio amplifier module
+- Tectonic TEAX13C02-8/RH 8 ohm audio exciter
+- 5 V supply for the Arduino and amplifier
+
+Control and drive wiring:
+
+```text
+Arduino A0 / DAC -> PAM8403 channel input, for example L-IN, through the module input coupling path
+PAM8403 L+ -> TEAX13C02-8/RH lead 1
+PAM8403 L- -> TEAX13C02-8/RH lead 2
+Common GND -> Arduino GND and PAM8403 GND
+5 V rail -> Arduino USB-C 5 V power input and PAM8403 VCC
+```
+
+The TEAX13C02-8/RH is not a low-frequency LRA. It is an audio exciter with a
+nominal resonance around `560 Hz`, so mounting and chosen frequency strongly
+affect the perceived haptic feel.
+
+The firmware accepts `40..1500 Hz` for experiments, but frequencies near and
+above the exciter's audio range are expected to be more useful than deep
+low-frequency commands. Start with low amplitude, then measure differential AC
+Vrms between the PAM8403 output pins while the exciter is connected.
+
