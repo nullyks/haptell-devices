@@ -26,9 +26,10 @@ haptell-01 pulse intensity=180 duration=800
 haptell-02 pulse intensity=180 duration=800
 ```
 
-Parameters:
-
-- `intensity`: PWM value from `0` to `255`, default `180`
+- `intensity`: value from `0` to `255`, default `180`
+  - DC motor firmware: PWM value
+  - DRV2605L firmware: mapped to a selected effect or RTP drive value
+  - PAM8403 firmware: envelope level for the 70 Hz carrier
 - `duration`: hold time in milliseconds, default `800`
 
 ### Double
@@ -42,7 +43,7 @@ haptell-02 double intensity=220 gap=120
 
 Parameters:
 
-- `intensity`: PWM value from `0` to `255`, default `220`
+- `intensity`: value from `0` to `255`, default `220`
 - `gap`: quiet gap between taps in milliseconds, default `120`
 
 ### Ramp
@@ -56,8 +57,8 @@ haptell-02 ramp from=60 to=255 duration=1200
 
 Parameters:
 
-- `from`: starting PWM value from `0` to `255`, default `60`
-- `to`: ending PWM value from `0` to `255`, default `255`
+- `from`: starting value from `0` to `255`, default `60`
+- `to`: ending value from `0` to `255`, default `255`
 - `duration`: ramp duration in milliseconds, default `1200`
 
 ### Stop
@@ -77,11 +78,11 @@ hardware path, actuator mounting, and output calibration.
 
 ### Shape
 
-Plays a custom LRA amplitude envelope on the main DRV2605L `haptell-02`
-firmware, the simple blocking DRV2605L `haptell-02` example, and the PAM8403 +
-VG2230001H `haptell-02` firmware.
+Plays a custom amplitude envelope. The command is supported by all current DC,
+DRV2605L, and PAM8403 firmware variants.
 
 ```text
+haptell-01 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 ```
 
@@ -93,14 +94,14 @@ Parameters:
 - `intensity`: normalized envelope value from `0` to `255`
 
 The first point must be at `0 ms`, and the last point must be at `duration`.
-The firmware linearly interpolates between points. The DRV2605L variants send
-the resulting values to the DRV2605L in realtime playback mode. The PAM8403
-variant uses the values to scale a 70 Hz DAC sine carrier before amplification.
-The web sender includes a simple envelope editor that generates this command and
-shows the outgoing data as a structured array. See `lra-shape-designer.md` for
-the full workflow.
+The firmware linearly interpolates between points. The DC motor variants use the
+resulting values as PWM output. The DRV2605L variants send the resulting values
+to the DRV2605L in realtime playback mode. The PAM8403 variant uses the values
+to scale a 70 Hz DAC sine carrier before amplification. The web sender includes
+a simple envelope editor that generates this command and shows the outgoing data
+as a structured array. See `lra-shape-designer.md` for the full workflow.
 
-In the simple blocking `haptell-02` example, the same command works but playback
+In the simple blocking firmware variants, the same command works but playback
 blocks the sketch until the shape is finished.
 
 The simple blocking haptell-02 firmware example also supports:
@@ -149,4 +150,4 @@ Start it from the repository root:
 node tools/udp_web_sender/server.js
 ```
 
-Then open `http://127.0.0.1:8080`. The web UI has buttons for `pulse`, `double`, `ramp`, and `stop`, plus a custom LRA shape designer for the `haptell-02` realtime envelope command.
+Then open `http://127.0.0.1:8080`. The web UI has buttons for `pulse`, `double`, `ramp`, and `stop`, plus a custom shape designer for the shared `shape` envelope command.

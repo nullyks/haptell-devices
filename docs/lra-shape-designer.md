@@ -1,15 +1,15 @@
-# LRA Shape Designer
+# Shape Designer
 
 This document describes the simple Node.js web UI and firmware pair for
-designing and playing custom LRA haptic envelopes on `haptell-02`.
+designing and playing custom haptic amplitude envelopes.
 
 The feature is intentionally small:
 
 - The browser UI lets a user design a vibration amplitude envelope.
 - The Node.js server sends one compact UDP text command.
-- The Arduino firmware parses the command and plays the envelope either in
-  DRV2605L realtime playback mode or, for the VG2230001H/PAM8403 variant, as the
-  amplitude of a 70 Hz sine carrier.
+- The Arduino firmware parses the command and plays the envelope as DC PWM,
+  DRV2605L realtime playback, or the amplitude of a 70 Hz PAM8403 carrier,
+  depending on the selected firmware variant.
 - Patterns are limited to 5 seconds and 24 points.
 
 ## Mental Model
@@ -19,6 +19,8 @@ waveform. The DRV2605L remains responsible for driving the LRA actuator.
 
 For the PAM8403 + VG2230001H firmware, the carrier is fixed at 70 Hz and the
 same envelope controls its amplitude.
+
+For the DC coin motor firmware, the same envelope directly controls PWM output.
 
 The user designs an amplitude envelope:
 
@@ -36,8 +38,8 @@ Example:
 1600 ms  -> 0
 ```
 
-The firmware linearly interpolates between these points and sends the resulting
-drive values to the DRV2605L.
+The firmware linearly interpolates between these points and applies the
+resulting intensity to the selected hardware path.
 
 ## Web UI
 
@@ -98,7 +100,7 @@ Command components:
   ["target", "haptell-02"],
   ["command", "shape"],
   ["durationMs", 1600],
-  ["mode", "rtp-envelope"],
+  ["mode", "amplitude-envelope"],
   ["points", [
     ["timeMs", "intensity"],
     [0, 0],
@@ -112,11 +114,10 @@ Command components:
 
 ## Firmware Behavior
 
-The main DRV2605L `haptell-02` firmware, the simple blocking DRV2605L example,
-and the PAM8403 + VG2230001H `haptell-02` firmware all accept the `shape`
-action:
+All current firmware variants accept the `shape` action:
 
 ```text
+haptell-01 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 ```
 
@@ -157,6 +158,13 @@ During playback, the PAM8403 + VG2230001H firmware:
 4. Maps the current `0..255` intensity to a limited DAC sine amplitude.
 5. Feeds that signal into one PAM8403 input channel.
 6. Stops the carrier and returns the DAC to midpoint when the shape ends.
+
+During playback, the DC motor firmware:
+
+1. Uses `millis()` to track elapsed time.
+2. Interpolates between the nearest envelope points.
+3. Writes the current `0..255` intensity to Arduino `D9` with `analogWrite()`.
+4. Stops the motor when the shape ends.
 
 ## Why Unsigned RTP Is Used
 
@@ -222,6 +230,8 @@ Stop:
 haptell-02 stop
 ```
 
+For the DC motor, use the same examples with `haptell-01` as the target.
+
 ## Current Limits
 
 This is a first practical version, not a full haptic authoring system.
@@ -244,19 +254,17 @@ window. See `lra-vibration-strength.md`.
 Main firmware:
 
 ```text
+firmware/haptell_01_uno_r4_wifi_dc_coin/haptell_01_uno_r4_wifi_dc_coin.ino
 firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
 ```
 
 Simple blocking firmware:
 
 ```text
+firmware/haptell_01_uno_r4_wifi_dc_coin_simple_blocking/haptell_01_uno_r4_wifi_dc_coin_simple_blocking.ino
 firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
-```
-
-PAM8403 / VG2230001H firmware:
-
-```text
-firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
+firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino
 ```
 
 Web UI:

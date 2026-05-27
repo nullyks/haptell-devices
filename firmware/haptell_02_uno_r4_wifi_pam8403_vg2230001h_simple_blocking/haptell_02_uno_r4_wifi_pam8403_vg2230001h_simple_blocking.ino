@@ -1,23 +1,27 @@
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
+#include "dac.h"
 
 #include "secrets.h"
 
-const char DEVICE_ID[] = "haptell-01";
+const char DEVICE_ID[] = "haptell-02";
 const unsigned int UDP_PORT = 4444;
-const int MOTOR_PWM_PIN = 9;
 
-const byte MAX_PATTERN_STEPS = 24;
 const byte MAX_SHAPE_POINTS = 24;
 const unsigned int MAX_SHAPE_DURATION_MS = 5000;
-const int DEFAULT_INTENSITY = 180;
-const unsigned long WIFI_RETRY_INTERVAL_MS = 10000;
+const unsigned long ENVELOPE_UPDATE_INTERVAL_MS = 5;
 
-struct PatternStep {
-  uint8_t from;
-  uint8_t to;
-  unsigned long durationMs;
-};
+const float CARRIER_FREQUENCY_HZ = 70.0;
+const byte SINE_TABLE_SIZE = 32;
+const unsigned long CARRIER_SAMPLE_RATE_HZ = 2240;
+const unsigned long CARRIER_SAMPLE_INTERVAL_US = 1000000UL / CARRIER_SAMPLE_RATE_HZ;
+
+const int DAC_MIDPOINT = 2048;
+const int DAC_MAX_VALUE = 4095;
+
+// Safe starting value for a 5 V UNO R4 DAC feeding a PAM8403 input.
+// Increase only after measuring Vrms across the actuator.
+const uint16_t MAX_DAC_SWING_COUNTS = 120;
 
 struct ShapePoint {
   unsigned int timeMs;
@@ -25,26 +29,30 @@ struct ShapePoint {
 };
 
 WiFiUDP udp;
-PatternStep pattern[MAX_PATTERN_STEPS];
-ShapePoint shapePoints[MAX_SHAPE_POINTS];
-byte patternLength = 0;
-byte currentStep = 0;
-unsigned long stepStartedAt = 0;
-bool patternPlaying = false;
 
+ShapePoint shapePoints[MAX_SHAPE_POINTS];
 byte shapePointCount = 0;
 
+int16_t sineTable[SINE_TABLE_SIZE];
+byte sineIndex = 0;
+unsigned long nextCarrierSampleAtUs = 0;
+uint8_t currentDrive = 0;
+bool carrierRunning = false;
+
 char packetBuffer[512];
-unsigned long lastWifiAttemptAt = 0;
 
 void setup() {
-  pinMode(MOTOR_PWM_PIN, OUTPUT);
-  stopMotor();
-
   Serial.begin(115200);
   delay(500);
 
-  Serial.println("Haptell haptell-01 starting");
+  prepareSineTable();
+  setupDacOutput();
+
+  Serial.println("Haptell haptell-02 PAM8403/VG2230001H simple blocking starting");
+  Serial.print("Carrier frequency: ");
+  Serial.print(CARRIER_FREQUENCY_HZ);
+  Serial.println(" Hz");
+
   connectToWiFi();
   udp.begin(UDP_PORT);
   Serial.print("Listening for UDP commands on port ");
@@ -52,9 +60,25 @@ void setup() {
 }
 
 void loop() {
-  keepWiFiConnected();
   readUdpCommand();
-  updatePatternPlayer();
+}
+
+void prepareSineTable() {
+  for (byte i = 0; i < SINE_TABLE_SIZE; i++) {
+    float phase = (2.0 * PI * i) / SINE_TABLE_SIZE;
+    sineTable[i] = (int16_t)(sin(phase) * 32767.0);
+  }
+}
+
+void setupDacOutput() {
+  analogWriteResolution(12);
+  _dac12[0].init();
+  writeDac12(DAC_MIDPOINT);
+}
+
+void writeDac12(int value) {
+  int constrained = constrain(value, 0, DAC_MAX_VALUE);
+  _dac12[0].set((uint16_t)constrained << 4);
 }
 
 void connectToWiFi() {
@@ -62,7 +86,6 @@ void connectToWiFi() {
   Serial.println(WIFI_SSID);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  lastWifiAttemptAt = millis();
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
@@ -74,21 +97,6 @@ void connectToWiFi() {
   Serial.println();
   Serial.print("Connected. IP address: ");
   Serial.println(WiFi.localIP());
-}
-
-void keepWiFiConnected() {
-  if (WiFi.status() == WL_CONNECTED) {
-    return;
-  }
-
-  unsigned long now = millis();
-  if (now - lastWifiAttemptAt < WIFI_RETRY_INTERVAL_MS) {
-    return;
-  }
-
-  Serial.println("WiFi disconnected. Reconnecting...");
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  lastWifiAttemptAt = now;
 }
 
 void readUdpCommand() {
@@ -123,7 +131,7 @@ void handleCommand(String command) {
 
   if (action == "pulse") {
     playPulse(
-      getIntParam(command, "intensity", DEFAULT_INTENSITY),
+      getIntParam(command, "intensity", 180),
       getIntParam(command, "duration", 800)
     );
   } else if (action == "double") {
@@ -140,7 +148,7 @@ void handleCommand(String command) {
   } else if (action == "shape") {
     playShape(command);
   } else if (action == "stop") {
-    stopPattern();
+    stopPlayback();
   } else {
     Serial.println("Ignored: unknown action");
   }
@@ -204,35 +212,46 @@ String getStringParam(String text, const char *name, const char *fallback) {
 }
 
 void playPulse(int intensity, int durationMs) {
-  clearPattern();
-  addStep(0, constrainIntensity(intensity), 25);
-  addStep(constrainIntensity(intensity), constrainIntensity(intensity), max(1, durationMs));
-  addStep(constrainIntensity(intensity), 0, 80);
-  startPattern();
+  uint8_t level = constrainIntensity(intensity);
+  unsigned int holdMs = (unsigned int)constrain(durationMs, 1, MAX_SHAPE_DURATION_MS - 100);
+  unsigned int totalMs = holdMs + 100;
+
+  shapePointCount = 0;
+  addShapePoint(0, 0);
+  addShapePoint(20, level);
+  addShapePoint(20 + holdMs, level);
+  addShapePoint(totalMs, 0);
+  playLoadedShape(totalMs);
 }
 
 void playDoubleTap(int intensity, int gapMs) {
   uint8_t level = constrainIntensity(intensity);
-  clearPattern();
-  addStep(0, level, 15);
-  addStep(level, level, 90);
-  addStep(level, 0, 45);
-  addStep(0, 0, max(1, gapMs));
-  addStep(0, level, 15);
-  addStep(level, level, 90);
-  addStep(level, 0, 80);
-  startPattern();
+  unsigned int gap = (unsigned int)constrain(gapMs, 1, MAX_SHAPE_DURATION_MS - 390);
+  unsigned int totalMs = 390 + gap;
+
+  shapePointCount = 0;
+  addShapePoint(0, 0);
+  addShapePoint(20, level);
+  addShapePoint(110, level);
+  addShapePoint(160, 0);
+  addShapePoint(160 + gap, 0);
+  addShapePoint(180 + gap, level);
+  addShapePoint(270 + gap, level);
+  addShapePoint(totalMs, 0);
+  playLoadedShape(totalMs);
 }
 
 void playRamp(int fromIntensity, int toIntensity, int durationMs) {
-  clearPattern();
-  addStep(
-    constrainIntensity(fromIntensity),
-    constrainIntensity(toIntensity),
-    max(1, durationMs)
-  );
-  addStep(constrainIntensity(toIntensity), 0, 100);
-  startPattern();
+  uint8_t from = constrainIntensity(fromIntensity);
+  uint8_t to = constrainIntensity(toIntensity);
+  unsigned int rampMs = (unsigned int)constrain(durationMs, 1, MAX_SHAPE_DURATION_MS - 100);
+  unsigned int totalMs = rampMs + 100;
+
+  shapePointCount = 0;
+  addShapePoint(0, from);
+  addShapePoint(rampMs, to);
+  addShapePoint(totalMs, 0);
+  playLoadedShape(totalMs);
 }
 
 void playShape(String command) {
@@ -248,85 +267,107 @@ void playShape(String command) {
     return;
   }
 
-  clearPattern();
-  for (byte i = 1; i < shapePointCount; i++) {
-    ShapePoint previous = shapePoints[i - 1];
-    ShapePoint next = shapePoints[i];
-    addStep(previous.intensity, next.intensity, next.timeMs - previous.timeMs);
-  }
-  startPattern();
+  playLoadedShape((unsigned int)durationMs);
+}
 
-  Serial.print("Playing DC PWM shape for ");
+void addShapePoint(unsigned int timeMs, uint8_t intensity) {
+  if (shapePointCount >= MAX_SHAPE_POINTS) {
+    return;
+  }
+
+  shapePoints[shapePointCount++] = { timeMs, intensity };
+}
+
+void playLoadedShape(unsigned int durationMs) {
+  if (shapePointCount == 0) {
+    stopPlayback();
+    return;
+  }
+
+  Serial.print("Playing blocking 70 Hz envelope for ");
   Serial.print(durationMs);
   Serial.print(" ms with ");
   Serial.print(shapePointCount);
   Serial.println(" points");
-}
 
-void clearPattern() {
-  patternLength = 0;
-  currentStep = 0;
-  patternPlaying = false;
-}
+  currentDrive = shapeIntensityAt(0);
+  sineIndex = 0;
+  nextCarrierSampleAtUs = micros();
+  carrierRunning = true;
 
-void addStep(uint8_t from, uint8_t to, unsigned long durationMs) {
-  if (patternLength >= MAX_PATTERN_STEPS) {
-    return;
-  }
+  unsigned long startedAt = millis();
+  unsigned long lastEnvelopeUpdateAt = 0;
 
-  pattern[patternLength++] = { from, to, durationMs };
-}
+  while (millis() - startedAt < durationMs) {
+    unsigned long now = millis();
+    unsigned long elapsed = now - startedAt;
 
-void startPattern() {
-  if (patternLength == 0) {
-    stopPattern();
-    return;
-  }
-
-  currentStep = 0;
-  stepStartedAt = millis();
-  patternPlaying = true;
-  analogWrite(MOTOR_PWM_PIN, pattern[0].from);
-}
-
-void updatePatternPlayer() {
-  if (!patternPlaying) {
-    return;
-  }
-
-  PatternStep step = pattern[currentStep];
-  unsigned long now = millis();
-  unsigned long elapsed = now - stepStartedAt;
-
-  if (elapsed >= step.durationMs) {
-    analogWrite(MOTOR_PWM_PIN, step.to);
-    currentStep++;
-
-    if (currentStep >= patternLength) {
-      stopPattern();
-      return;
+    if (lastEnvelopeUpdateAt == 0 || now - lastEnvelopeUpdateAt >= ENVELOPE_UPDATE_INTERVAL_MS) {
+      currentDrive = shapeIntensityAt(elapsed);
+      lastEnvelopeUpdateAt = now;
     }
 
-    stepStartedAt = now;
-    analogWrite(MOTOR_PWM_PIN, pattern[currentStep].from);
+    updateCarrier();
+  }
+
+  stopPlayback();
+}
+
+void updateCarrier() {
+  if (!carrierRunning) {
     return;
   }
 
-  uint8_t output = interpolate(step.from, step.to, elapsed, step.durationMs);
-  analogWrite(MOTOR_PWM_PIN, output);
-}
-
-uint8_t interpolate(uint8_t from, uint8_t to, unsigned long elapsed, unsigned long duration) {
-  if (duration == 0 || from == to) {
-    return to;
+  unsigned long now = micros();
+  if ((long)(now - nextCarrierSampleAtUs) < 0) {
+    return;
   }
 
-  long delta = (long)to - (long)from;
-  return from + (delta * elapsed / duration);
+  writeCarrierSample();
+
+  sineIndex = (sineIndex + 1) % SINE_TABLE_SIZE;
+  nextCarrierSampleAtUs += CARRIER_SAMPLE_INTERVAL_US;
+
+  if ((long)(now - nextCarrierSampleAtUs) >= 0) {
+    unsigned long skipped = ((now - nextCarrierSampleAtUs) / CARRIER_SAMPLE_INTERVAL_US) + 1;
+    sineIndex = (sineIndex + skipped) % SINE_TABLE_SIZE;
+    nextCarrierSampleAtUs += skipped * CARRIER_SAMPLE_INTERVAL_US;
+  }
 }
 
-uint8_t constrainIntensity(int value) {
-  return (uint8_t)constrain(value, 0, 255);
+void writeCarrierSample() {
+  uint16_t swing = (uint32_t)currentDrive * MAX_DAC_SWING_COUNTS / 255;
+  long offset = ((long)sineTable[sineIndex] * swing) / 32767L;
+  writeDac12(DAC_MIDPOINT + offset);
+}
+
+uint8_t shapeIntensityAt(unsigned long elapsedMs) {
+  if (shapePointCount == 0) {
+    return 0;
+  }
+
+  if (elapsedMs <= shapePoints[0].timeMs) {
+    return shapePoints[0].intensity;
+  }
+
+  for (byte i = 1; i < shapePointCount; i++) {
+    if (elapsedMs <= shapePoints[i].timeMs) {
+      ShapePoint previous = shapePoints[i - 1];
+      ShapePoint next = shapePoints[i];
+      unsigned int segmentDuration = next.timeMs - previous.timeMs;
+
+      if (segmentDuration == 0) {
+        return next.intensity;
+      }
+
+      unsigned long segmentElapsed = elapsedMs - previous.timeMs;
+      long delta = (long)next.intensity - (long)previous.intensity;
+      long value = previous.intensity + (delta * segmentElapsed / segmentDuration);
+      return (uint8_t)constrain(value, 0, 255);
+    }
+  }
+
+  return shapePoints[shapePointCount - 1].intensity;
 }
 
 bool loadShapePoints(String pointsText, unsigned int durationMs) {
@@ -367,9 +408,7 @@ bool loadShapePoints(String pointsText, unsigned int durationMs) {
       return false;
     }
 
-    shapePoints[shapePointCount].timeMs = (unsigned int)timeMs;
-    shapePoints[shapePointCount].intensity = constrainIntensity(intensity);
-    shapePointCount++;
+    addShapePoint((unsigned int)timeMs, constrainIntensity(intensity));
 
     if (comma < 0) {
       break;
@@ -407,14 +446,12 @@ bool parseNonNegativeInt(String text, int *value) {
   return true;
 }
 
-void stopPattern() {
-  patternPlaying = false;
-  patternLength = 0;
-  currentStep = 0;
-  stopMotor();
+uint8_t constrainIntensity(int value) {
+  return (uint8_t)constrain(value, 0, 255);
 }
 
-void stopMotor() {
-  analogWrite(MOTOR_PWM_PIN, 0);
+void stopPlayback() {
+  currentDrive = 0;
+  carrierRunning = false;
+  writeDac12(DAC_MIDPOINT);
 }
-

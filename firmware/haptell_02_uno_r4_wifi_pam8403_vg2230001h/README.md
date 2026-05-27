@@ -1,12 +1,18 @@
 # haptell-02 Arduino UNO R4 WiFi + PAM8403 + VG2230001H Firmware
 
-This firmware is a separate `haptell-02` hardware variant for the Vybronics
+This is the main non-blocking `haptell-02` hardware variant for the Vybronics
 VG2230001H 70 Hz LRA / voice-coil actuator. It does not use the DRV2605L.
 
 The Arduino UNO R4 WiFi generates a 70 Hz sine carrier on its `A0` DAC output.
 A PAM8403 class-D audio amplifier drives the actuator, and the firmware changes
 the carrier amplitude according to the selected haptic pattern or Shape Designer
 envelope.
+
+For the simpler blocking version, see:
+
+```text
+../haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/
+```
 
 ## Setup
 

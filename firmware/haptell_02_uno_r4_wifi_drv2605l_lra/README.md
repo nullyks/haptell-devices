@@ -1,8 +1,17 @@
 # haptell-02 Arduino UNO R4 WiFi + DRV2605L LRA Firmware
 
-This firmware controls a Vybronics VG1040003D LRA actuator through a Mavaol DRV2605L haptic motor controller module. It listens for UDP commands on port `4444` and maps the shared Haptell pattern commands to DRV2605L effect playback.
+This is the main non-blocking firmware for the Vybronics VG1040003D LRA actuator
+through a Mavaol DRV2605L haptic motor controller module. It listens for UDP
+commands on port `4444` and maps the shared Haptell pattern commands to
+DRV2605L effect or realtime playback.
 
 For a beginner-friendly explanation of the firmware structure, logic, and C++ syntax, see `CODE_WALKTHROUGH.md`.
+
+For the simpler blocking version, see:
+
+```text
+../haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/
+```
 
 ## Setup
 

@@ -51,7 +51,7 @@
               <input id="pulseDuration" type="number" min="0" value="800">
             </label>
           </div>
-          <button data-command="pulse">Send Pulse</button>
+          <button type="button" data-command="pulse">Send Pulse</button>
         </article>
 
         <article class="command">
@@ -69,7 +69,7 @@
               <input id="doubleGap" type="number" min="0" value="120">
             </label>
           </div>
-          <button data-command="double">Send Double</button>
+          <button type="button" data-command="double">Send Double</button>
         </article>
 
         <article class="command">
@@ -91,17 +91,17 @@
               <input id="rampDuration" type="number" min="0" value="1200">
             </label>
           </div>
-          <button data-command="ramp">Send Ramp</button>
+          <button type="button" data-command="ramp">Send Ramp</button>
         </article>
       </section>
 
-      <section class="designer" aria-label="LRA shape designer">
+      <section class="designer" aria-label="Shape designer">
         <div class="section-head">
           <div>
             <h2>Shape Designer</h2>
-            <p>Realtime LRA amplitude envelope for the main haptell-02 firmware.</p>
+            <p>Amplitude envelope for DC motor and LRA firmware variants.</p>
           </div>
-          <button id="sendShape">Send Shape</button>
+          <button id="sendShape" type="button" data-command="shape">Send Shape</button>
         </div>
 
         <div class="designer-controls">
@@ -155,7 +155,7 @@
       </section>
 
       <section class="stop-row" aria-label="Stop command">
-        <button class="stop-button" data-command="stop">Send Stop</button>
+        <button class="stop-button" type="button" data-command="stop">Send Stop</button>
       </section>
     </main>
 

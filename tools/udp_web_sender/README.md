@@ -1,6 +1,6 @@
 # UDP Web Sender
 
-This is a small local Node.js web app for sending Haptell UDP commands from a browser. It also includes a simple LRA shape designer for custom `haptell-02` realtime amplitude envelopes.
+This is a small local Node.js web app for sending Haptell UDP commands from a browser. It also includes a simple shape designer for custom amplitude envelopes.
 
 It is a browser-based companion to `tools/udp_sender/send_haptell_command.py`. The browser does not send UDP directly. Instead, the browser sends an HTTP request to the local Node.js server, and the Node.js server sends the UDP packet to the Haptell device.
 
@@ -102,7 +102,7 @@ Options:
 
 ## Command Buttons
 
-The UI has buttons for the common commands and a custom shape designer for the main `haptell-02` firmware.
+The UI has buttons for the common commands and a custom shape designer for the current firmware variants.
 
 ### Pulse
 
@@ -156,13 +156,16 @@ Use `stop` to stop playback immediately.
 
 ## Shape Designer
 
-The Shape Designer sends a compact realtime envelope command to the main
-DRV2605L `haptell-02` firmware, to the simple blocking DRV2605L example, and to
-the PAM8403 + VG2230001H firmware:
+The Shape Designer sends a compact envelope command supported by the DC motor,
+DRV2605L, and PAM8403 firmware variants:
 
 ```text
+haptell-01 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 ```
+
+Select `haptell-01` to send a DC motor PWM envelope. Select `haptell-02` for
+either LRA hardware path.
 
 The graph shows the amplitude envelope that the firmware will interpolate. The
 data preview shows the outgoing command as a structured array:
@@ -172,7 +175,7 @@ data preview shows the outgoing command as a structured array:
   ["target", "haptell-02"],
   ["command", "shape"],
   ["durationMs", 1600],
-  ["mode", "rtp-envelope"],
+  ["mode", "amplitude-envelope"],
   ["points", [
     ["timeMs", "intensity"],
     [0, 0],
@@ -193,7 +196,7 @@ Limits:
 - last point: `duration`
 
 For the firmware behavior, DRV2605L unsigned realtime playback setup,
-PAM8403/70 Hz carrier behavior, and test commands, see
+PAM8403/70 Hz carrier behavior, DC PWM behavior, and test commands, see
 `../../docs/lra-shape-designer.md`.
 
 ## Command Preview

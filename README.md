@@ -47,6 +47,11 @@ firmware/
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
+  haptell_01_uno_r4_wifi_dc_coin_simple_blocking/
+    haptell_01_uno_r4_wifi_dc_coin_simple_blocking.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
   haptell_02_uno_r4_wifi_drv2605l_lra/
     haptell_02_uno_r4_wifi_drv2605l_lra.ino
     secrets.example.h
@@ -59,6 +64,11 @@ firmware/
     CODE_WALKTHROUGH.md
   haptell_02_uno_r4_wifi_pam8403_vg2230001h/
     haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino
+    secrets.example.h
+    README.md
+    CODE_WALKTHROUGH.md
+  haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/
+    haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino
     secrets.example.h
     README.md
     CODE_WALKTHROUGH.md
@@ -80,6 +90,7 @@ schematics/
     diagram.md
 docs/
   command-protocol.md
+  firmware-variants.md
   hardware-notes.md
   lra-shape-designer.md
   lra-vibration-strength.md
@@ -108,7 +119,9 @@ Example command:
 haptell-01 pulse intensity=180 duration=800
 ```
 
-See `docs/command-protocol.md` for the supported commands.
+See `docs/command-protocol.md` for the supported commands, and
+`docs/firmware-variants.md` for the non-blocking and simple blocking firmware
+pairs.
 
 You can also use the Python sender example in `tools/udp_sender/`:
 
@@ -124,7 +137,11 @@ node tools/udp_web_sender/server.js
 
 Then open `http://127.0.0.1:8080`.
 
-The web sender also includes a simple `haptell-02` LRA shape designer. It visualizes a custom realtime amplitude envelope, shows the outgoing data as an array, and sends a compact `shape` command to the firmware. See `docs/lra-shape-designer.md`.
+The web sender also includes a simple shape designer. It visualizes a custom
+amplitude envelope, shows the outgoing data as an array, and sends a compact
+`shape` command to the firmware. The same command format works for the DC motor,
+DRV2605L LRA, and PAM8403/VG2230001H firmware variants. See
+`docs/lra-shape-designer.md`.
 
 ## Hardware Warning
 

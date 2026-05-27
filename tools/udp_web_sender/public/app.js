@@ -93,6 +93,8 @@ let shapePoints = [
   { timeMs: 1600, intensity: 0 },
 ];
 let activePointIndex = null;
+let lastPointerCommandButton = null;
+let lastPointerCommandAt = 0;
 
 function getTarget() {
   return inputs.target.value.trim() || "haptell-02";
@@ -178,7 +180,7 @@ function buildDataArray(action = "shape") {
     ["target", getTarget()],
     ["command", "shape"],
     ["durationMs", getDuration()],
-    ["mode", "rtp-envelope"],
+    ["mode", "amplitude-envelope"],
     [
       "points",
       [
@@ -385,17 +387,72 @@ function updatePointFromGraph(index, event) {
   renderDesigner();
 }
 
-document.querySelectorAll("button[data-command]").forEach((button) => {
-  button.addEventListener("mouseenter", () => updatePreview(button.dataset.command));
-  button.addEventListener("focus", () => updatePreview(button.dataset.command));
-  button.addEventListener("click", () => sendCommand(button.dataset.command));
+function commandButtonFromEvent(event) {
+  if (!(event.target instanceof Element)) {
+    return null;
+  }
+
+  const button = event.target.closest("button[data-command]");
+  if (!button || button.disabled) {
+    return null;
+  }
+
+  return button;
+}
+
+function sendCommandFromButton(button) {
+  updatePreview(button.dataset.command);
+  sendCommand(button.dataset.command);
+}
+
+document.addEventListener("mouseover", (event) => {
+  const button = commandButtonFromEvent(event);
+  if (!button) {
+    return;
+  }
+
+  updatePreview(button.dataset.command);
+});
+
+document.addEventListener("focusin", (event) => {
+  const button = commandButtonFromEvent(event);
+  if (!button) {
+    return;
+  }
+
+  updatePreview(button.dataset.command);
+});
+
+document.addEventListener("pointerup", (event) => {
+  const button = commandButtonFromEvent(event);
+  if (!button) {
+    return;
+  }
+
+  event.preventDefault();
+  lastPointerCommandButton = button;
+  lastPointerCommandAt = Date.now();
+  sendCommandFromButton(button);
+});
+
+document.addEventListener("click", (event) => {
+  const button = commandButtonFromEvent(event);
+  if (!button) {
+    return;
+  }
+
+  event.preventDefault();
+  if (button === lastPointerCommandButton && Date.now() - lastPointerCommandAt < 800) {
+    return;
+  }
+
+  sendCommandFromButton(button);
 });
 
 document.querySelectorAll("button[data-preset]").forEach((button) => {
   button.addEventListener("click", () => applyPreset(button.dataset.preset));
 });
 
-document.querySelector("#sendShape").addEventListener("click", () => sendCommand("shape"));
 document.querySelector("#addPoint").addEventListener("click", addPoint);
 
 pointsListEl.addEventListener("input", (event) => {

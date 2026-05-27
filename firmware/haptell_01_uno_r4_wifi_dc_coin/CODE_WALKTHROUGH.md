@@ -391,6 +391,38 @@ If a step goes from `0` to `180` over 100 ms:
 
 This creates smooth ramps instead of sudden jumps.
 
+## Shape Designer Playback
+
+The firmware also supports a custom `shape` command:
+
+```text
+haptell-01 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+```
+
+The command contains a list of `time:intensity` points. For the DC motor,
+`intensity` is the PWM value sent to the MOSFET gate output through Arduino
+`D9`.
+
+The firmware validates the points first:
+
+- duration must be `1..5000 ms`
+- there must be at least two points
+- point times must be sorted
+- the first point time must be `0`
+- the last point time must equal `duration`
+- intensity must be `0..255`
+
+After validation, the code turns each pair of neighboring points into a
+`PatternStep`:
+
+```text
+previous intensity -> next intensity over next.timeMs - previous.timeMs
+```
+
+The existing non-blocking pattern player then handles the shape exactly like the
+built-in `pulse`, `double`, and `ramp` patterns. This means `stop` or another
+valid command can interrupt an active shape.
+
 ## Motor Output
 
 The motor is controlled with:

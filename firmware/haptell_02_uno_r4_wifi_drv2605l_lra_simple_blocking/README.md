@@ -1,6 +1,6 @@
-# haptell-02 Simple Blocking Firmware Example
+# haptell-02 Simple Blocking DRV2605L LRA Firmware
 
-This is a beginner-friendly firmware example for the same haptell-02 hardware:
+This is the beginner-friendly blocking firmware for the same haptell-02 hardware:
 
 - Arduino UNO R4 WiFi
 - Mavaol DRV2605L haptic motor controller module
