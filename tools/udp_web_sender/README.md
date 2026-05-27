@@ -1,6 +1,6 @@
 # UDP Web Sender
 
-This is a small local Node.js web app for sending Haptell UDP commands from a browser.
+This is a small local Node.js web app for sending Haptell UDP commands from a browser. It also includes a simple LRA shape designer for custom `haptell-02` realtime amplitude envelopes.
 
 It is a browser-based companion to `tools/udp_sender/send_haptell_command.py`. The browser does not send UDP directly. Instead, the browser sends an HTTP request to the local Node.js server, and the Node.js server sends the UDP packet to the Haptell device.
 
@@ -102,7 +102,7 @@ Options:
 
 ## Command Buttons
 
-The UI has one button for each currently supported command.
+The UI has buttons for the common commands and a custom shape designer for the main `haptell-02` firmware.
 
 ### Pulse
 
@@ -144,16 +144,6 @@ Fields:
 - `to`: default `255`
 - `duration`: default `1200`
 
-### Custom
-
-Sends:
-
-```text
-haptell-02 custom
-```
-
-The `custom` command is implemented by the simple blocking haptell-02 firmware example. It demonstrates a DRV2605L realtime playback shape without using built-in DRV2605L effect numbers.
-
 ### Stop
 
 Sends:
@@ -163,6 +153,46 @@ haptell-02 stop
 ```
 
 Use `stop` to stop playback immediately.
+
+## Shape Designer
+
+The Shape Designer sends a compact realtime envelope command to the main
+`haptell-02` firmware:
+
+```text
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+```
+
+The graph shows the amplitude envelope that the firmware will interpolate. The
+data preview shows the outgoing command as a structured array:
+
+```js
+[
+  ["target", "haptell-02"],
+  ["command", "shape"],
+  ["durationMs", 1600],
+  ["mode", "rtp-envelope"],
+  ["points", [
+    ["timeMs", "intensity"],
+    [0, 0],
+    [100, 180],
+    [700, 180],
+    [1200, 60],
+    [1600, 0]
+  ]]
+]
+```
+
+Limits:
+
+- duration: up to `5000 ms`
+- points: up to `24`
+- intensity: `0` to `255`
+- first point: `0 ms`
+- last point: `duration`
+
+For the firmware behavior, unsigned realtime playback setup, and test commands,
+see `../../docs/lra-shape-designer.md`.
 
 ## Command Preview
 
@@ -233,16 +263,6 @@ UDP sending can succeed even when the device does not receive or act on the pack
 - The firmware is listening on UDP port `4444`.
 - The selected target matches the firmware device ID, or the target is `all`.
 - The device is powered and the haptic driver wiring is correct.
-
-### `custom` Does Nothing
-
-Only the simple blocking haptell-02 firmware example currently implements `custom`.
-
-Use this sketch:
-
-```text
-firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino
-```
 
 ### Firewall Notes
 

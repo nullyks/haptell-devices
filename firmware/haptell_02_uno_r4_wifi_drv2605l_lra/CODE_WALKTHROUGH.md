@@ -56,10 +56,11 @@ void loop() {
   keepWiFiConnected();
   readUdpCommand();
   updateEffectPlayer();
+  updateShapePlayer();
 }
 ```
 
-This keeps the device responsive. Even while an effect sequence is playing, the Arduino can receive a new command such as `stop`.
+This keeps the device responsive. Even while an effect sequence or realtime shape is playing, the Arduino can receive a new command such as `stop`.
 
 ## Included Libraries
 
@@ -191,6 +192,7 @@ The device receives text such as:
 
 ```text
 haptell-02 pulse intensity=180 duration=800
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 ```
 
 The function `readUdpCommand()` checks whether a UDP packet arrived:
@@ -264,14 +266,16 @@ if (action == "pulse") {
   playDoubleTap(getIntParam(command, "intensity", 220), getIntParam(command, "gap", 120));
 } else if (action == "ramp") {
   playRamp(getIntParam(command, "from", 60), getIntParam(command, "to", 255));
+} else if (action == "shape") {
+  playShape(command);
 } else if (action == "stop") {
-  stopEffects();
+  stopPlayback();
 } else {
   Serial.println("Ignored: unknown action");
 }
 ```
 
-Unknown patterns are ignored. A valid new pattern interrupts the current sequence because each pattern function starts by clearing the previous steps.
+Unknown patterns are ignored. A valid new pattern interrupts the current sequence because each pattern function clears the previous playback state before starting.
 
 ## Reading Parameters
 
@@ -353,6 +357,25 @@ if (now - effectStepStartedAt < effectSteps[currentEffectStep].holdMs) {
 
 This avoids long blocking `delay()` calls during pattern playback. The Arduino can keep checking WiFi and UDP while a haptic sequence is running.
 
+## Realtime Shape Playback
+
+The `shape` command plays a short custom amplitude envelope in DRV2605L realtime playback mode:
+
+```text
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+```
+
+The `points` parameter is a compact list of `time:intensity` pairs. The first point must be at `0 ms`, and the last point must be at the requested duration. The maximum duration is `5000 ms`, and the firmware accepts up to 24 points.
+
+During playback, `updateShapePlayer()` uses `millis()` to compute the elapsed time, finds the two surrounding points, linearly interpolates the intensity, and sends it to the DRV2605L:
+
+```cpp
+drv.setMode(DRV2605_MODE_REALTIME);
+drv.setRealtimeValue(shapeIntensityAt(elapsed));
+```
+
+The shape player uses unsigned realtime values, so `0` means no drive and `255` means full-scale drive. When shape playback ends or `stop` is received, the firmware writes `0` and returns the DRV2605L to internal-trigger mode for the built-in library effects.
+
 ## Triggering the DRV2605L
 
 The function `playCurrentEffectStep()` triggers the active effect:
@@ -379,15 +402,13 @@ if (effect == 0) {
 The `stop` command calls:
 
 ```cpp
-void stopEffects() {
-  sequencePlaying = false;
-  effectStepCount = 0;
-  currentEffectStep = 0;
-  drv.stop();
+void stopPlayback() {
+  stopShape();
+  stopEffects();
 }
 ```
 
-This clears the sequence and tells the DRV2605L to stop output.
+This clears both possible playback paths: the built-in effect sequencer and the realtime shape player.
 
 ## Important Syntax Notes
 
@@ -488,8 +509,8 @@ If the actuator does not move:
 Think of this firmware as a tiny network-to-haptics translator:
 
 - UDP commands choose a named Haptell pattern.
-- Pattern functions convert the command into DRV2605L effect steps.
-- `loop()` keeps checking time and advances through the steps.
+- Pattern functions convert the command into DRV2605L effect steps or a realtime shape.
+- `loop()` keeps checking time and advances through the active playback state.
 - The DRV2605L, not the Arduino GPIO pin, drives the LRA.
 
 This keeps the command protocol shared with `haptell-01` while using hardware that is much better suited to an LRA actuator.

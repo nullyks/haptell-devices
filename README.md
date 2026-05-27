@@ -65,6 +65,8 @@ schematics/
 docs/
   command-protocol.md
   hardware-notes.md
+  lra-shape-designer.md
+  lra-vibration-strength.md
 tools/
   udp_sender/
     send_haptell_command.py
@@ -105,6 +107,8 @@ node tools/udp_web_sender/server.js
 ```
 
 Then open `http://127.0.0.1:8080`.
+
+The web sender also includes a simple `haptell-02` LRA shape designer. It visualizes a custom realtime amplitude envelope, shows the outgoing data as an array, and sends a compact `shape` command to the firmware. See `docs/lra-shape-designer.md`.
 
 ## Hardware Warning
 

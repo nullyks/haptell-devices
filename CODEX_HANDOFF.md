@@ -151,6 +151,7 @@ Current patterns:
 - `pulse`
 - `double`
 - `ramp`
+- `shape` on the main haptell-02 firmware
 - `stop`
 
 Example commands:
@@ -163,11 +164,12 @@ haptell-01 stop
 haptell-02 pulse intensity=180 duration=800
 haptell-02 double intensity=220 gap=120
 haptell-02 ramp from=60 to=255 duration=1200
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
 haptell-02 stop
 all stop
 ```
 
-The haptell-01 firmware, main haptell-02 firmware, and simple blocking haptell-02 example were successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi`.
+The haptell-01 firmware, main haptell-02 firmware, and simple blocking haptell-02 example were successfully compiled locally with Arduino CLI for `arduino:renesas_uno:unor4wifi` before the later `shape` command addition. The updated main haptell-02 firmware with `shape` support was also compiled on this machine using a temporary dummy `secrets.h`, then the dummy credentials file was removed.
 
 Installed local Arduino tooling:
 
@@ -197,7 +199,9 @@ The repository also includes a local Node.js web sender:
 tools/udp_web_sender/server.js
 ```
 
-It starts a local HTTP server at `http://127.0.0.1:8080` and provides large browser buttons for `pulse`, `double`, `ramp`, `custom`, and `stop`. No npm packages are required.
+It starts a local HTTP server at `http://127.0.0.1:8080` and provides buttons for `pulse`, `double`, `ramp`, and `stop`, plus a `haptell-02` LRA shape designer. The shape designer visualizes a realtime amplitude envelope, shows the outgoing data as a structured array, and sends compact UDP commands such as `haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0`. No npm packages are required.
+
+The shape designer and firmware workflow are documented in `docs/lra-shape-designer.md`.
 
 Example:
 
@@ -289,9 +293,9 @@ DRV2605L OUT- -> VG1040003D lead 2
 1. Physically build and test the DC motor driver circuit.
 2. Upload firmware to Arduino UNO R4 WiFi.
 3. Confirm the Arduino joins the WiFi network and prints its IP address to Serial Monitor.
-4. Test `pulse`, `double`, `ramp`, and `stop` commands with a UDP sender.
+4. Test `pulse`, `double`, `ramp`, `shape`, and `stop` commands with a UDP sender.
 5. Measure whether IRF3205 switches the small motor reliably at the selected PWM levels.
-6. Add a small client tool or web controller for sending UDP commands.
+6. Use the Node.js web sender to design and send short `haptell-02` LRA envelope shapes.
 7. After LiPo hardware arrives, document and test the portable 5 V power path.
 8. Install the Adafruit DRV2605 Arduino library and compile `haptell-02`.
 9. Physically build and test the DRV2605L + VG1040003D LRA prototype.

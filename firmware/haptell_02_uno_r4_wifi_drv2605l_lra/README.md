@@ -29,6 +29,7 @@ For a beginner-friendly explanation of the firmware structure, logic, and C++ sy
 - `pulse`
 - `double`
 - `ramp`
+- `shape`
 - `stop`
 
 Example:
@@ -36,6 +37,16 @@ Example:
 ```text
 haptell-02 pulse intensity=180 duration=800
 ```
+
+Custom realtime envelope example:
+
+```text
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+```
+
+The `shape` command accepts up to 24 sorted `time:intensity` points over a
+maximum duration of 5000 ms. The firmware interpolates between points and sends
+unsigned realtime drive values to the DRV2605L.
 
 The current pattern mappings are first-pass tuning values. The exact feel should be adjusted after testing with the real VG1040003D actuator and DRV2605L module.
 

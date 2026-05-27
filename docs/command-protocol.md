@@ -71,6 +71,27 @@ all stop
 
 For `haptell-02`, the DRV2605L firmware maps these generic pattern names to DRV2605L LRA effect playback. The `intensity`, `from`, `to`, and `duration` values are kept in the command interface for compatibility and later tuning, but the exact feel depends on the selected DRV2605L effect library, actuator calibration, and module behavior.
 
+### Shape
+
+Plays a custom LRA realtime amplitude envelope on the main `haptell-02` firmware.
+
+```text
+haptell-02 shape duration=1600 points=0:0,100:180,700:180,1200:60,1600:0
+```
+
+Parameters:
+
+- `duration`: total pattern duration in milliseconds, `1` to `5000`
+- `points`: comma-separated `time:intensity` pairs
+- `time`: point time in milliseconds, sorted from `0` to `duration`
+- `intensity`: realtime drive value from `0` to `255`
+
+The first point must be at `0 ms`, and the last point must be at `duration`.
+The firmware linearly interpolates between points and sends the resulting values
+to the DRV2605L in realtime playback mode. The web sender includes a simple
+envelope editor that generates this command and shows the outgoing data as a
+structured array. See `lra-shape-designer.md` for the full workflow.
+
 The simple blocking haptell-02 firmware example also supports:
 
 ```text
@@ -117,4 +138,4 @@ Start it from the repository root:
 node tools/udp_web_sender/server.js
 ```
 
-Then open `http://127.0.0.1:8080`. The web UI has large buttons for `pulse`, `double`, `ramp`, `custom`, and `stop`, with default parameter fields filled in.
+Then open `http://127.0.0.1:8080`. The web UI has buttons for `pulse`, `double`, `ramp`, and `stop`, plus a custom LRA shape designer for the `haptell-02` realtime envelope command.

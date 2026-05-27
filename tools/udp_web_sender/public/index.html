@@ -11,7 +11,7 @@
       <header class="topbar">
         <div>
           <h1>Haptell UDP Sender</h1>
-          <p>Send local UDP commands to haptell-01 or haptell-02.</p>
+          <p>Send local UDP commands and LRA envelope shapes to Haptell devices.</p>
         </div>
         <div class="status" id="status">Ready</div>
       </header>
@@ -93,22 +93,54 @@
           </div>
           <button data-command="ramp">Send Ramp</button>
         </article>
+      </section>
 
-        <article class="command">
+      <section class="designer" aria-label="LRA shape designer">
+        <div class="section-head">
           <div>
-            <h2>Custom</h2>
-            <p>haptell-02 realtime DRV2605L example.</p>
+            <h2>Shape Designer</h2>
+            <p>Realtime LRA amplitude envelope for the main haptell-02 firmware.</p>
           </div>
-          <button data-command="custom">Send Custom</button>
-        </article>
+          <button id="sendShape">Send Shape</button>
+        </div>
 
-        <article class="command stop">
-          <div>
-            <h2>Stop</h2>
-            <p>Stop playback immediately.</p>
+        <div class="designer-controls">
+          <label>
+            duration ms
+            <input id="shapeDuration" type="number" min="100" max="5000" step="20" value="1600">
+          </label>
+          <label>
+            max points
+            <input id="maxPoints" type="text" value="24" readonly>
+          </label>
+          <div class="preset-buttons" aria-label="Shape presets">
+            <button data-preset="tap" type="button">Tap</button>
+            <button data-preset="double" type="button">Double</button>
+            <button data-preset="pulse" type="button">Pulse</button>
+            <button data-preset="ramp" type="button">Ramp</button>
+            <button data-preset="heartbeat" type="button">Heartbeat</button>
           </div>
-          <button data-command="stop">Send Stop</button>
-        </article>
+        </div>
+
+        <div class="designer-grid">
+          <div class="graph-panel">
+            <svg id="envelopeGraph" viewBox="0 0 720 320" role="img" aria-label="LRA envelope graph">
+              <rect class="graph-bg" x="48" y="24" width="640" height="240"></rect>
+              <g id="gridLayer"></g>
+              <path id="envelopeFill"></path>
+              <polyline id="envelopeLine"></polyline>
+              <g id="pointLayer"></g>
+            </svg>
+          </div>
+
+          <div class="points-panel">
+            <div class="points-head">
+              <h3>Points</h3>
+              <button id="addPoint" type="button">Add Point</button>
+            </div>
+            <div id="pointsList" class="points-list"></div>
+          </div>
+        </div>
       </section>
 
       <section class="preview" aria-label="Command preview">
@@ -116,6 +148,14 @@
           Command preview
           <input id="commandPreview" type="text" readonly value="haptell-02 pulse intensity=180 duration=800">
         </label>
+        <label>
+          Data array preview
+          <textarea id="dataPreview" readonly rows="10"></textarea>
+        </label>
+      </section>
+
+      <section class="stop-row" aria-label="Stop command">
+        <button class="stop-button" data-command="stop">Send Stop</button>
       </section>
     </main>
 

@@ -1,14 +1,16 @@
 :root {
   color-scheme: light;
-  --bg: #f7f7f4;
+  --bg: #f4f6f8;
   --panel: #ffffff;
-  --ink: #071a2d;
-  --muted: #52606d;
-  --line: #d5d9de;
+  --ink: #101820;
+  --muted: #55616f;
+  --line: #d4dae2;
   --blue: #245db8;
+  --cyan: #0f7c8f;
   --green: #1f7a4d;
   --red: #b8292f;
   --focus: #f4c542;
+  --soft: #eaf2ff;
 }
 
 * {
@@ -24,38 +26,49 @@ body {
 }
 
 .app {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1220px, calc(100% - 32px));
   margin: 0 auto;
   padding: 24px 0 40px;
 }
 
-.topbar {
+.topbar,
+.section-head,
+.points-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+}
+
+.topbar {
   margin-bottom: 18px;
 }
 
 h1,
 h2,
+h3,
 p {
   margin: 0;
 }
 
 h1 {
-  font-size: 36px;
+  font-size: 34px;
   line-height: 1.15;
 }
 
 h2 {
-  font-size: 26px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 20px;
   line-height: 1.2;
 }
 
 p {
   color: var(--muted);
-  font-size: 18px;
+  font-size: 17px;
   margin-top: 6px;
 }
 
@@ -81,10 +94,9 @@ p {
 }
 
 .settings,
-.preview {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr 0.8fr;
-  gap: 14px;
+.preview,
+.designer,
+.stop-row {
   padding: 18px;
   margin-bottom: 18px;
   border: 1px solid var(--line);
@@ -92,8 +104,16 @@ p {
   background: var(--panel);
 }
 
+.settings {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr 0.8fr;
+  gap: 14px;
+}
+
 .preview {
+  display: grid;
   grid-template-columns: 1fr;
+  gap: 14px;
   margin-top: 18px;
 }
 
@@ -101,31 +121,47 @@ label {
   display: grid;
   gap: 8px;
   color: var(--muted);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
 }
 
 input,
 select,
-button {
+button,
+textarea {
   width: 100%;
-  min-height: 56px;
   border-radius: 8px;
   font: inherit;
-  font-size: 22px;
 }
 
 input,
-select {
+select,
+button {
+  min-height: 52px;
+  font-size: 20px;
+}
+
+input,
+select,
+textarea {
   border: 1px solid var(--line);
   background: #fff;
   color: var(--ink);
   padding: 10px 12px;
 }
 
+textarea {
+  min-height: 220px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
 input:focus,
 select:focus,
-button:focus {
+button:focus,
+textarea:focus {
   outline: 4px solid var(--focus);
   outline-offset: 2px;
 }
@@ -133,6 +169,7 @@ button:focus {
 .commands {
   display: grid;
   gap: 14px;
+  margin-bottom: 18px;
 }
 
 .command {
@@ -157,11 +194,6 @@ button:focus {
   grid-template-columns: repeat(2, minmax(120px, 1fr));
 }
 
-.command:nth-child(4),
-.command:nth-child(5) {
-  grid-template-columns: minmax(180px, 1fr) minmax(180px, 0.4fr);
-}
-
 button {
   border: 0;
   background: var(--blue);
@@ -171,35 +203,183 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:hover:not(:disabled) {
   filter: brightness(0.92);
 }
 
-.stop button {
-  background: var(--red);
+button:disabled {
+  background: #aeb7c2;
+  cursor: default;
+}
+
+#sendShape {
+  width: min(260px, 100%);
+  background: var(--cyan);
+}
+
+.designer-controls {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.35fr) minmax(110px, 0.25fr) minmax(360px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin: 18px 0;
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(92px, 1fr));
+  gap: 10px;
+}
+
+.preset-buttons button {
+  background: #43515f;
+  font-size: 17px;
+}
+
+.designer-grid {
+  display: grid;
+  grid-template-columns: minmax(460px, 1.25fr) minmax(330px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.graph-panel,
+.points-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.graph-panel {
+  padding: 12px;
+}
+
+#envelopeGraph {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  touch-action: none;
+}
+
+.graph-bg {
+  fill: #fff;
+  stroke: var(--line);
+}
+
+.grid-line {
+  stroke: #e2e7ee;
+  stroke-width: 1;
+}
+
+.grid-text {
+  fill: var(--muted);
+  font-size: 12px;
+}
+
+#envelopeFill {
+  fill: rgba(15, 124, 143, 0.16);
+  stroke: none;
+}
+
+#envelopeLine {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.shape-point {
+  fill: #fff;
+  stroke: var(--cyan);
+  stroke-width: 4;
+  cursor: grab;
+}
+
+.shape-point.fixed {
+  fill: var(--soft);
+  stroke: var(--blue);
+  cursor: default;
+}
+
+.points-panel {
+  padding: 14px;
+}
+
+.points-head {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+#addPoint {
+  width: 150px;
+  min-height: 44px;
+  font-size: 16px;
+  background: var(--green);
+}
+
+.points-list {
+  display: grid;
+  gap: 10px;
+}
+
+.point-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 112px;
+  gap: 10px;
+  align-items: end;
+}
+
+.point-row input,
+.point-row button {
+  min-height: 44px;
+  font-size: 17px;
+}
+
+.point-row button {
+  background: #43515f;
 }
 
 #commandPreview {
   font-family: Consolas, "Courier New", monospace;
+  font-size: 17px;
 }
 
-@media (max-width: 820px) {
+.stop-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.stop-button {
+  width: min(260px, 100%);
+  background: var(--red);
+}
+
+@media (max-width: 920px) {
   .topbar,
-  .settings,
-  .command,
-  .command:nth-child(4),
-  .command:nth-child(5) {
-    grid-template-columns: 1fr;
+  .section-head,
+  .points-head,
+  .stop-row {
     display: grid;
   }
 
-  .topbar {
-    display: grid;
+  .settings,
+  .command,
+  .designer-controls,
+  .designer-grid {
+    grid-template-columns: 1fr;
   }
 
   .params,
   .command:nth-child(1) .params,
-  .command:nth-child(2) .params {
+  .command:nth-child(2) .params,
+  .preset-buttons,
+  .point-row {
     grid-template-columns: 1fr;
+  }
+
+  #sendShape,
+  #addPoint,
+  .stop-button {
+    width: 100%;
   }
 }
