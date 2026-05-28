@@ -382,10 +382,28 @@ button:disabled {
 }
 
 #addPoint {
-  width: 150px;
+  width: 132px;
   min-height: 40px;
   font-size: 16px;
   background: var(--green);
+}
+
+.add-point-controls {
+  display: grid;
+  grid-template-columns: 126px 132px;
+  gap: 8px;
+  align-items: end;
+}
+
+.add-point-controls label {
+  gap: 4px;
+  font-size: 13px;
+}
+
+.add-point-controls select {
+  min-height: 40px;
+  font-size: 15px;
+  padding: 6px 8px;
 }
 
 .points-list {
@@ -467,7 +485,12 @@ button:disabled {
     grid-column: 1 / -1;
   }
 
+  .add-point-controls,
   #addPoint {
     width: 100%;
+  }
+
+  .add-point-controls {
+    grid-template-columns: 1fr;
   }
 }

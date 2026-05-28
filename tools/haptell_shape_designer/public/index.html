@@ -48,8 +48,8 @@
             <p>First point intensity is editable. Final point is always zero.</p>
           </div>
           <div class="designer-actions">
-            <button id="saveJson" class="secondary" type="button">Save JSON</button>
-            <button id="loadJsonButton" class="file-button" type="button">Load JSON</button>
+            <button id="saveJson" class="secondary" type="button">Save Shape</button>
+            <button id="loadJsonButton" class="file-button" type="button">Load Shape</button>
             <input id="loadJson" class="file-input" type="file" accept="application/json,.json">
           </div>
         </div>
@@ -57,7 +57,7 @@
         <div class="designer-controls">
           <label>
             duration ms
-            <input id="shapeDuration" type="number" min="100" max="15000" step="10" value="3000">
+            <input id="shapeDuration" type="text" inputmode="numeric" pattern="[0-9]*" value="3000">
           </label>
           <label>
             max points
@@ -96,7 +96,13 @@
           <aside class="points-panel">
             <div class="points-head">
               <h3>Points</h3>
-              <button id="addPoint" type="button">Add Point</button>
+              <div class="add-point-controls">
+                <label>
+                  after
+                  <select id="addAfterPoint"></select>
+                </label>
+                <button id="addPoint" type="button">Add Point</button>
+              </div>
             </div>
             <div id="pointsList" class="points-list"></div>
           </aside>

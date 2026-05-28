@@ -25,6 +25,8 @@ const pointsListEl = document.querySelector("#pointsList");
 const zoomDisplayEl = document.querySelector("#zoomDisplay");
 const zoomRangeEl = document.querySelector("#zoomRange");
 const zoomPanEl = document.querySelector("#zoomPan");
+const addAfterPointEl = document.querySelector("#addAfterPoint");
+const addPointButtonEl = document.querySelector("#addPoint");
 
 const inputs = {
   ipAddress: document.querySelector("#ipAddress"),
@@ -89,6 +91,8 @@ let activePointIndex = null;
 let busyTimer = null;
 let graphZoomLevel = 1;
 let graphViewStartRatio = 0;
+let currentDurationMs = 3000;
+let addAfterIndex = 0;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -99,7 +103,49 @@ function getTarget() {
 }
 
 function getDuration() {
-  return clamp(Number(inputs.shapeDuration.value) || 3000, MIN_DURATION_MS, MAX_DURATION_MS);
+  return currentDurationMs;
+}
+
+function sanitizeDurationInput() {
+  const cleaned = inputs.shapeDuration.value.replace(/\D/g, "");
+  if (inputs.shapeDuration.value !== cleaned) {
+    inputs.shapeDuration.value = cleaned;
+  }
+}
+
+function getDurationInputValue() {
+  sanitizeDurationInput();
+  const rawValue = Number(inputs.shapeDuration.value);
+  if (!Number.isFinite(rawValue) || rawValue <= 0) {
+    return currentDurationMs;
+  }
+
+  return clamp(Math.round(rawValue), MIN_DURATION_MS, MAX_DURATION_MS);
+}
+
+function setShapeDuration(nextDurationMs, scalePoints) {
+  nextDurationMs = clamp(Math.round(Number(nextDurationMs) || currentDurationMs), MIN_DURATION_MS, MAX_DURATION_MS);
+  const previousDurationMs = currentDurationMs;
+
+  if (scalePoints && previousDurationMs > 0 && nextDurationMs !== previousDurationMs) {
+    const ratio = nextDurationMs / previousDurationMs;
+    shapePoints = shapePoints.map((point, index) => {
+      const isFirst = index === 0;
+      const isLast = index === shapePoints.length - 1;
+      return {
+        timeMs: isFirst ? 0 : isLast ? nextDurationMs : clamp(Math.round(point.timeMs * ratio), 0, nextDurationMs),
+        intensity: point.intensity,
+      };
+    });
+  }
+
+  currentDurationMs = nextDurationMs;
+  inputs.shapeDuration.value = currentDurationMs;
+}
+
+function commitDurationInput() {
+  setShapeDuration(getDurationInputValue(), true);
+  renderDesigner();
 }
 
 function normalizeShapePoints() {
@@ -211,6 +257,7 @@ function showBusyWarning(durationMs) {
 }
 
 async function sendShape() {
+  commitDurationInput();
   const command = buildCommand();
   const durationMs = getDuration();
   previewEl.value = command;
@@ -399,13 +446,14 @@ function renderGraph() {
 
 function renderPointRows() {
   normalizeShapePoints();
+  renderAddAfterOptions();
 
   const rows = shapePoints
     .map((point, index) => {
       const isFirst = index === 0;
       const isLast = index === shapePoints.length - 1;
-      const removeButton = isFirst || isLast
-        ? `<button type="button" disabled>Keep</button>`
+      const actionCell = isFirst || isLast
+        ? `<div class="point-action" aria-hidden="true"></div>`
         : `<button type="button" data-remove-point="${index}">Remove</button>`;
 
       return `
@@ -413,7 +461,7 @@ function renderPointRows() {
           <div class="point-number">${index + 1}</div>
           <input aria-label="Point ${index + 1} time" type="number" min="0" max="${getDuration()}" step="10" value="${point.timeMs}" data-point-time="${index}" ${isFirst || isLast ? "readonly" : ""}>
           <input aria-label="Point ${index + 1} intensity" type="number" min="0" max="255" value="${point.intensity}" data-point-intensity="${index}" ${isLast ? "readonly" : ""}>
-          ${removeButton}
+          ${actionCell}
         </div>
       `;
     })
@@ -430,6 +478,36 @@ function renderPointRows() {
   `;
 }
 
+function getMaxAddAfterIndex() {
+  return Math.max(0, shapePoints.length - 2);
+}
+
+function getAddAfterIndex() {
+  const selectedIndex = Number(addAfterPointEl.value);
+  if (Number.isFinite(selectedIndex)) {
+    addAfterIndex = selectedIndex;
+  }
+
+  addAfterIndex = clamp(Math.round(addAfterIndex), 0, getMaxAddAfterIndex());
+  return addAfterIndex;
+}
+
+function renderAddAfterOptions() {
+  const maxAddAfterIndex = getMaxAddAfterIndex();
+  addAfterIndex = clamp(Math.round(addAfterIndex), 0, maxAddAfterIndex);
+
+  addAfterPointEl.innerHTML = shapePoints
+    .slice(0, -1)
+    .map((point, index) => {
+      return `<option value="${index}">#${index + 1} (${point.timeMs} ms)</option>`;
+    })
+    .join("");
+
+  addAfterPointEl.value = String(addAfterIndex);
+  addAfterPointEl.disabled = shapePoints.length >= MAX_POINTS;
+  addPointButtonEl.disabled = shapePoints.length >= MAX_POINTS;
+}
+
 function renderDesigner() {
   renderGraph();
   renderPointRows();
@@ -444,13 +522,19 @@ function addPoint() {
     return;
   }
 
-  const durationMs = getDuration();
-  let timeMs = Math.round(durationMs / 2);
-  while (shapePoints.some((point) => point.timeMs === timeMs) && timeMs < durationMs - 20) {
-    timeMs += 20;
+  const afterIndex = getAddAfterIndex();
+  const previousPoint = shapePoints[afterIndex];
+  const nextPoint = shapePoints[afterIndex + 1];
+
+  if (!nextPoint || nextPoint.timeMs - previousPoint.timeMs <= 1) {
+    setStatus(`No time gap after point ${afterIndex + 1}`, "error");
+    return;
   }
 
-  shapePoints.push({ timeMs, intensity: 128 });
+  const timeMs = previousPoint.timeMs + Math.round((nextPoint.timeMs - previousPoint.timeMs) / 2);
+  const intensity = Math.round((previousPoint.intensity + nextPoint.intensity) / 2);
+  shapePoints.splice(afterIndex + 1, 0, { timeMs, intensity });
+  addAfterIndex = afterIndex + 1;
   renderDesigner();
 }
 
@@ -470,7 +554,7 @@ function applyPreset(name) {
     return;
   }
 
-  inputs.shapeDuration.value = preset.durationMs;
+  setShapeDuration(preset.durationMs, false);
   shapePoints = preset.points.map((point) => ({ ...point }));
   renderDesigner();
 }
@@ -524,6 +608,7 @@ function downloadJsonFallback(jsonText, fileName) {
 }
 
 async function saveJson() {
+  commitDurationInput();
   const pattern = buildPatternJson();
   const jsonText = JSON.stringify(pattern, null, 2);
   const fileName = defaultJsonFileName(pattern);
@@ -602,7 +687,7 @@ function validateLoadedPattern(pattern) {
 async function loadJsonFile(file) {
   try {
     const loaded = validateLoadedPattern(JSON.parse(await file.text()));
-    inputs.shapeDuration.value = loaded.durationMs;
+    setShapeDuration(loaded.durationMs, false);
     shapePoints = loaded.points;
     renderDesigner();
     setStatus("JSON loaded", "ok");
@@ -655,7 +740,10 @@ document.querySelectorAll("button[data-preset]").forEach((button) => {
   button.addEventListener("click", () => applyPreset(button.dataset.preset));
 });
 
-document.querySelector("#addPoint").addEventListener("click", addPoint);
+addAfterPointEl.addEventListener("change", () => {
+  addAfterIndex = Number(addAfterPointEl.value);
+});
+addPointButtonEl.addEventListener("click", addPoint);
 document.querySelector("#zoomOut").addEventListener("click", () => setGraphZoom(graphZoomLevel - ZOOM_STEP));
 document.querySelector("#zoomIn").addEventListener("click", () => setGraphZoom(graphZoomLevel + ZOOM_STEP));
 document.querySelector("#zoomFit").addEventListener("click", () => {
@@ -729,18 +817,29 @@ graphEl.addEventListener("wheel", (event) => {
 Object.values(inputs).forEach((input) => {
   input.addEventListener("input", () => {
     if (input === inputs.shapeDuration) {
-      renderDesigner();
+      sanitizeDurationInput();
       return;
     }
     updatePreview();
   });
   input.addEventListener("change", () => {
     if (input === inputs.shapeDuration) {
-      renderDesigner();
+      commitDurationInput();
       return;
     }
     updatePreview();
   });
 });
+
+inputs.shapeDuration.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    commitDurationInput();
+    inputs.shapeDuration.blur();
+  }
+});
+
+inputs.shapeDuration.addEventListener("wheel", (event) => {
+  event.preventDefault();
+}, { passive: false });
 
 renderDesigner();

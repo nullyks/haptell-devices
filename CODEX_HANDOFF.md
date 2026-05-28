@@ -330,8 +330,12 @@ It starts at `http://127.0.0.1:8082` by default. It designs custom `shape`
 commands up to `15000 ms` and `30` points. The graph and point table both show
 point numbers to help users navigate longer shapes. The graph supports
 horizontal zooming with `+`, `-`, `Fit`, mouse wheel zoom, and a pan slider.
+The duration field is a plain numeric text entry; when duration changes, point
+times are scaled proportionally so the relative shape timing is preserved.
+The `Add Point` control has an `after` menu so users can choose after which
+existing point the new point is inserted.
 JSON save/load stores only the pattern; on browsers with the File System
-Access API, Save JSON asks for a filename/folder and Load JSON opens a file
+Access API, Save Shape asks for a filename/folder and Load Shape opens a file
 picker. The UI shows a blocking playback warning after Node.js confirms that
 the UDP packet was sent.
 

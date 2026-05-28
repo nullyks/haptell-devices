@@ -54,6 +54,10 @@ numeric row.
 The point table is intentionally compact so more rows are visible at once. For
 long 30-point patterns, the table can still scroll.
 
+The `duration ms` field is a plain numeric text entry, not a spinner control.
+When the duration changes, point times are scaled proportionally so the shape's
+relative timing stays the same.
+
 The graph can zoom horizontally. Use the `+`, `-`, and `Fit` controls above
 the graph, or scroll the mouse wheel over the graph. When the graph is zoomed
 in, the range slider pans through the visible part of the pattern.
@@ -114,6 +118,10 @@ first second.
 
 The graph marker and the point table row share the same point number.
 
+The `after` menu next to `Add Point` selects the point after which the new
+point will be inserted. The final fixed zero point is not shown in this menu,
+because new points must be inserted before the end of the pattern.
+
 Editable values:
 
 - first point: intensity only
@@ -123,10 +131,13 @@ Editable values:
 The final point is fixed because the motor or actuator should always be driven
 back to zero when the pattern ends.
 
+Changing the total duration rescales point times. For example, changing a
+`3000 ms` shape to `6000 ms` moves a point at `400 ms` to `800 ms`.
+
 Zooming changes only the visible time window. It does not change the saved
 points, the command preview, or the JSON file.
 
-## JSON Save and Load
+## Shape Save and Load
 
 The JSON file stores only the pattern. It does not store:
 
@@ -134,15 +145,15 @@ The JSON file stores only the pattern. It does not store:
 - UDP port
 - selected target firmware
 
-On browsers that support the File System Access API, `Save JSON` opens a save
-dialog so the user can choose the filename and folder. `Load JSON` opens an
+On browsers that support the File System Access API, `Save Shape` opens a save
+dialog so the user can choose the filename and folder. `Load Shape` opens an
 open-file dialog for selecting an existing pattern file.
 
 If the browser does not support the File System Access API, the tool falls back
 to normal browser behavior:
 
-- `Save JSON`: starts a regular download
-- `Load JSON`: uses a normal file input
+- `Save Shape`: starts a regular download
+- `Load Shape`: uses a normal file input
 
 The fallback still works, but the browser may decide the download folder.
 
