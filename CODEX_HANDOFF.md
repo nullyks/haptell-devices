@@ -10,6 +10,9 @@ The repository is public because the user wants to continue development from ano
 
 Repository: https://github.com/nullyks/haptell-devices
 
+Related enclosure and physical model development repository:
+https://github.com/nullyks/haptell-models
+
 ## User Preferences and Decisions
 
 - Repository content should be in English because it is the client's communication language.
