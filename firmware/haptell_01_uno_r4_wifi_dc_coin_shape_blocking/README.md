@@ -38,6 +38,20 @@ During playback, this sketch is busy generating the shape and does not read new
 UDP packets. The web tool shows a busy warning for the duration of the sent
 shape after Node.js confirms that the UDP packet was sent.
 
+## Serial Plotter Debug View
+
+During shape playback the sketch prints the actual PWM value sent to the DC
+motor driver:
+
+```text
+pwm:128
+```
+
+Open Arduino Serial Plotter at `115200` baud and send a shape command. The
+`pwm` curve shows the currently playing envelope as sampled by the firmware.
+The firmware updates PWM every `10 ms`, so each plotted sample is approximately
+one playback update step.
+
 ## Compile
 
 ```powershell

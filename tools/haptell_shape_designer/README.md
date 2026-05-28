@@ -34,6 +34,7 @@ node tools/haptell_shape_designer/server.js
 ## What the UI Does
 
 - Draws a large amplitude envelope.
+- Supports graph zooming and horizontal panning for longer patterns.
 - Shows point numbers on both the graph and the point table.
 - Shows a compact point table so more points are visible at once.
 - Sends a compact UDP `shape` command.
@@ -59,6 +60,12 @@ the same WiFi network.
 - first point intensity is editable
 - final point time is always `duration`
 - final point intensity is always `0`
+
+## Graph Zoom
+
+Use `+`, `-`, and `Fit` above the graph to zoom the visible time range. The
+range slider pans through the pattern when the graph is zoomed in. Scrolling
+the mouse wheel over the graph also zooms around the cursor position.
 
 ## JSON Save and Load
 

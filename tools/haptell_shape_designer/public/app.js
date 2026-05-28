@@ -1,6 +1,9 @@
 const MAX_DURATION_MS = 15000;
 const MIN_DURATION_MS = 100;
 const MAX_POINTS = 30;
+const MIN_ZOOM_LEVEL = 1;
+const MAX_ZOOM_LEVEL = 8;
+const ZOOM_STEP = 0.5;
 const GRAPH = {
   left: 86,
   top: 34,
@@ -19,6 +22,9 @@ const pointLayerEl = document.querySelector("#pointLayer");
 const envelopeLineEl = document.querySelector("#envelopeLine");
 const envelopeFillEl = document.querySelector("#envelopeFill");
 const pointsListEl = document.querySelector("#pointsList");
+const zoomDisplayEl = document.querySelector("#zoomDisplay");
+const zoomRangeEl = document.querySelector("#zoomRange");
+const zoomPanEl = document.querySelector("#zoomPan");
 
 const inputs = {
   ipAddress: document.querySelector("#ipAddress"),
@@ -81,6 +87,8 @@ let shapePoints = [
 
 let activePointIndex = null;
 let busyTimer = null;
+let graphZoomLevel = 1;
+let graphViewStartRatio = 0;
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -235,16 +243,96 @@ async function sendShape() {
   }
 }
 
-function graphPoint(point) {
+function roundZoomLevel(value) {
+  return Math.round(value / ZOOM_STEP) * ZOOM_STEP;
+}
+
+function getVisibleTimeRange() {
   const durationMs = getDuration();
-  const x = GRAPH.left + (point.timeMs / durationMs) * GRAPH.width;
+  const windowDurationMs = durationMs / graphZoomLevel;
+  const maxStartMs = Math.max(0, durationMs - windowDurationMs);
+  const startMs = maxStartMs * graphViewStartRatio;
+  return {
+    startMs,
+    endMs: startMs + windowDurationMs,
+    windowDurationMs,
+    maxStartMs,
+  };
+}
+
+function clampZoomView() {
+  graphZoomLevel = clamp(roundZoomLevel(graphZoomLevel), MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL);
+  if (graphZoomLevel <= MIN_ZOOM_LEVEL) {
+    graphZoomLevel = MIN_ZOOM_LEVEL;
+    graphViewStartRatio = 0;
+    return;
+  }
+
+  graphViewStartRatio = clamp(graphViewStartRatio, 0, 1);
+}
+
+function setGraphZoom(nextZoomLevel, anchorRatio = 0.5) {
+  const oldRange = getVisibleTimeRange();
+  const anchorTimeMs = oldRange.startMs + oldRange.windowDurationMs * anchorRatio;
+
+  graphZoomLevel = clamp(roundZoomLevel(nextZoomLevel), MIN_ZOOM_LEVEL, MAX_ZOOM_LEVEL);
+
+  const durationMs = getDuration();
+  const nextWindowDurationMs = durationMs / graphZoomLevel;
+  const nextMaxStartMs = Math.max(0, durationMs - nextWindowDurationMs);
+  const nextStartMs = clamp(anchorTimeMs - nextWindowDurationMs * anchorRatio, 0, nextMaxStartMs);
+  graphViewStartRatio = nextMaxStartMs === 0 ? 0 : nextStartMs / nextMaxStartMs;
+
+  renderGraph();
+}
+
+function updateZoomControls() {
+  const range = getVisibleTimeRange();
+  const zoomPercent = Math.round(graphZoomLevel * 100);
+
+  zoomDisplayEl.textContent = `${zoomPercent}%`;
+  zoomRangeEl.textContent = `${Math.round(range.startMs)}-${Math.round(range.endMs)} ms`;
+  zoomPanEl.disabled = graphZoomLevel <= MIN_ZOOM_LEVEL;
+  zoomPanEl.value = Math.round(graphViewStartRatio * 1000);
+
+  document.querySelector("#zoomOut").disabled = graphZoomLevel <= MIN_ZOOM_LEVEL;
+  document.querySelector("#zoomIn").disabled = graphZoomLevel >= MAX_ZOOM_LEVEL;
+  document.querySelector("#zoomFit").disabled = graphZoomLevel <= MIN_ZOOM_LEVEL;
+}
+
+function getIntensityAtTime(timeMs) {
+  if (timeMs <= shapePoints[0].timeMs) {
+    return shapePoints[0].intensity;
+  }
+
+  for (let i = 1; i < shapePoints.length; i++) {
+    const previous = shapePoints[i - 1];
+    const next = shapePoints[i];
+
+    if (timeMs <= next.timeMs) {
+      const durationMs = next.timeMs - previous.timeMs;
+      if (durationMs === 0) {
+        return next.intensity;
+      }
+
+      const elapsedMs = timeMs - previous.timeMs;
+      return previous.intensity + ((next.intensity - previous.intensity) * elapsedMs) / durationMs;
+    }
+  }
+
+  return shapePoints[shapePoints.length - 1].intensity;
+}
+
+function graphPoint(point) {
+  const range = getVisibleTimeRange();
+  const x = GRAPH.left + ((point.timeMs - range.startMs) / range.windowDurationMs) * GRAPH.width;
   const y = GRAPH.top + GRAPH.height - (point.intensity / 255) * GRAPH.height;
   return { x, y };
 }
 
 function drawGrid() {
   const lines = [];
-  const durationMs = getDuration();
+  const range = getVisibleTimeRange();
   const bottom = GRAPH.top + GRAPH.height;
   const right = GRAPH.left + GRAPH.width;
 
@@ -252,7 +340,7 @@ function drawGrid() {
 
   for (let i = 0; i <= 6; i++) {
     const x = GRAPH.left + (GRAPH.width * i) / 6;
-    const time = Math.round((durationMs * i) / 6);
+    const time = Math.round(range.startMs + (range.windowDurationMs * i) / 6);
     const anchor = i === 0 ? "start" : i === 6 ? "end" : "middle";
     lines.push(`<line class="grid-line" x1="${x}" y1="${GRAPH.top}" x2="${x}" y2="${bottom}"></line>`);
     lines.push(`<text class="grid-text" x="${x}" y="${bottom + 28}" text-anchor="${anchor}">${time} ms</text>`);
@@ -270,23 +358,35 @@ function drawGrid() {
 
 function renderGraph() {
   normalizeShapePoints();
+  clampZoomView();
+  updateZoomControls();
   drawGrid();
 
-  const graphPoints = shapePoints.map(graphPoint);
+  const range = getVisibleTimeRange();
+  const visibleEnvelopePoints = [
+    { timeMs: range.startMs, intensity: getIntensityAtTime(range.startMs) },
+    ...shapePoints.filter((point) => point.timeMs > range.startMs && point.timeMs < range.endMs),
+    { timeMs: range.endMs, intensity: getIntensityAtTime(range.endMs) },
+  ];
+  const graphPoints = visibleEnvelopePoints.map(graphPoint);
   const linePoints = graphPoints.map((point) => `${point.x},${point.y}`).join(" ");
   const baseY = GRAPH.top + GRAPH.height;
-  const fillPoints = [
-    `${GRAPH.left},${baseY}`,
-    ...graphPoints.map((point) => `${point.x},${point.y}`),
-    `${GRAPH.left + GRAPH.width},${baseY}`,
+  const fillPath = [
+    `M ${GRAPH.left},${baseY}`,
+    ...graphPoints.map((point) => `L ${point.x},${point.y}`),
+    `L ${GRAPH.left + GRAPH.width},${baseY}`,
+    "Z",
   ].join(" ");
 
   envelopeLineEl.setAttribute("points", linePoints);
-  envelopeFillEl.setAttribute("d", `M ${fillPoints.replaceAll(" ", " L ")} Z`);
+  envelopeFillEl.setAttribute("d", fillPath);
 
-  pointLayerEl.innerHTML = graphPoints
-    .map((point, index) => {
-      const endClass = index === graphPoints.length - 1 ? " end" : "";
+  pointLayerEl.innerHTML = shapePoints
+    .map((shapePoint, index) => ({ shapePoint, index }))
+    .filter(({ shapePoint }) => shapePoint.timeMs >= range.startMs && shapePoint.timeMs <= range.endMs)
+    .map(({ shapePoint, index }) => {
+      const point = graphPoint(shapePoint);
+      const endClass = index === shapePoints.length - 1 ? " end" : "";
       const labelX = clamp(point.x, GRAPH.left + 16, GRAPH.left + GRAPH.width - 16);
       const labelY = point.y < GRAPH.top + 34 ? point.y + 26 : point.y - 14;
       return `
@@ -393,10 +493,10 @@ function updatePointFromGraph(index, event) {
   }
 
   const coords = graphCoordinatesFromEvent(event);
-  const durationMs = getDuration();
+  const range = getVisibleTimeRange();
   const minTime = isFirst ? 0 : shapePoints[index - 1].timeMs + 10;
   const maxTime = isFirst ? 0 : shapePoints[index + 1].timeMs - 10;
-  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * durationMs);
+  const timeMs = Math.round(range.startMs + ((coords.x - GRAPH.left) / GRAPH.width) * range.windowDurationMs);
   const intensity = Math.round(((GRAPH.top + GRAPH.height - coords.y) / GRAPH.height) * 255);
 
   shapePoints[index] = {
@@ -556,6 +656,17 @@ document.querySelectorAll("button[data-preset]").forEach((button) => {
 });
 
 document.querySelector("#addPoint").addEventListener("click", addPoint);
+document.querySelector("#zoomOut").addEventListener("click", () => setGraphZoom(graphZoomLevel - ZOOM_STEP));
+document.querySelector("#zoomIn").addEventListener("click", () => setGraphZoom(graphZoomLevel + ZOOM_STEP));
+document.querySelector("#zoomFit").addEventListener("click", () => {
+  graphZoomLevel = MIN_ZOOM_LEVEL;
+  graphViewStartRatio = 0;
+  renderGraph();
+});
+zoomPanEl.addEventListener("input", () => {
+  graphViewStartRatio = Number(zoomPanEl.value) / 1000;
+  renderGraph();
+});
 
 pointsListEl.addEventListener("input", (event) => {
   const timeIndex = event.target.dataset.pointTime;
@@ -605,6 +716,14 @@ graphEl.addEventListener("pointermove", (event) => {
 graphEl.addEventListener("pointerup", (event) => {
   activePointIndex = null;
   graphEl.releasePointerCapture(event.pointerId);
+});
+
+graphEl.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  const coords = graphCoordinatesFromEvent(event);
+  const anchorRatio = (coords.x - GRAPH.left) / GRAPH.width;
+  const direction = event.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+  setGraphZoom(graphZoomLevel + direction, anchorRatio);
 });
 
 Object.values(inputs).forEach((input) => {

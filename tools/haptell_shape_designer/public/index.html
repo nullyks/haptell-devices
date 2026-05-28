@@ -73,6 +73,17 @@
 
         <div class="workbench">
           <div class="graph-panel">
+            <div class="graph-toolbar" aria-label="Graph zoom controls">
+              <button id="zoomOut" class="zoom-button" type="button" aria-label="Zoom out">-</button>
+              <div id="zoomDisplay" class="zoom-display">100%</div>
+              <button id="zoomIn" class="zoom-button" type="button" aria-label="Zoom in">+</button>
+              <button id="zoomFit" class="zoom-fit" type="button">Fit</button>
+              <label class="zoom-pan">
+                view
+                <input id="zoomPan" type="range" min="0" max="1000" step="1" value="0">
+              </label>
+              <div id="zoomRange" class="zoom-range">0-3000 ms</div>
+            </div>
             <svg id="envelopeGraph" viewBox="0 0 960 500" role="img" aria-label="Amplitude envelope graph">
               <rect class="graph-bg" x="86" y="34" width="804" height="374"></rect>
               <g id="gridLayer"></g>

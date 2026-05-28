@@ -263,6 +263,47 @@ button:disabled {
 
 .graph-panel {
   padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.graph-toolbar {
+  display: grid;
+  grid-template-columns: 44px 72px 44px 72px minmax(180px, 1fr) 150px;
+  gap: 8px;
+  align-items: end;
+}
+
+.zoom-button,
+.zoom-fit {
+  min-height: 38px;
+  padding: 8px 10px;
+  background: #475569;
+  font-size: 18px;
+}
+
+.zoom-display,
+.zoom-range {
+  display: grid;
+  min-height: 38px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #eef3f8;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.zoom-pan {
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.zoom-pan input {
+  min-height: 38px;
+  padding: 0;
 }
 
 #envelopeGraph {
@@ -416,8 +457,14 @@ button:disabled {
   }
 
   .designer-actions,
-  .preset-buttons {
+  .preset-buttons,
+  .graph-toolbar {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .zoom-pan,
+  .zoom-range {
+    grid-column: 1 / -1;
   }
 
   #addPoint {

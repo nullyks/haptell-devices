@@ -1,7 +1,7 @@
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
 
-#include "secrets.h"
+#include "secrets.example.h"
 
 const char DEVICE_ID[] = "haptell-01-dc-shape";
 const unsigned int UDP_PORT = 4444;
@@ -10,6 +10,7 @@ const int MOTOR_PWM_PIN = 9;
 const byte MAX_SHAPE_POINTS = 30;
 const unsigned int MAX_SHAPE_DURATION_MS = 15000;
 const unsigned long SHAPE_UPDATE_INTERVAL_MS = 10;
+const bool ENABLE_PWM_SERIAL_PLOTTER = true;
 
 struct ShapePoint {
   unsigned int timeMs;
@@ -19,14 +20,16 @@ struct ShapePoint {
 WiFiUDP udp;
 ShapePoint shapePoints[MAX_SHAPE_POINTS];
 byte shapePointCount = 0;
+bool serialOutputReady = false;
 
 char packetBuffer[768];
 
 void setup() {
   pinMode(MOTOR_PWM_PIN, OUTPUT);
-  stopMotor();
+  analogWrite(MOTOR_PWM_PIN, 0);
 
   Serial.begin(115200);
+  serialOutputReady = true;
   delay(500);
 
   Serial.println("Haptell DC shape-only blocking firmware starting");
@@ -183,7 +186,7 @@ void playShape(String command) {
 
 void playSegment(uint8_t from, uint8_t to, unsigned long durationMs) {
   if (durationMs == 0) {
-    analogWrite(MOTOR_PWM_PIN, to);
+    writeMotorPwm(to);
     return;
   }
 
@@ -191,12 +194,12 @@ void playSegment(uint8_t from, uint8_t to, unsigned long durationMs) {
   unsigned long elapsed = 0;
 
   while (elapsed < durationMs) {
-    analogWrite(MOTOR_PWM_PIN, interpolate(from, to, elapsed, durationMs));
+    writeMotorPwm(interpolate(from, to, elapsed, durationMs));
     delay(SHAPE_UPDATE_INTERVAL_MS);
     elapsed = millis() - startedAt;
   }
 
-  analogWrite(MOTOR_PWM_PIN, to);
+  writeMotorPwm(to);
 }
 
 uint8_t interpolate(uint8_t from, uint8_t to, unsigned long elapsed, unsigned long duration) {
@@ -289,5 +292,20 @@ bool parseNonNegativeInt(String text, int *value) {
 }
 
 void stopMotor() {
-  analogWrite(MOTOR_PWM_PIN, 0);
+  writeMotorPwm(0);
+}
+
+void writeMotorPwm(uint8_t pwmValue) {
+  analogWrite(MOTOR_PWM_PIN, pwmValue);
+  plotPwmValue(pwmValue);
+}
+
+void plotPwmValue(uint8_t pwmValue) {
+  if (!ENABLE_PWM_SERIAL_PLOTTER || !serialOutputReady) {
+    return;
+  }
+
+  // Arduino Serial Plotter understands repeated label:value lines.
+  Serial.print("pwm:");
+  Serial.println(pwmValue);
 }

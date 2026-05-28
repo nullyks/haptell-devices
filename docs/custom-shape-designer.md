@@ -41,6 +41,7 @@ The first screen is the working editor:
 - UDP port, default `4444`
 - target firmware selector
 - large amplitude envelope graph
+- graph zoom controls
 - point table
 - JSON save/load controls
 - command preview
@@ -52,6 +53,10 @@ numeric row.
 
 The point table is intentionally compact so more rows are visible at once. For
 long 30-point patterns, the table can still scroll.
+
+The graph can zoom horizontally. Use the `+`, `-`, and `Fit` controls above
+the graph, or scroll the mouse wheel over the graph. When the graph is zoomed
+in, the range slider pans through the visible part of the pattern.
 
 ## Supported Shape-Only Firmware
 
@@ -117,6 +122,9 @@ Editable values:
 
 The final point is fixed because the motor or actuator should always be driven
 back to zero when the pattern ends.
+
+Zooming changes only the visible time window. It does not change the saved
+points, the command preview, or the JSON file.
 
 ## JSON Save and Load
 

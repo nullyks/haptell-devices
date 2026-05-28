@@ -328,10 +328,12 @@ tools/haptell_shape_designer/server.js
 
 It starts at `http://127.0.0.1:8082` by default. It designs custom `shape`
 commands up to `15000 ms` and `30` points. The graph and point table both show
-point numbers to help users navigate longer shapes. JSON save/load stores only
-the pattern; on browsers with the File System Access API, Save JSON asks for a
-filename/folder and Load JSON opens a file picker. The UI shows a blocking
-playback warning after Node.js confirms that the UDP packet was sent.
+point numbers to help users navigate longer shapes. The graph supports
+horizontal zooming with `+`, `-`, `Fit`, mouse wheel zoom, and a pan slider.
+JSON save/load stores only the pattern; on browsers with the File System
+Access API, Save JSON asks for a filename/folder and Load JSON opens a file
+picker. The UI shows a blocking playback warning after Node.js confirms that
+the UDP packet was sent.
 
 It targets dedicated shape-only blocking firmware:
 
@@ -345,6 +347,11 @@ These sketches support only `shape` and idle-state `stop`. They intentionally
 do not accept `all`, because blocking playback can last 15 seconds and should
 not be started accidentally on multiple devices sharing the same WiFi network.
 The workflow is documented in `docs/custom-shape-designer.md`.
+
+The DC coin shape-only blocking firmware prints `pwm:<value>` while a shape is
+playing, so Arduino Serial Plotter can show the actual PWM envelope sent to
+the motor driver. The playback update interval is `10 ms`, so each plotted
+sample is approximately one firmware update step.
 
 Example:
 

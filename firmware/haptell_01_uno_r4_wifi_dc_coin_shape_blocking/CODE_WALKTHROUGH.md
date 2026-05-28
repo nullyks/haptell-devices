@@ -27,5 +27,13 @@ The last point must be at the full duration and must have intensity `0`.
 The DC motor is driven from PWM pin `D9` through the MOSFET driver circuit.
 Between two points, `playSegment()` linearly interpolates the PWM value.
 
+`writeMotorPwm()` is the single place where the sketch sends a PWM value to the
+motor. It also prints `pwm:<value>` when Serial Plotter output is enabled. This
+means Arduino Serial Plotter shows the same value that is sent to
+`analogWrite()`, not a separate approximation.
+
+The playback update interval is `10 ms`, so the Serial Plotter trace advances
+in roughly 10 ms samples while a shape is playing.
+
 Because playback is blocking, the board cannot receive a new UDP packet while
 the shape is active.
