@@ -252,7 +252,10 @@ uint8_t interpolate(uint8_t from, uint8_t to, unsigned long elapsed, unsigned lo
   }
 
   long delta = (long)to - (long)from;
-  return from + (delta * elapsed / duration);
+  long elapsedMs = (long)constrain(elapsed, 0, duration);
+  long durationMs = (long)duration;
+  long value = (long)from + (delta * elapsedMs / durationMs);
+  return (uint8_t)constrain(value, 0, 255);
 }
 
 bool loadShapePoints(String pointsText, unsigned int durationMs) {

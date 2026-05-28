@@ -41,18 +41,32 @@ shape after Node.js confirms that the UDP packet was sent.
 ## Serial Plotter Debug View
 
 During shape playback the sketch prints the actual PWM value sent to the DC
-motor driver:
+motor driver, plus fixed minimum and maximum reference traces:
 
 ```text
-pwm:128
+pwm:128  min:0  max:255
 ```
 
 Open Arduino Serial Plotter at `115200` baud and send a shape command. The
-`pwm` curve shows the currently playing envelope as sampled by the firmware.
-The firmware updates PWM every `10 ms`, so each plotted sample is approximately
-one playback update step.
+`pwm` curve shows the currently playing envelope. The `min` and `max` traces
+keep the Y scale pinned to the full PWM range, `0..255`.
+
+Arduino Serial Plotter does not accept real timestamp values for the X axis; it
+plots incoming samples from left to right. To make the full shape easier to see,
+the firmware sends about `240` plotter samples per shape while still updating
+the motor PWM every `10 ms`. For a `15000 ms` shape this means the motor is
+still updated every `10 ms`, but the plotter receives one debug sample roughly
+every `63 ms`. This is intended to fit a full maximum-length shape in a FullHD
+fullscreen Arduino Serial Plotter window.
+
+When Serial Plotter output is enabled, the sketch suppresses the raw UDP command
+line during playback so command numbers such as `15000` do not disturb the
+plotter's Y scale.
 
 ## Compile
+
+Copy `secrets.example.h` to `secrets.h` in this folder and fill in the local
+WiFi credentials before uploading.
 
 ```powershell
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking

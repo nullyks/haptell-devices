@@ -348,10 +348,12 @@ do not accept `all`, because blocking playback can last 15 seconds and should
 not be started accidentally on multiple devices sharing the same WiFi network.
 The workflow is documented in `docs/custom-shape-designer.md`.
 
-The DC coin shape-only blocking firmware prints `pwm:<value>` while a shape is
-playing, so Arduino Serial Plotter can show the actual PWM envelope sent to
-the motor driver. The playback update interval is `10 ms`, so each plotted
-sample is approximately one firmware update step.
+The DC coin shape-only blocking firmware prints
+`pwm:<value> min:0 max:255` while a shape is playing, so Arduino Serial Plotter
+can show the actual PWM envelope sent to the motor driver with a fixed 0..255
+Y scale. The motor playback update interval is still `10 ms`, but Serial
+Plotter output is decimated to about `240` samples per shape so the full shape
+fits better in a FullHD fullscreen plotter window.
 
 Example:
 

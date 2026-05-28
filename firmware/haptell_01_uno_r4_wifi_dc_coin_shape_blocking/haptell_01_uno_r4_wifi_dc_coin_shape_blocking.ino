@@ -11,6 +11,9 @@ const byte MAX_SHAPE_POINTS = 30;
 const unsigned int MAX_SHAPE_DURATION_MS = 15000;
 const unsigned long SHAPE_UPDATE_INTERVAL_MS = 10;
 const bool ENABLE_PWM_SERIAL_PLOTTER = true;
+const unsigned int SERIAL_PLOTTER_TARGET_SAMPLES = 240;
+const uint8_t SERIAL_PLOTTER_Y_MIN = 0;
+const uint8_t SERIAL_PLOTTER_Y_MAX = 255;
 
 struct ShapePoint {
   unsigned int timeMs;
@@ -21,6 +24,10 @@ WiFiUDP udp;
 ShapePoint shapePoints[MAX_SHAPE_POINTS];
 byte shapePointCount = 0;
 bool serialOutputReady = false;
+bool serialPlotterShapeActive = false;
+unsigned long serialPlotterShapeStartedAt = 0;
+unsigned long serialPlotterNextSampleAtMs = 0;
+unsigned long serialPlotterSampleIntervalMs = SHAPE_UPDATE_INTERVAL_MS;
 
 char packetBuffer[768];
 
@@ -79,8 +86,10 @@ void readUdpCommand() {
   String command = String(packetBuffer);
   command.trim();
 
-  Serial.print("UDP command: ");
-  Serial.println(command);
+  if (!ENABLE_PWM_SERIAL_PLOTTER) {
+    Serial.print("UDP command: ");
+    Serial.println(command);
+  }
 
   handleCommand(command);
 }
@@ -169,12 +178,15 @@ void playShape(String command) {
     return;
   }
 
-  Serial.print("Playing blocking DC PWM shape for ");
-  Serial.print(durationMs);
-  Serial.print(" ms with ");
-  Serial.print(shapePointCount);
-  Serial.println(" points");
+  if (!ENABLE_PWM_SERIAL_PLOTTER) {
+    Serial.print("Playing blocking DC PWM shape for ");
+    Serial.print(durationMs);
+    Serial.print(" ms with ");
+    Serial.print(shapePointCount);
+    Serial.println(" points");
+  }
 
+  beginSerialPlotterShape((unsigned int)durationMs);
   for (byte i = 1; i < shapePointCount; i++) {
     ShapePoint previous = shapePoints[i - 1];
     ShapePoint next = shapePoints[i];
@@ -182,6 +194,7 @@ void playShape(String command) {
   }
 
   stopMotor();
+  endSerialPlotterShape();
 }
 
 void playSegment(uint8_t from, uint8_t to, unsigned long durationMs) {
@@ -208,7 +221,10 @@ uint8_t interpolate(uint8_t from, uint8_t to, unsigned long elapsed, unsigned lo
   }
 
   long delta = (long)to - (long)from;
-  return (uint8_t)constrain(from + (delta * elapsed / duration), 0, 255);
+  long elapsedMs = (long)constrain(elapsed, 0, duration);
+  long durationMs = (long)duration;
+  long value = (long)from + (delta * elapsedMs / durationMs);
+  return (uint8_t)constrain(value, 0, 255);
 }
 
 bool loadShapePoints(String pointsText, unsigned int durationMs) {
@@ -300,12 +316,49 @@ void writeMotorPwm(uint8_t pwmValue) {
   plotPwmValue(pwmValue);
 }
 
-void plotPwmValue(uint8_t pwmValue) {
+void beginSerialPlotterShape(unsigned int durationMs) {
   if (!ENABLE_PWM_SERIAL_PLOTTER || !serialOutputReady) {
     return;
   }
 
-  // Arduino Serial Plotter understands repeated label:value lines.
+  serialPlotterShapeActive = true;
+  serialPlotterShapeStartedAt = millis();
+  serialPlotterNextSampleAtMs = 0;
+  serialPlotterSampleIntervalMs =
+    max(SHAPE_UPDATE_INTERVAL_MS, ((unsigned long)durationMs + SERIAL_PLOTTER_TARGET_SAMPLES - 1) / SERIAL_PLOTTER_TARGET_SAMPLES);
+}
+
+void endSerialPlotterShape() {
+  if (!ENABLE_PWM_SERIAL_PLOTTER || !serialPlotterShapeActive) {
+    return;
+  }
+
+  printSerialPlotterSample(0);
+  serialPlotterShapeActive = false;
+}
+
+void plotPwmValue(uint8_t pwmValue) {
+  if (!ENABLE_PWM_SERIAL_PLOTTER || !serialOutputReady || !serialPlotterShapeActive) {
+    return;
+  }
+
+  unsigned long elapsedMs = millis() - serialPlotterShapeStartedAt;
+  if (elapsedMs < serialPlotterNextSampleAtMs) {
+    return;
+  }
+
+  printSerialPlotterSample(pwmValue);
+  do {
+    serialPlotterNextSampleAtMs += serialPlotterSampleIntervalMs;
+  } while (serialPlotterNextSampleAtMs <= elapsedMs);
+}
+
+void printSerialPlotterSample(uint8_t pwmValue) {
+  // The min/max traces keep Arduino Serial Plotter's Y scale pinned to 0..255.
   Serial.print("pwm:");
-  Serial.println(pwmValue);
+  Serial.print(pwmValue);
+  Serial.print("\tmin:");
+  Serial.print(SERIAL_PLOTTER_Y_MIN);
+  Serial.print("\tmax:");
+  Serial.println(SERIAL_PLOTTER_Y_MAX);
 }

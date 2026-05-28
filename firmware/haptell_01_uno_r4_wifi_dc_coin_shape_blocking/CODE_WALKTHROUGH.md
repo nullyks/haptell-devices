@@ -32,8 +32,21 @@ motor. It also prints `pwm:<value>` when Serial Plotter output is enabled. This
 means Arduino Serial Plotter shows the same value that is sent to
 `analogWrite()`, not a separate approximation.
 
-The playback update interval is `10 ms`, so the Serial Plotter trace advances
-in roughly 10 ms samples while a shape is playing.
+The motor playback update interval is still `10 ms`. Serial Plotter output is
+decimated to about `240` samples per shape so long patterns are easier to see
+as a whole in Arduino Serial Plotter's fixed scrolling window. This target is
+intended for a FullHD fullscreen Arduino Serial Plotter window.
+
+Every plotter line includes fixed reference traces:
+
+```text
+pwm:<value> min:0 max:255
+```
+
+The `min` and `max` traces keep the Y scale pinned to the full PWM range.
+Arduino Serial Plotter does not use real timestamp values for the X axis, so
+the firmware controls the visible X range by limiting how many debug samples it
+prints per shape.
 
 Because playback is blocking, the board cannot receive a new UDP packet while
 the shape is active.
