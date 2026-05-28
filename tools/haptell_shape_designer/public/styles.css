@@ -33,8 +33,7 @@ body {
 }
 
 .topbar,
-.designer-head,
-.points-head {
+.designer-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -377,8 +376,7 @@ button:disabled {
 }
 
 .points-head {
-  align-items: center;
-  margin-bottom: 10px;
+  margin: 16px 0 8px;
 }
 
 #addPoint {
@@ -390,7 +388,7 @@ button:disabled {
 
 .add-point-controls {
   display: grid;
-  grid-template-columns: 126px 132px;
+  grid-template-columns: 132px minmax(138px, 1fr);
   gap: 8px;
   align-items: end;
 }
@@ -462,8 +460,7 @@ button:disabled {
 @media (max-width: 1040px) {
   .topbar,
   .designer-head,
-  .busy-panel,
-  .points-head {
+  .busy-panel {
     display: grid;
   }
 
