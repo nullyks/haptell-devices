@@ -2,14 +2,18 @@
 #include <WiFiUdp.h>
 #include "dac.h"
 
-#include "secrets.h"
+#include "secrets.example.h"
 
 const char DEVICE_ID[] = "haptell-02-pam8403-shape";
 const unsigned int UDP_PORT = 4444;
 
 const byte MAX_SHAPE_POINTS = 30;
 const unsigned int MAX_SHAPE_DURATION_MS = 15000;
-const unsigned long ENVELOPE_UPDATE_INTERVAL_MS = 5;
+const unsigned long SHAPE_UPDATE_INTERVAL_MS = 10;
+const bool ENABLE_DRIVE_SERIAL_PLOTTER = true;
+const unsigned int SERIAL_PLOTTER_TARGET_SAMPLES = 240;
+const uint8_t SERIAL_PLOTTER_Y_MIN = 0;
+const uint8_t SERIAL_PLOTTER_Y_MAX = 255;
 
 const float CARRIER_FREQUENCY_HZ = 70.0;
 const byte SINE_TABLE_SIZE = 32;
@@ -32,6 +36,11 @@ WiFiUDP udp;
 
 ShapePoint shapePoints[MAX_SHAPE_POINTS];
 byte shapePointCount = 0;
+bool serialOutputReady = false;
+bool serialPlotterShapeActive = false;
+unsigned long serialPlotterShapeStartedAt = 0;
+unsigned long serialPlotterNextSampleAtMs = 0;
+unsigned long serialPlotterSampleIntervalMs = SHAPE_UPDATE_INTERVAL_MS;
 
 int16_t sineTable[SINE_TABLE_SIZE];
 byte sineIndex = 0;
@@ -43,6 +52,7 @@ char packetBuffer[768];
 
 void setup() {
   Serial.begin(115200);
+  serialOutputReady = true;
   delay(500);
 
   prepareSineTable();
@@ -116,8 +126,10 @@ void readUdpCommand() {
   String command = String(packetBuffer);
   command.trim();
 
-  Serial.print("UDP command: ");
-  Serial.println(command);
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER) {
+    Serial.print("UDP command: ");
+    Serial.println(command);
+  }
 
   handleCommand(command);
 }
@@ -215,13 +227,16 @@ void playLoadedShape(unsigned int durationMs) {
     return;
   }
 
-  Serial.print("Playing blocking 70 Hz envelope for ");
-  Serial.print(durationMs);
-  Serial.print(" ms with ");
-  Serial.print(shapePointCount);
-  Serial.println(" points");
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER) {
+    Serial.print("Playing blocking 70 Hz envelope for ");
+    Serial.print(durationMs);
+    Serial.print(" ms with ");
+    Serial.print(shapePointCount);
+    Serial.println(" points");
+  }
 
-  currentDrive = shapeIntensityAt(0);
+  beginSerialPlotterShape(durationMs);
+  setDriveValue(shapeIntensityAt(0));
   sineIndex = 0;
   nextCarrierSampleAtUs = micros();
   carrierRunning = true;
@@ -233,8 +248,8 @@ void playLoadedShape(unsigned int durationMs) {
     unsigned long now = millis();
     unsigned long elapsed = now - startedAt;
 
-    if (lastEnvelopeUpdateAt == 0 || now - lastEnvelopeUpdateAt >= ENVELOPE_UPDATE_INTERVAL_MS) {
-      currentDrive = shapeIntensityAt(elapsed);
+    if (lastEnvelopeUpdateAt == 0 || now - lastEnvelopeUpdateAt >= SHAPE_UPDATE_INTERVAL_MS) {
+      setDriveValue(shapeIntensityAt(elapsed));
       lastEnvelopeUpdateAt = now;
     }
 
@@ -242,6 +257,7 @@ void playLoadedShape(unsigned int durationMs) {
   }
 
   stopPlayback();
+  endSerialPlotterShape();
 }
 
 void updateCarrier() {
@@ -272,6 +288,11 @@ void writeCarrierSample() {
   writeDac12(DAC_MIDPOINT + offset);
 }
 
+void setDriveValue(uint8_t driveValue) {
+  currentDrive = driveValue;
+  plotDriveValue(driveValue);
+}
+
 uint8_t shapeIntensityAt(unsigned long elapsedMs) {
   if (shapePointCount == 0) {
     return 0;
@@ -291,9 +312,10 @@ uint8_t shapeIntensityAt(unsigned long elapsedMs) {
         return next.intensity;
       }
 
-      unsigned long segmentElapsed = elapsedMs - previous.timeMs;
+      long segmentElapsedMs = (long)constrain(elapsedMs - previous.timeMs, 0UL, (unsigned long)segmentDuration);
+      long segmentDurationMs = (long)segmentDuration;
       long delta = (long)next.intensity - (long)previous.intensity;
-      long value = previous.intensity + (delta * segmentElapsed / segmentDuration);
+      long value = (long)previous.intensity + (delta * segmentElapsedMs / segmentDurationMs);
       return (uint8_t)constrain(value, 0, 255);
     }
   }
@@ -382,7 +404,54 @@ bool parseNonNegativeInt(String text, int *value) {
 }
 
 void stopPlayback() {
-  currentDrive = 0;
+  setDriveValue(0);
   carrierRunning = false;
   writeDac12(DAC_MIDPOINT);
+}
+
+void beginSerialPlotterShape(unsigned int durationMs) {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialOutputReady) {
+    return;
+  }
+
+  serialPlotterShapeActive = true;
+  serialPlotterShapeStartedAt = millis();
+  serialPlotterNextSampleAtMs = 0;
+  serialPlotterSampleIntervalMs =
+    max(SHAPE_UPDATE_INTERVAL_MS, ((unsigned long)durationMs + SERIAL_PLOTTER_TARGET_SAMPLES - 1) / SERIAL_PLOTTER_TARGET_SAMPLES);
+}
+
+void endSerialPlotterShape() {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialPlotterShapeActive) {
+    return;
+  }
+
+  printSerialPlotterSample(0);
+  serialPlotterShapeActive = false;
+}
+
+void plotDriveValue(uint8_t driveValue) {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialOutputReady || !serialPlotterShapeActive) {
+    return;
+  }
+
+  unsigned long elapsedMs = millis() - serialPlotterShapeStartedAt;
+  if (elapsedMs < serialPlotterNextSampleAtMs) {
+    return;
+  }
+
+  printSerialPlotterSample(driveValue);
+  do {
+    serialPlotterNextSampleAtMs += serialPlotterSampleIntervalMs;
+  } while (serialPlotterNextSampleAtMs <= elapsedMs);
+}
+
+void printSerialPlotterSample(uint8_t driveValue) {
+  // The min/max traces keep Arduino Serial Plotter's Y scale pinned to 0..255.
+  Serial.print("drive:");
+  Serial.print(driveValue);
+  Serial.print("\tmin:");
+  Serial.print(SERIAL_PLOTTER_Y_MIN);
+  Serial.print("\tmax:");
+  Serial.println(SERIAL_PLOTTER_Y_MAX);
 }

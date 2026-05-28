@@ -444,11 +444,12 @@ DriveState patternStateAt(unsigned long elapsedMs) {
         return { next.amplitude, next.frequencyHz };
       }
 
-      unsigned long segmentElapsed = elapsedMs - previous.timeMs;
+      long segmentElapsedMs = (long)constrain(elapsedMs - previous.timeMs, 0UL, (unsigned long)segmentDuration);
+      long segmentDurationMs = (long)segmentDuration;
       long amplitudeDelta = (long)next.amplitude - (long)previous.amplitude;
       long frequencyDelta = (long)next.frequencyHz - (long)previous.frequencyHz;
-      long amplitude = previous.amplitude + (amplitudeDelta * segmentElapsed / segmentDuration);
-      long frequency = previous.frequencyHz + (frequencyDelta * segmentElapsed / segmentDuration);
+      long amplitude = (long)previous.amplitude + (amplitudeDelta * segmentElapsedMs / segmentDurationMs);
+      long frequency = (long)previous.frequencyHz + (frequencyDelta * segmentElapsedMs / segmentDurationMs);
 
       return {
         (uint8_t)constrain(amplitude, 0, 255),

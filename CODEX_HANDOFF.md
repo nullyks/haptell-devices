@@ -352,12 +352,19 @@ do not accept `all`, because blocking playback can last 15 seconds and should
 not be started accidentally on multiple devices sharing the same WiFi network.
 The workflow is documented in `docs/custom-shape-designer.md`.
 
-The DC coin shape-only blocking firmware prints
-`pwm:<value> min:0 max:255` while a shape is playing, so Arduino Serial Plotter
-can show the actual PWM envelope sent to the motor driver with a fixed 0..255
-Y scale. The motor playback update interval is still `10 ms`, but Serial
+The shape-only blocking firmware variants now all expose Arduino Serial Plotter
+envelope debug with a fixed 0..255 Y scale. DC prints
+`pwm:<value> min:0 max:255`, while DRV2605L and PAM8403/VG2230001H print
+`drive:<value> min:0 max:255`. For DRV2605L, `drive` is the value sent through
+`setRealtimeValue()`; for PAM8403, `drive` scales the fixed 70 Hz carrier. In
+all three sketches, the shape envelope update interval is `10 ms`, but Serial
 Plotter output is decimated to about `240` samples per shape so the full shape
 fits better in a FullHD fullscreen plotter window.
+
+For all LRA/PAM8403 shape and pattern interpolation code, keep elapsed time and
+duration in signed `long` variables before multiplying by a signed delta. This
+prevents falling segments such as `210 -> 0` from overflowing through unsigned
+arithmetic and clipping to `255`.
 
 Example:
 

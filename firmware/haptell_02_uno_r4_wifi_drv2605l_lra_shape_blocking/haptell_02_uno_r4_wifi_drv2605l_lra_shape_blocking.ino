@@ -3,7 +3,7 @@
 #include <WiFiUdp.h>
 #include <Adafruit_DRV2605.h>
 
-#include "secrets.h"
+#include "secrets.example.h"
 
 const char DEVICE_ID[] = "haptell-02-drv2605l-shape";
 const unsigned int UDP_PORT = 4444;
@@ -11,7 +11,11 @@ const uint8_t DRV2605_LRA_LIBRARY = 6;
 
 const byte MAX_SHAPE_POINTS = 30;
 const unsigned int MAX_SHAPE_DURATION_MS = 15000;
-const unsigned long SHAPE_UPDATE_INTERVAL_MS = 12;
+const unsigned long SHAPE_UPDATE_INTERVAL_MS = 10;
+const bool ENABLE_DRIVE_SERIAL_PLOTTER = true;
+const unsigned int SERIAL_PLOTTER_TARGET_SAMPLES = 240;
+const uint8_t SERIAL_PLOTTER_Y_MIN = 0;
+const uint8_t SERIAL_PLOTTER_Y_MAX = 255;
 
 struct ShapePoint {
   unsigned int timeMs;
@@ -23,12 +27,18 @@ Adafruit_DRV2605 drv;
 
 ShapePoint shapePoints[MAX_SHAPE_POINTS];
 byte shapePointCount = 0;
+bool serialOutputReady = false;
+bool serialPlotterShapeActive = false;
+unsigned long serialPlotterShapeStartedAt = 0;
+unsigned long serialPlotterNextSampleAtMs = 0;
+unsigned long serialPlotterSampleIntervalMs = SHAPE_UPDATE_INTERVAL_MS;
 
 char packetBuffer[768];
 bool drvReady = false;
 
 void setup() {
   Serial.begin(115200);
+  serialOutputReady = true;
   delay(500);
 
   Serial.println("Haptell DRV2605L LRA shape-only blocking firmware starting");
@@ -87,8 +97,10 @@ void readUdpCommand() {
   String command = String(packetBuffer);
   command.trim();
 
-  Serial.print("UDP command: ");
-  Serial.println(command);
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER) {
+    Serial.print("UDP command: ");
+    Serial.println(command);
+  }
 
   handleCommand(command);
 }
@@ -182,12 +194,15 @@ void playShape(String command) {
     return;
   }
 
-  Serial.print("Playing blocking DRV2605L realtime shape for ");
-  Serial.print(durationMs);
-  Serial.print(" ms with ");
-  Serial.print(shapePointCount);
-  Serial.println(" points");
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER) {
+    Serial.print("Playing blocking DRV2605L realtime shape for ");
+    Serial.print(durationMs);
+    Serial.print(" ms with ");
+    Serial.print(shapePointCount);
+    Serial.println(" points");
+  }
 
+  beginSerialPlotterShape((unsigned int)durationMs);
   configureUnsignedUnidirectionalRtp();
   drv.setMode(DRV2605_MODE_REALTIME);
 
@@ -199,15 +214,16 @@ void playShape(String command) {
     unsigned long elapsed = now - startedAt;
 
     if (lastUpdateAt == 0 || now - lastUpdateAt >= SHAPE_UPDATE_INTERVAL_MS) {
-      drv.setRealtimeValue(shapeIntensityAt(elapsed));
+      setRealtimeDriveValue(shapeIntensityAt(elapsed));
       lastUpdateAt = now;
     }
 
     delay(1);
   }
 
-  drv.setRealtimeValue(0);
+  setRealtimeDriveValue(0);
   prepareLibraryPlayback();
+  endSerialPlotterShape();
 }
 
 uint8_t shapeIntensityAt(unsigned long elapsedMs) {
@@ -229,9 +245,10 @@ uint8_t shapeIntensityAt(unsigned long elapsedMs) {
         return next.intensity;
       }
 
-      unsigned long segmentElapsed = elapsedMs - previous.timeMs;
+      long segmentElapsedMs = (long)constrain(elapsedMs - previous.timeMs, 0UL, (unsigned long)segmentDuration);
+      long segmentDurationMs = (long)segmentDuration;
       long delta = (long)next.intensity - (long)previous.intensity;
-      long value = previous.intensity + (delta * segmentElapsed / segmentDuration);
+      long value = (long)previous.intensity + (delta * segmentElapsedMs / segmentDurationMs);
       return (uint8_t)constrain(value, 0, 255);
     }
   }
@@ -324,9 +341,14 @@ void stopHaptics() {
     return;
   }
 
-  drv.setRealtimeValue(0);
+  setRealtimeDriveValue(0);
   drv.stop();
   prepareLibraryPlayback();
+}
+
+void setRealtimeDriveValue(uint8_t driveValue) {
+  drv.setRealtimeValue(driveValue);
+  plotDriveValue(driveValue);
 }
 
 void prepareLibraryPlayback() {
@@ -350,4 +372,51 @@ void restoreSignedBidirectionalInput() {
 
   drv.writeRegister8(DRV2605_REG_CONTROL2, control2 | 0x80);
   drv.writeRegister8(DRV2605_REG_CONTROL3, control3 & ~0x08);
+}
+
+void beginSerialPlotterShape(unsigned int durationMs) {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialOutputReady) {
+    return;
+  }
+
+  serialPlotterShapeActive = true;
+  serialPlotterShapeStartedAt = millis();
+  serialPlotterNextSampleAtMs = 0;
+  serialPlotterSampleIntervalMs =
+    max(SHAPE_UPDATE_INTERVAL_MS, ((unsigned long)durationMs + SERIAL_PLOTTER_TARGET_SAMPLES - 1) / SERIAL_PLOTTER_TARGET_SAMPLES);
+}
+
+void endSerialPlotterShape() {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialPlotterShapeActive) {
+    return;
+  }
+
+  printSerialPlotterSample(0);
+  serialPlotterShapeActive = false;
+}
+
+void plotDriveValue(uint8_t driveValue) {
+  if (!ENABLE_DRIVE_SERIAL_PLOTTER || !serialOutputReady || !serialPlotterShapeActive) {
+    return;
+  }
+
+  unsigned long elapsedMs = millis() - serialPlotterShapeStartedAt;
+  if (elapsedMs < serialPlotterNextSampleAtMs) {
+    return;
+  }
+
+  printSerialPlotterSample(driveValue);
+  do {
+    serialPlotterNextSampleAtMs += serialPlotterSampleIntervalMs;
+  } while (serialPlotterNextSampleAtMs <= elapsedMs);
+}
+
+void printSerialPlotterSample(uint8_t driveValue) {
+  // The min/max traces keep Arduino Serial Plotter's Y scale pinned to 0..255.
+  Serial.print("drive:");
+  Serial.print(driveValue);
+  Serial.print("\tmin:");
+  Serial.print(SERIAL_PLOTTER_Y_MIN);
+  Serial.print("\tmax:");
+  Serial.println(SERIAL_PLOTTER_Y_MAX);
 }

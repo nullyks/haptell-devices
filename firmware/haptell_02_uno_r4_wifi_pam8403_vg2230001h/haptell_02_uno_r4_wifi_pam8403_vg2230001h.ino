@@ -395,9 +395,10 @@ uint8_t shapeIntensityAt(unsigned long elapsedMs) {
         return next.intensity;
       }
 
-      unsigned long segmentElapsed = elapsedMs - previous.timeMs;
+      long segmentElapsedMs = (long)constrain(elapsedMs - previous.timeMs, 0UL, (unsigned long)segmentDuration);
+      long segmentDurationMs = (long)segmentDuration;
       long delta = (long)next.intensity - (long)previous.intensity;
-      long value = previous.intensity + (delta * segmentElapsed / segmentDuration);
+      long value = (long)previous.intensity + (delta * segmentElapsedMs / segmentDurationMs);
       return (uint8_t)constrain(value, 0, 255);
     }
   }

@@ -38,6 +38,37 @@ Rules:
 `MAX_DAC_SWING_COUNTS` is conservative. Increase it only after measuring
 differential AC Vrms across the connected actuator.
 
+## Blocking Behavior
+
+During playback, this sketch is busy generating the shape and the 70 Hz carrier
+and does not read new UDP packets. The web tool shows a busy warning for the
+duration of the sent shape after Node.js confirms that the UDP packet was sent.
+
+## Serial Plotter Debug View
+
+During shape playback the sketch prints the drive value used to scale the 70 Hz
+sine carrier, plus fixed minimum and maximum reference traces:
+
+```text
+drive:128  min:0  max:255
+```
+
+Open Arduino Serial Plotter at `115200` baud and send a shape command. The
+`drive` curve shows the currently playing amplitude envelope before it is
+mapped to DAC swing by `MAX_DAC_SWING_COUNTS`. The `min` and `max` traces keep
+the Y scale pinned to the full `0..255` Shape Designer range.
+
+Arduino Serial Plotter does not accept real timestamp values for the X axis; it
+plots incoming samples from left to right. To make the full shape easier to see,
+the firmware sends about `240` plotter samples per shape while still updating
+the envelope every `10 ms`. For a `15000 ms` shape this means the carrier keeps
+running continuously, the envelope is updated every `10 ms`, and the plotter
+receives one debug sample roughly every `63 ms`.
+
+When Serial Plotter output is enabled, the sketch suppresses the raw UDP command
+line during playback so command numbers such as `15000` do not disturb the
+plotter's Y scale.
+
 ## Compile
 
 ```powershell

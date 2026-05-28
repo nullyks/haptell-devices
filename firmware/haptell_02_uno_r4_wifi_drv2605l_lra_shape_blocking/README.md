@@ -37,6 +37,31 @@ Rules:
 During playback, this sketch does not read new UDP packets. A `stop` command is
 useful while idle, but it cannot interrupt an active blocking shape.
 
+## Serial Plotter Debug View
+
+During shape playback the sketch prints the drive value sent to the DRV2605L
+realtime playback register, plus fixed minimum and maximum reference traces:
+
+```text
+drive:128  min:0  max:255
+```
+
+Open Arduino Serial Plotter at `115200` baud and send a shape command. The
+`drive` curve shows the currently playing envelope value sent through
+`setRealtimeValue()`. The `min` and `max` traces keep the Y scale pinned to the
+full `0..255` Shape Designer range.
+
+Arduino Serial Plotter does not accept real timestamp values for the X axis; it
+plots incoming samples from left to right. To make the full shape easier to see,
+the firmware sends about `240` plotter samples per shape while still updating
+the DRV2605L realtime value every `10 ms`. For a `15000 ms` shape this means
+the driver is still updated every `10 ms`, but the plotter receives one debug
+sample roughly every `63 ms`.
+
+When Serial Plotter output is enabled, the sketch suppresses the raw UDP command
+line during playback so command numbers such as `15000` do not disturb the
+plotter's Y scale.
+
 ## Compile
 
 ```powershell
