@@ -3,6 +3,11 @@
 This hardware path uses an Arduino UNO R4 WiFi as a waveform source, a PAM8403
 class-D audio amplifier, and a Tectonic TEAX13C02-8/RH 8 ohm audio exciter.
 
+## Files
+
+- `diagram.md`: human-readable wiring explanation with a Mermaid diagram
+- `wiring-diagram.png`: client-readable wiring diagram image
+
 ## Core Parts
 
 - Arduino UNO R4 WiFi
