@@ -28,7 +28,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `docs/custom-shape-designer.md`: focused amplitude-only Shape Designer workflow and JSON format.
 - `docs/hardware-notes.md`: hardware decisions and cautions.
 - `docs/haptell-03-frequency-patterns.md`: custom amplitude/frequency pattern workflow for the audio exciter path.
-- `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs, SVG diagram, and KiCad draft.
+- `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs.
 - `schematics/haptell-02-drv2605l-lra/`: second prototype wiring documentation for LiPo Rider Plus, DRV2605L, and LRA.
 - `schematics/haptell-03-pam8403-teax13c02-8ohm/`: third prototype wiring documentation for PAM8403 and TEAX13C02-8/RH.
 - `tools/udp_sender/`: Python example for sending UDP commands from a computer.
@@ -38,7 +38,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 
 ## Development Rules
 
-- Keep the project simple and accessible: static documentation, Arduino firmware, and KiCad/schematic files.
+- Keep the project simple and accessible: static documentation, Arduino firmware, and schematic documentation files.
 - Do not commit `secrets.h` or real WiFi credentials.
 - Preserve the Arduino sketch folder/file naming convention with underscores; Arduino IDE expects the `.ino` name to match the folder name.
 - For the first and second prototypes, target Arduino UNO R4 WiFi unless the user explicitly asks to move to ESP32/ESP8266.
@@ -67,14 +67,7 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno
 
 The second firmware requires the `Adafruit DRV2605 Library`, which also uses `Adafruit BusIO`.
 
-When working on KiCad schematics, verify that the schematic can be loaded/exported:
-
-```powershell
-& 'C:/Users/Nullyks/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe' sch export svg --output $env:TEMP/haptell-02-kicad-check schematics/haptell-02-drv2605l-lra/haptell-02-drv2605l-lra.kicad_sch
-& 'C:/Users/Nullyks/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe' sch erc --output $env:TEMP/haptell-02-kicad-erc.rpt schematics/haptell-02-drv2605l-lra/haptell-02-drv2605l-lra.kicad_sch
-```
-
-The `haptell-02` KiCad schematic uses embedded documentation symbols, so ERC may report library warnings for those custom symbols even when there are no connection errors.
+KiCad and Fritzing drafts are not currently kept under `schematics/`; use the manual documentation diagrams unless the user asks to reintroduce a schematic CAD workflow.
 
 ## GitHub
 

@@ -27,7 +27,7 @@ https://github.com/nullyks/haptell-models
 - UDP port: `4444`.
 - Haptic patterns are predefined in firmware at this stage.
 - Future goal: up to 10 artifacts on the same closed WiFi subnet.
-- Include both human-readable schematic documentation and KiCad files.
+- Include human-readable schematic documentation and client-readable diagrams.
 
 ## Hardware Context
 
@@ -143,8 +143,9 @@ The first prototype is `haptell-01`:
 - Gate resistor: 220 ohm
 - Gate pulldown: 10k
 - Flyback diode: 1N5819 across the motor
-- Test power: 9 V battery to Arduino barrel jack / VIN for short tests only
-- Intended portable power later: LiPo battery -> LiPo Rider Plus -> regulated 5 V rail
+- Power: 3.7 V 1S protected LiPo battery -> LiPo Rider Plus charger/booster -> regulated 5 V rail
+- Controller power: LiPo Rider Plus 5 V output to Arduino UNO R4 WiFi USB-C power input
+- Motor driver power: LiPo Rider Plus 5 V output to motor positive lead / MOSFET driver 5 V side
 
 IRF3205 is not ideal as a general-purpose low-voltage logic MOSFET, but it is acceptable for the first Arduino UNO R4 WiFi test because UNO R4 has 5 V logic and the motor current is small. For ESP32/ESP8266 prototypes, use a logic-level MOSFET that switches well at 3.3 V.
 
@@ -286,10 +287,9 @@ Installed local Arduino tooling:
 - `Adafruit DRV2605 Library` 1.2.4
 - `Adafruit BusIO` 1.17.4
 
-Installed local schematic tooling:
+Local schematic notes:
 
-- KiCad 10.0.2
-- `kicad-cli` at `C:/Users/Nullyks/AppData/Local/Programs/KiCad/10.0/bin/kicad-cli.exe`
+- KiCad and Fritzing drafts were removed from `schematics/`; the current path is manual client-readable documentation diagrams.
 
 ## Command Sender Tool
 
@@ -401,11 +401,6 @@ Contents:
 
 - `README.md`: BOM and connection summary.
 - `diagram.md`: text and Mermaid circuit diagram.
-- `circuit-diagram.svg`: visual documentation diagram.
-- `haptell-01-dc-coin-motor.kicad_pro`: first prototype KiCad project draft.
-- `haptell-01-dc-coin-motor.kicad_sch`: first prototype KiCad schematic draft.
-- `haptell-02-drv2605l-lra.kicad_pro`: second prototype KiCad project file.
-- `haptell-02-drv2605l-lra.kicad_sch`: second prototype KiCad schematic draft with embedded documentation symbols.
 
 The first circuit:
 
@@ -468,7 +463,7 @@ DRV2605L OUT- -> VG1040003D lead 2
 4. Test `pulse`, `double`, `ramp`, `shape`, and `stop` commands with a UDP sender.
 5. Measure whether IRF3205 switches the small motor reliably at the selected PWM levels.
 6. Use the Node.js web sender to design and send short `haptell-02` LRA envelope shapes.
-7. After LiPo hardware arrives, document and test the portable 5 V power path.
+7. Build and test the LiPo Rider Plus portable 5 V power path for haptell-01.
 8. Install the Adafruit DRV2605 Arduino library and compile `haptell-02`.
 9. Physically build and test the DRV2605L + VG1040003D LRA prototype.
 10. Tune DRV2605L library/effect mappings for the real actuator feel.

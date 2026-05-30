@@ -161,7 +161,7 @@ Full protocol documentation: `docs/command-protocol.md`.
 
 ```text
 firmware/     Arduino UNO R4 WiFi sketches
-schematics/   wiring notes, diagrams, and KiCad drafts
+schematics/   wiring notes and client-readable diagrams
 docs/         protocol, hardware, and workflow documentation
 tools/        UDP sender tools
 ```

@@ -5,9 +5,7 @@ This schematic documentation describes the second Haptell prototype: an Arduino 
 ## Files
 
 - `diagram.md`: human-readable wiring explanation with a Mermaid diagram
-- `circuit-diagram.svg`: simple visual circuit diagram for documentation
-- `haptell-02-drv2605l-lra.kicad_pro`: KiCad project file
-- `haptell-02-drv2605l-lra.kicad_sch`: KiCad schematic draft
+- `wiring-diagram.png`: client-readable wiring diagram image
 
 ## Bill of Materials
 

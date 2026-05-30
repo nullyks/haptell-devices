@@ -5,9 +5,7 @@ This schematic describes the first Haptell prototype: an Arduino UNO R4 WiFi dri
 ## Files
 
 - `diagram.md`: human-readable wiring explanation with a Mermaid diagram
-- `circuit-diagram.svg`: simple visual circuit diagram for documentation
-- `haptell-01-dc-coin-motor.kicad_pro`: KiCad project file
-- `haptell-01-dc-coin-motor.kicad_sch`: KiCad schematic draft
+- `wiring-diagram.png`: client-readable wiring diagram image
 
 ## Bill of Materials
 
@@ -19,16 +17,23 @@ This schematic describes the first Haptell prototype: an Arduino UNO R4 WiFi dri
 | R1 | 220 ohm resistor | Gate resistor |
 | R2 | 10k resistor | Gate pulldown |
 | D1 | 1N5819 Schottky diode | Flyback diode across motor |
-| BT1 | 9 V battery | Short bench test only |
+| BT1 | 3.7 V 1S protected LiPo battery | Portable power source |
+| U2 | LiPo Rider Plus | Charger/booster, 5 V / 2.4 A USB-C output |
 
 ## Connection Summary
 
 | Arduino UNO R4 WiFi | Connection |
 | --- | --- |
 | `D9` | R1 -> MOSFET gate |
-| `5V` | Motor positive lead |
+| USB-C 5 V input | LiPo Rider Plus 5 V output |
+| `5V` rail | Motor positive lead |
 | `GND` | MOSFET source and R2 ground |
-| Barrel jack / `VIN` | 9 V battery for first short test |
+
+| LiPo Rider Plus | Connection |
+| --- | --- |
+| Battery connector | 3.7 V 1S protected LiPo battery |
+| 5 V output | Arduino USB-C 5 V power input and motor positive lead |
+| GND | Arduino GND, MOSFET source, and R2 ground |
 
 The diode is placed across the motor with the cathode on the 5 V side and the anode on the MOSFET drain side.
 
@@ -36,3 +41,6 @@ The diode is placed across the motor with the cathode on the 5 V side and the an
 
 The IRF3205 is acceptable for the first UNO R4 WiFi test with this small motor. Use a true logic-level MOSFET for later ESP32/ESP8266 versions.
 
+Do not use a small rectangular 9 V battery as the active haptell-01 power
+source. The current portable path is the protected 1S LiPo battery through the
+LiPo Rider Plus regulated 5 V output.

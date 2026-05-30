@@ -7,6 +7,11 @@ amplifier module.
 It is not a DRV2605L circuit. The Arduino generates a 70 Hz analog carrier on
 its `A0` DAC output, and the PAM8403 drives the actuator as a small audio load.
 
+## Files
+
+- `diagram.md`: human-readable wiring explanation with a Mermaid diagram
+- `wiring-diagram.png`: client-readable wiring diagram image
+
 ## Core Parts
 
 - Arduino UNO R4 WiFi

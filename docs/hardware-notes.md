@@ -8,15 +8,18 @@ The motor must not be connected directly to a GPIO pin. The Arduino pin only dri
 
 ## Power
 
-For the first bench test, a 9 V battery may be connected to the Arduino UNO R4 WiFi barrel jack or `VIN`. This is only a short proof-of-concept power source. Small rectangular 9 V batteries have limited current capability and are not recommended for the final wireless artifact.
-
-The intended portable direction is:
+The first prototype power path is now:
 
 ```text
-1S LiPo battery -> LiPo Rider Plus charger/booster -> regulated 5 V rail -> Arduino and motor driver
+3.7 V 1S protected LiPo battery -> LiPo Rider Plus charger/booster -> regulated 5 V rail
+LiPo Rider Plus 5 V output -> Arduino UNO R4 WiFi USB-C power input
+LiPo Rider Plus 5 V output -> motor positive lead / MOSFET driver 5 V side
+LiPo Rider Plus GND -> Arduino GND and MOSFET source / driver GND
 ```
 
 Use a common ground between the Arduino and the motor driver circuit.
+Do not use a small rectangular 9 V battery as the active haptell-01 power
+source.
 
 ## MOSFET Choice
 
