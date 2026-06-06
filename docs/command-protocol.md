@@ -14,6 +14,7 @@ Targets:
 - `haptell-02` addresses the LRA prototype. Current firmware variants include
   the DRV2605L + VG1040003D path and the PAM8403 + VG2230001H path.
 - `haptell-03` addresses the PAM8403 + TEAX13C02-8/RH audio-exciter prototype.
+- `haptell-04-triple-dc-shape` addresses the three-DC-motor shape-only prototype.
 - `all` broadcasts a command to every Haptell device that receives the packet.
 
 ## Commands
@@ -114,6 +115,7 @@ targets:
 haptell-01-dc-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
 haptell-02-drv2605l-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
 haptell-02-pam8403-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
+haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
 ```
 
 These shape-only firmware variants support:
@@ -127,6 +129,24 @@ They intentionally use unique target IDs and do not accept `all`, so multiple
 blocking devices can share a WiFi network without all starting at once.
 
 See `custom-shape-designer.md`.
+
+### Haptell 04 Triple DC Shape
+
+The haptell-04 three-motor firmware uses a shape command with three intensity
+values per point:
+
+```text
+haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
+```
+
+Each point is:
+
+```text
+timeMs:motor1Intensity:motor2Intensity:motor3Intensity
+```
+
+The firmware linearly interpolates all three motor intensities independently.
+The matching web tool is `tools/haptell_04_triple_shape_designer/`.
 
 The simple blocking haptell-02 firmware example also supports:
 
@@ -255,3 +275,18 @@ node tools/haptell_shape_designer/server.js
 Then open `http://127.0.0.1:8082`. This UI designs amplitude-only `shape`
 commands, saves/loads JSON pattern files, and shows a blocking playback warning
 after Node.js confirms that it sent the UDP packet.
+
+The haptell-04 triple shape designer is available at:
+
+```text
+tools/haptell_04_triple_shape_designer/server.js
+```
+
+Start it from the repository root:
+
+```powershell
+node tools/haptell_04_triple_shape_designer/server.js
+```
+
+Then open `http://127.0.0.1:8083`. This UI designs one shared time envelope
+with separate intensity curves for three DC motors.

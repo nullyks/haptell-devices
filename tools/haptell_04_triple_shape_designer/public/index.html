@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell 04 Triple Shape Designer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell 04 Triple Shape Designer</h1>
+          <p>Three independent DC motor envelopes on one shared timeline.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" min="1" max="65535" value="4444">
+        </label>
+        <label>
+          Target firmware
+          <input id="target" type="text" value="haptell-04-triple-dc-shape" readonly>
+        </label>
+        <button id="sendShape" type="button">Send Shape</button>
+      </section>
+
+      <section class="busy-panel hidden" id="busyPanel" aria-live="polite">
+        <strong>Blocking firmware is likely busy.</strong>
+        <span id="busyText">Waiting for playback to finish.</span>
+      </section>
+
+      <section class="designer" aria-label="Triple motor shape designer">
+        <div class="designer-head">
+          <div>
+            <h2>Envelope</h2>
+            <p>All three motors share point times. Each motor has its own intensity value.</p>
+          </div>
+          <div class="designer-actions">
+            <button id="saveJson" class="secondary" type="button">Save Shape</button>
+            <button id="loadJsonButton" class="file-button" type="button">Load Shape</button>
+            <input id="loadJson" class="file-input" type="file" accept="application/json,.json">
+          </div>
+        </div>
+
+        <div class="designer-controls">
+          <label>
+            duration ms
+            <input id="shapeDuration" type="text" inputmode="numeric" pattern="[0-9]*" value="3000">
+          </label>
+          <label>
+            max points
+            <input type="text" value="30" readonly>
+          </label>
+          <div class="legend" aria-label="Motor legend">
+            <span><i class="m1"></i>Motor 1</span>
+            <span><i class="m2"></i>Motor 2</span>
+            <span><i class="m3"></i>Motor 3</span>
+          </div>
+          <div class="preset-buttons" aria-label="Shape presets">
+            <button data-preset="wave" type="button">Wave</button>
+            <button data-preset="chase" type="button">Chase</button>
+            <button data-preset="allPulse" type="button">All Pulse</button>
+            <button data-preset="alternating" type="button">Alternating</button>
+          </div>
+        </div>
+
+        <div class="workbench">
+          <div class="graph-panel">
+            <div class="graph-toolbar" aria-label="Graph zoom controls">
+              <button id="zoomOut" class="zoom-button" type="button" aria-label="Zoom out">-</button>
+              <div id="zoomDisplay" class="zoom-display">100%</div>
+              <button id="zoomIn" class="zoom-button" type="button" aria-label="Zoom in">+</button>
+              <button id="zoomFit" class="zoom-fit" type="button">Fit</button>
+              <label class="zoom-pan">
+                view
+                <input id="zoomPan" type="range" min="0" max="1000" step="1" value="0">
+              </label>
+              <div id="zoomRange" class="zoom-range">0-3000 ms</div>
+            </div>
+            <svg id="envelopeGraph" viewBox="0 0 960 500" role="img" aria-label="Three motor amplitude envelope graph">
+              <rect class="graph-bg" x="86" y="34" width="804" height="374"></rect>
+              <g id="gridLayer"></g>
+              <polyline id="motorLine0" class="motor-line motor-1"></polyline>
+              <polyline id="motorLine1" class="motor-line motor-2"></polyline>
+              <polyline id="motorLine2" class="motor-line motor-3"></polyline>
+              <g id="pointLayer"></g>
+            </svg>
+          </div>
+
+          <aside class="points-panel">
+            <div class="add-point-controls">
+              <button id="addPoint" type="button">Add Point</button>
+              <label>
+                after
+                <select id="addAfterPoint"></select>
+              </label>
+            </div>
+            <div class="points-head">
+              <h3>Points</h3>
+            </div>
+            <div id="pointsList" class="points-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="preview" aria-label="Command and data preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly>
+        </label>
+        <label>
+          Data array preview
+          <textarea id="dataPreview" readonly rows="10"></textarea>
+        </label>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

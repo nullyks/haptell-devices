@@ -1,0 +1,561 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f6f8;
+  --panel: #ffffff;
+  --ink: #111827;
+  --muted: #5b6675;
+  --line: #d4dce6;
+  --blue: #1f5da8;
+  --green: #287349;
+  --amber: #a15c08;
+  --red: #b72a31;
+  --focus: #f2c84b;
+  --m1: #1f5da8;
+  --m2: #287349;
+  --m3: #b72a31;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app {
+  width: min(1460px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.topbar,
+.designer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.topbar {
+  margin-bottom: 18px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+h2 {
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+h3 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+p {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.status {
+  min-width: 210px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.status.ok {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.status.error {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.settings,
+.busy-panel,
+.designer,
+.preview {
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: 1.1fr 0.5fr 1.2fr 220px;
+  gap: 14px;
+  align-items: end;
+}
+
+.busy-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-color: #d8902d;
+  background: #fff8ec;
+  color: #6f3e05;
+  font-size: 18px;
+}
+
+.hidden {
+  display: none;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+input,
+select,
+button,
+textarea,
+.file-button {
+  width: 100%;
+  border-radius: 8px;
+  font: inherit;
+}
+
+input,
+select,
+button,
+.file-button {
+  min-height: 50px;
+  font-size: 19px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 10px 12px;
+}
+
+input[readonly] {
+  background: #f8fafc;
+}
+
+textarea {
+  min-height: 220px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+button:focus,
+textarea:focus,
+.file-button:focus {
+  outline: 4px solid var(--focus);
+  outline-offset: 2px;
+}
+
+button,
+.file-button {
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  background: var(--blue);
+  color: #fff;
+  padding: 12px 18px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled),
+.file-button:hover {
+  filter: brightness(0.92);
+}
+
+button:disabled {
+  background: #aeb7c2;
+  cursor: default;
+}
+
+#sendShape {
+  background: #117c89;
+}
+
+.designer-actions {
+  display: grid;
+  grid-template-columns: 160px 160px;
+  gap: 10px;
+}
+
+.secondary,
+.file-button {
+  background: #475569;
+}
+
+.file-input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.designer-controls {
+  display: grid;
+  grid-template-columns: 180px 130px 360px minmax(420px, 1fr);
+  gap: 14px;
+  align-items: end;
+  margin: 18px 0;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.legend i {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+}
+
+.legend .m1 {
+  background: var(--m1);
+}
+
+.legend .m2 {
+  background: var(--m2);
+}
+
+.legend .m3 {
+  background: var(--m3);
+}
+
+.preset-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.preset-buttons button {
+  background: #566579;
+  font-size: 15px;
+  padding-inline: 10px;
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(720px, 1fr) minmax(470px, 0.42fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.graph-panel,
+.points-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.graph-panel {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.graph-toolbar {
+  display: grid;
+  grid-template-columns: 44px 72px 44px 72px minmax(180px, 1fr) 150px;
+  gap: 8px;
+  align-items: end;
+}
+
+.zoom-button,
+.zoom-fit {
+  min-height: 38px;
+  padding: 8px 10px;
+  background: #475569;
+  font-size: 18px;
+}
+
+.zoom-display,
+.zoom-range {
+  display: grid;
+  min-height: 38px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #eef3f8;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.zoom-pan {
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.zoom-pan input {
+  min-height: 38px;
+  padding: 0;
+}
+
+#envelopeGraph {
+  display: block;
+  width: 100%;
+  min-height: 500px;
+  touch-action: none;
+}
+
+.graph-bg {
+  fill: #fff;
+  stroke: var(--line);
+}
+
+.grid-line {
+  stroke: #e1e7ef;
+  stroke-width: 1;
+}
+
+.grid-text {
+  fill: var(--muted);
+  font-size: 13px;
+}
+
+.axis-label {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.motor-line {
+  fill: none;
+  stroke-width: 4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.motor-1 {
+  stroke: var(--m1);
+}
+
+.motor-2 {
+  stroke: var(--m2);
+}
+
+.motor-3 {
+  stroke: var(--m3);
+}
+
+.shape-point {
+  fill: #fff;
+  stroke-width: 4;
+  cursor: grab;
+}
+
+.shape-point.motor-1 {
+  stroke: var(--m1);
+}
+
+.shape-point.motor-2 {
+  stroke: var(--m2);
+}
+
+.shape-point.motor-3 {
+  stroke: var(--m3);
+}
+
+.shape-point.end {
+  fill: #eef3f8;
+  cursor: default;
+}
+
+.shape-point-label {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+}
+
+.points-panel {
+  padding: 12px;
+  max-height: 620px;
+  overflow: auto;
+}
+
+.points-head {
+  margin: 16px 0 8px;
+}
+
+#addPoint {
+  width: 132px;
+  min-height: 40px;
+  font-size: 16px;
+  background: var(--green);
+}
+
+.add-point-controls {
+  display: grid;
+  grid-template-columns: 132px minmax(138px, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+.add-point-controls label {
+  gap: 4px;
+  font-size: 13px;
+}
+
+.add-point-controls select {
+  min-height: 40px;
+  font-size: 15px;
+  padding: 6px 8px;
+}
+
+.points-list {
+  display: grid;
+  gap: 6px;
+}
+
+.point-row {
+  display: grid;
+  grid-template-columns: 32px minmax(70px, 1fr) repeat(3, minmax(56px, 0.8fr)) 70px;
+  gap: 6px;
+  align-items: center;
+}
+
+.point-row-head {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 2px 2px;
+}
+
+.point-number {
+  display: grid;
+  min-height: 34px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #eef3f8;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.point-row input,
+.point-row button {
+  min-height: 34px;
+  font-size: 14px;
+  padding: 6px 8px;
+}
+
+.point-row button {
+  background: #566579;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+#commandPreview {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 16px;
+}
+
+@media (max-width: 1120px) {
+  .topbar,
+  .designer-head,
+  .busy-panel {
+    display: grid;
+  }
+
+  .settings,
+  .designer-controls,
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .designer-actions,
+  .preset-buttons,
+  .graph-toolbar,
+  .legend {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .zoom-pan,
+  .zoom-range {
+    grid-column: 1 / -1;
+  }
+
+  .point-row {
+    grid-template-columns: 30px minmax(66px, 1fr) repeat(3, minmax(50px, 0.8fr));
+  }
+
+  .point-row .point-action {
+    grid-column: 2 / -1;
+  }
+
+  .add-point-controls,
+  #addPoint {
+    width: 100%;
+  }
+
+  .add-point-controls {
+    grid-template-columns: 1fr;
+  }
+}

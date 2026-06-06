@@ -1,0 +1,10 @@
+{
+  "name": "haptell-04-triple-shape-designer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local web UI for designing three-motor Haptell 04 shape commands.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}

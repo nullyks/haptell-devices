@@ -117,6 +117,27 @@ interpolates amplitude and frequency between points. The accepted frequency
 range is `40..1500 Hz`; the useful tactile range depends strongly on the
 exciter mounting and the surface it drives.
 
+### haptell-04 Triple DC Motor Variant
+
+The repository now includes a shape-only `haptell-04` path for three DC
+vibration motors:
+
+```text
+firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/
+schematics/haptell-04-triple-dc-motor/
+tools/haptell_04_triple_shape_designer/
+```
+
+It is similar to haptell-01, but uses three MOSFET-switched motor channels on
+Arduino PWM pins `D9`, `D10`, and `D11`. The command format is:
+
+```text
+haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
+```
+
+Each point is `timeMs:motor1:motor2:motor3`. The firmware linearly interpolates
+all three motor intensities independently.
+
 ## Second Prototype Architecture
 
 The second prototype is `haptell-02`:
@@ -199,6 +220,12 @@ haptell-03 PAM8403 / TEAX13C02-8/RH simple blocking firmware path:
 firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking.ino
 ```
 
+haptell-04 triple DC shape-only firmware path:
+
+```text
+firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/haptell_04_uno_r4_wifi_triple_dc_shape_blocking.ino
+```
+
 The firmware:
 
 - Uses `WiFiS3.h` and `WiFiUdp.h`.
@@ -236,6 +263,7 @@ There are now simple blocking examples for all current hardware paths:
 - `haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking`
 - `haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking`
 - `haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking`
+- `haptell_04_uno_r4_wifi_triple_dc_shape_blocking`
 
 The blocking examples are easier to read, but they do not receive new UDP
 packets while a pattern is playing.
@@ -267,6 +295,7 @@ haptell-03 tone amplitude=120 frequency=560 duration=500
 haptell-03 sweep amplitude=140 from=180 to=900 duration=1200
 haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
 haptell-03 stop
+haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
 ```
 
 The same `shape ...` command works across the DC, DRV2605L, and
@@ -355,6 +384,18 @@ do not accept `all`, because blocking playback can last 15 seconds and should
 not be started accidentally on multiple devices sharing the same WiFi network.
 The workflow is documented in `docs/custom-shape-designer.md`.
 
+A dedicated haptell-04 three-motor Shape Designer is available at:
+
+```text
+tools/haptell_04_triple_shape_designer/server.js
+```
+
+It starts at `http://127.0.0.1:8083` by default. It uses one shared timeline
+with three independently editable motor intensity curves and sends compact
+commands such as
+`haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0`.
+The workflow is documented in `docs/haptell-04-triple-shape-designer.md`.
+
 The shape-only blocking firmware variants now all expose Arduino Serial Plotter
 envelope debug with a fixed 0..255 Y scale. DC prints
 `pwm:<value> min:0 max:255`, while DRV2605L and PAM8403/VG2230001H print
@@ -395,6 +436,12 @@ haptell-03 schematic documentation folder:
 
 ```text
 schematics/haptell-03-pam8403-teax13c02-8ohm/
+```
+
+haptell-04 schematic documentation folder:
+
+```text
+schematics/haptell-04-triple-dc-motor/
 ```
 
 Contents:
@@ -471,6 +518,7 @@ DRV2605L OUT- -> VG1040003D lead 2
 12. Build and bench-test the `haptell-03` PAM8403 + TEAX13C02-8/RH path.
 13. Use the haptell-03 web sender to test tone, sweep, and custom amplitude/frequency patterns.
 14. Use the focused Shape Designer to create and save longer custom amplitude patterns.
+15. Build and bench-test haptell-04 one motor channel at a time, then test all three channels with the triple Shape Designer.
 
 ## Open Questions
 

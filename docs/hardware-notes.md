@@ -147,3 +147,38 @@ above the exciter's audio range are expected to be more useful than deep
 low-frequency commands. Start with low amplitude, then measure differential AC
 Vrms between the PAM8403 output pins while the exciter is connected.
 
+## haptell-04 Triple DC Motor Variant
+
+This variant is similar to haptell-01, but it has three independently
+controlled DC vibration motors.
+
+Core parts:
+
+- Arduino UNO R4 WiFi
+- Three small 3-5 V DC vibration motors
+- Three low-side N-channel MOSFET driver stages
+- One flyback diode per motor
+- LiPo Rider Plus 5 V portable power path
+
+Default PWM pins:
+
+```text
+Arduino D9  -> motor 1 MOSFET gate through 220R
+Arduino D10 -> motor 2 MOSFET gate through 220R
+Arduino D11 -> motor 3 MOSFET gate through 220R
+```
+
+Each motor should be wired like the haptell-01 motor channel:
+
+```text
+5 V rail -> motor positive
+motor negative -> MOSFET drain
+MOSFET source -> GND
+MOSFET gate -> 10k pulldown -> GND
+1N5819 cathode -> motor positive / 5 V
+1N5819 anode -> motor negative / MOSFET drain
+```
+
+Do not drive any motor directly from an Arduino GPIO pin. All three driver
+stages must share common ground with the Arduino.
+

@@ -23,6 +23,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/`: shape-only blocking PAM8403/VG2230001H sketch for the custom Shape Designer.
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/`: third Arduino UNO R4 WiFi firmware for PAM8403 + TEAX13C02-8/RH audio exciter.
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/`: beginner-friendly blocking haptell-03 example sketch.
+- `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/`: shape-only blocking haptell-04 sketch for three DC motors.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/secrets.example.h`: WiFi credential template.
 - `docs/command-protocol.md`: UDP command format.
 - `docs/custom-shape-designer.md`: focused amplitude-only Shape Designer workflow and JSON format.
@@ -35,6 +36,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `tools/udp_web_sender/`: local Node.js browser UI for sending UDP commands.
 - `tools/haptell_03_frequency_web_sender/`: local Node.js browser UI for designing haptell-03 amplitude/frequency patterns.
 - `tools/haptell_shape_designer/`: focused local Node.js browser UI for amplitude-only custom shape design, JSON save/load, and shape-only firmware sending.
+- `tools/haptell_04_triple_shape_designer/`: local Node.js browser UI for three-motor haptell-04 shape design.
 
 ## Development Rules
 
@@ -46,6 +48,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - Device ID for the first prototype is `haptell-01`.
 - Device ID for the second DRV2605L + LRA prototype is `haptell-02`.
 - Device ID for the third PAM8403 + TEAX13C02-8/RH audio-exciter prototype is `haptell-03`.
+- Device ID for the fourth three-DC-motor shape prototype is `haptell-04-triple-dc-shape`.
 - Prefer non-blocking firmware behavior so the device can receive new commands while a pattern is playing.
 - Do not drive motors directly from GPIO pins. Document and use a driver stage.
 - When adding hardware, include both human-readable documentation and schematic source files.
@@ -63,6 +66,7 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking
 ```
 
 The second firmware requires the `Adafruit DRV2605 Library`, which also uses `Adafruit BusIO`.

@@ -62,6 +62,7 @@ sketches for the amplitude-only designer:
 | DC coin motor + MOSFET | `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/` | `haptell-01-dc-shape` |
 | DRV2605L + VG1040003D LRA | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` | `haptell-02-drv2605l-shape` |
 | PAM8403 + VG2230001H 70 Hz actuator | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` | `haptell-02-pam8403-shape` |
+| Three DC motors + MOSFET drivers | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` | `haptell-04-triple-dc-shape` |
 
 These sketches remove `pulse`, `double`, and `ramp` from the command surface.
 They support only `shape` and idle-state `stop`, with up to `15000 ms` duration
@@ -79,3 +80,15 @@ haptell-03 pattern duration=<duration_ms> points=<time:amplitude:frequency,time:
 
 The dedicated web sender in `tools/haptell_03_frequency_web_sender/` generates
 this command and visualizes both curves on the same time axis.
+
+## Haptell 04 Triple DC Shape Support
+
+The `haptell-04` firmware is a shape-only blocking sketch for three DC vibration
+motors. It uses one shared time axis and three independent motor intensities:
+
+```text
+haptell-04-triple-dc-shape shape duration=<duration_ms> points=<time:m1:m2:m3,time:m1:m2:m3,...>
+```
+
+The dedicated web tool in `tools/haptell_04_triple_shape_designer/` generates
+this command and visualizes all three motor envelopes on one graph.

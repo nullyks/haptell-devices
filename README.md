@@ -15,6 +15,7 @@ motor, LRA, or exciter driver.
 | `haptell-02` | DRV2605L + VG1040003D 170 Hz LRA | LRA driver IC prototype | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` |
 | `haptell-02` | PAM8403 + VG2230001H 70 Hz actuator | 70 Hz actuator path when DRV2605L is not a good fit | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
 | `haptell-03` | PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | Experimental amplitude and frequency control | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
+| `haptell-04` | Three DC vibration motors + MOSFET drivers | Three independent DC motor envelopes | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
 
 Shared defaults:
 
@@ -31,6 +32,7 @@ Shared defaults:
 | `tools/udp_web_sender/` | `http://127.0.0.1:8080` | General `pulse`, `double`, `ramp`, `shape`, and `stop` testing |
 | `tools/haptell_shape_designer/` | `http://127.0.0.1:8082` | Large amplitude-only shape editor with JSON save/load |
 | `tools/haptell_03_frequency_web_sender/` | `http://127.0.0.1:8081` | haptell-03 amplitude and frequency pattern editor |
+| `tools/haptell_04_triple_shape_designer/` | `http://127.0.0.1:8083` | haptell-04 three-motor shape editor |
 
 Start a web tool from the repository root:
 
@@ -101,6 +103,7 @@ only custom `shape` playback from the focused Shape Designer and an idle-state
 | DC coin motor + MOSFET | `haptell-01-dc-shape` | `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/` |
 | DRV2605L + VG1040003D LRA | `haptell-02-drv2605l-shape` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` |
 | PAM8403 + VG2230001H 70 Hz actuator | `haptell-02-pam8403-shape` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` |
+| Three DC motors + MOSFET drivers | `haptell-04-triple-dc-shape` | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
 
 The unique target IDs let multiple haptell-02 variants share one WiFi network
 without both reacting to the same blocking command.
@@ -130,6 +133,7 @@ Focused Shape Designer command:
 
 ```text
 haptell-02-drv2605l-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
+haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
 ```
 
 haptell-03 frequency pattern command:
@@ -150,6 +154,7 @@ Full protocol documentation: `docs/command-protocol.md`.
 | `docs/command-protocol.md` | UDP command format and examples |
 | `docs/firmware-variants.md` | Firmware family matrix and blocking/non-blocking behavior |
 | `docs/custom-shape-designer.md` | Large Shape Designer workflow, JSON format, and shape-only firmware |
+| `docs/haptell-04-triple-shape-designer.md` | haptell-04 three-motor shape workflow |
 | `docs/lra-shape-designer.md` | Original shared shape designer for DC/LRA amplitude envelopes |
 | `docs/haptell-03-frequency-patterns.md` | haptell-03 amplitude/frequency pattern workflow |
 | `docs/hardware-notes.md` | Hardware decisions, wiring cautions, and power notes |
@@ -184,6 +189,8 @@ Do not drive vibration motors directly from an Arduino GPIO pin.
 - DRV2605L LRA path: connect the LRA to the DRV2605L differential output.
 - PAM8403 paths: connect actuators across one bridged amplifier output channel.
   Do not connect either PAM8403 output pin to ground.
+- haptell-04 triple DC path: use three separate MOSFET driver stages, one per
+  motor, with one flyback diode per motor.
 
 The first prototype can use the available IRF3205 MOSFET with Arduino UNO R4
 WiFi 5 V logic for small-motor bench testing. For future 3.3 V boards, use a
@@ -199,6 +206,7 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking
 ```
 
 The DRV2605L firmware requires:
