@@ -138,6 +138,31 @@ haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:
 Each point is `timeMs:motor1:motor2:motor3`. The firmware linearly interpolates
 all three motor intensities independently.
 
+### haptell-05 Weighted Servo Variant
+
+The repository now includes a shape-only `haptell-05` path for a weighted 270
+degree hobby servo:
+
+```text
+firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/
+schematics/haptell-05-servo-weight/
+tools/haptell_05_servo_shape_designer/
+```
+
+The Arduino sends the servo signal on `D9`. The servo must use a separate
+`4.8-6.8 V` supply sized for stall current, with common ground tied to Arduino
+GND. Do not power the servo from the Arduino 5 V pin.
+
+The command format is:
+
+```text
+servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
+```
+
+Each point is `timeMs:angleDeg:easing`. Supported easing values are `linear`,
+`easeIn`, `easeOut`, and `easeInOut`. The firmware also accepts addressed forms
+with `haptell-05-servo-shape` or `haptell-05`.
+
 ## Second Prototype Architecture
 
 The second prototype is `haptell-02`:
@@ -226,6 +251,12 @@ haptell-04 triple DC shape-only firmware path:
 firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/haptell_04_uno_r4_wifi_triple_dc_shape_blocking.ino
 ```
 
+haptell-05 weighted servo shape-only firmware path:
+
+```text
+firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/haptell_05_uno_r4_wifi_servo_weight_shape_blocking.ino
+```
+
 The firmware:
 
 - Uses `WiFiS3.h` and `WiFiUdp.h`.
@@ -264,6 +295,7 @@ There are now simple blocking examples for all current hardware paths:
 - `haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking`
 - `haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking`
 - `haptell_04_uno_r4_wifi_triple_dc_shape_blocking`
+- `haptell_05_uno_r4_wifi_servo_weight_shape_blocking`
 
 The blocking examples are easier to read, but they do not receive new UDP
 packets while a pattern is playing.
@@ -296,6 +328,7 @@ haptell-03 sweep amplitude=140 from=180 to=900 duration=1200
 haptell-03 pattern duration=1200 points=0:0:560,80:150:560,700:180:760,1200:0:560
 haptell-03 stop
 haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
+servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
 ```
 
 The same `shape ...` command works across the DC, DRV2605L, and
@@ -396,6 +429,18 @@ commands such as
 `haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0`.
 The workflow is documented in `docs/haptell-04-triple-shape-designer.md`.
 
+A dedicated haptell-05 servo Shape Designer is available at:
+
+```text
+tools/haptell_05_servo_shape_designer/server.js
+```
+
+It starts at `http://127.0.0.1:8084` by default. It designs one angle-vs-time
+curve, shows the `135 deg` neutral line and a shaded safe range, supports
+draggable keyframes, calculates `pulse us`, saves/loads JSON, shows speed
+warnings, includes `Nudge`, `Swing`, `Kick`, `Recoil`, and `Wobble` presets,
+and previews a small servo horn animation.
+
 The shape-only blocking firmware variants now all expose Arduino Serial Plotter
 envelope debug with a fixed 0..255 Y scale. DC prints
 `pwm:<value> min:0 max:255`, while DRV2605L and PAM8403/VG2230001H print
@@ -442,6 +487,12 @@ haptell-04 schematic documentation folder:
 
 ```text
 schematics/haptell-04-triple-dc-motor/
+```
+
+haptell-05 schematic documentation folder:
+
+```text
+schematics/haptell-05-servo-weight/
 ```
 
 Contents:
@@ -519,6 +570,7 @@ DRV2605L OUT- -> VG1040003D lead 2
 13. Use the haptell-03 web sender to test tone, sweep, and custom amplitude/frequency patterns.
 14. Use the focused Shape Designer to create and save longer custom amplitude patterns.
 15. Build and bench-test haptell-04 one motor channel at a time, then test all three channels with the triple Shape Designer.
+16. Build and bench-test haptell-05 with a current-capable servo supply before adding the offset weight.
 
 ## Open Questions
 

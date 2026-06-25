@@ -24,19 +24,23 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/`: third Arduino UNO R4 WiFi firmware for PAM8403 + TEAX13C02-8/RH audio exciter.
 - `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/`: beginner-friendly blocking haptell-03 example sketch.
 - `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/`: shape-only blocking haptell-04 sketch for three DC motors.
+- `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/`: shape-only blocking haptell-05 sketch for a weighted 270 degree servo.
 - `firmware/haptell_01_uno_r4_wifi_dc_coin/secrets.example.h`: WiFi credential template.
 - `docs/command-protocol.md`: UDP command format.
 - `docs/custom-shape-designer.md`: focused amplitude-only Shape Designer workflow and JSON format.
 - `docs/hardware-notes.md`: hardware decisions and cautions.
 - `docs/haptell-03-frequency-patterns.md`: custom amplitude/frequency pattern workflow for the audio exciter path.
+- `docs/haptell-05-servo-shape-designer.md`: custom angle/easing pattern workflow for the weighted servo path.
 - `schematics/haptell-01-dc-coin-motor/`: first prototype schematic docs.
 - `schematics/haptell-02-drv2605l-lra/`: second prototype wiring documentation for LiPo Rider Plus, DRV2605L, and LRA.
 - `schematics/haptell-03-pam8403-teax13c02-8ohm/`: third prototype wiring documentation for PAM8403 and TEAX13C02-8/RH.
+- `schematics/haptell-05-servo-weight/`: fifth prototype wiring documentation for the weighted servo actuator.
 - `tools/udp_sender/`: Python example for sending UDP commands from a computer.
 - `tools/udp_web_sender/`: local Node.js browser UI for sending UDP commands.
 - `tools/haptell_03_frequency_web_sender/`: local Node.js browser UI for designing haptell-03 amplitude/frequency patterns.
 - `tools/haptell_shape_designer/`: focused local Node.js browser UI for amplitude-only custom shape design, JSON save/load, and shape-only firmware sending.
 - `tools/haptell_04_triple_shape_designer/`: local Node.js browser UI for three-motor haptell-04 shape design.
+- `tools/haptell_05_servo_shape_designer/`: local Node.js browser UI for haptell-05 servo angle shape design.
 
 ## Development Rules
 
@@ -49,6 +53,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - Device ID for the second DRV2605L + LRA prototype is `haptell-02`.
 - Device ID for the third PAM8403 + TEAX13C02-8/RH audio-exciter prototype is `haptell-03`.
 - Device ID for the fourth three-DC-motor shape prototype is `haptell-04-triple-dc-shape`.
+- Device ID for the fifth weighted-servo shape prototype is `haptell-05-servo-shape`.
 - Prefer non-blocking firmware behavior so the device can receive new commands while a pattern is playing.
 - Do not drive motors directly from GPIO pins. Document and use a driver stage.
 - When adding hardware, include both human-readable documentation and schematic source files.
@@ -67,6 +72,7 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_01_uno
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking
 ```
 
 The second firmware requires the `Adafruit DRV2605 Library`, which also uses `Adafruit BusIO`.

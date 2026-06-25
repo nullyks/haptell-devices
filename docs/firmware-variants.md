@@ -13,6 +13,7 @@ Each motor/actuator hardware path has two firmware styles:
 | DRV2605L + VG1040003D 170 Hz LRA | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/` |
 | PAM8403 + VG2230001H 70 Hz actuator | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/` |
 | PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | `haptell-03` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/` |
+| Weighted 270 degree servo | `haptell-05-servo-shape` | - | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
 
 ## Non-Blocking Firmware
 
@@ -63,6 +64,7 @@ sketches for the amplitude-only designer:
 | DRV2605L + VG1040003D LRA | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` | `haptell-02-drv2605l-shape` |
 | PAM8403 + VG2230001H 70 Hz actuator | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` | `haptell-02-pam8403-shape` |
 | Three DC motors + MOSFET drivers | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` | `haptell-04-triple-dc-shape` |
+| Weighted 270 degree servo | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` | `haptell-05-servo-shape` |
 
 These sketches remove `pulse`, `double`, and `ramp` from the command surface.
 They support only `shape` and idle-state `stop`, with up to `15000 ms` duration
@@ -92,3 +94,23 @@ haptell-04-triple-dc-shape shape duration=<duration_ms> points=<time:m1:m2:m3,ti
 
 The dedicated web tool in `tools/haptell_04_triple_shape_designer/` generates
 this command and visualizes all three motor envelopes on one graph.
+
+## Haptell 05 Servo Shape Support
+
+The `haptell-05` firmware is a shape-only blocking sketch for a weighted 270
+degree servo. It uses a separate command because each point contains angle and
+easing rather than intensity:
+
+```text
+servo-shape duration=<duration_ms> points=<time:angle:easing,time:angle:easing,...>
+```
+
+Example:
+
+```text
+servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
+```
+
+The dedicated web tool in `tools/haptell_05_servo_shape_designer/` generates
+this command, calculates pulse widths, shows speed warnings, and previews the
+servo horn motion.

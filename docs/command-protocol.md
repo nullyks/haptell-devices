@@ -15,6 +15,7 @@ Targets:
   the DRV2605L + VG1040003D path and the PAM8403 + VG2230001H path.
 - `haptell-03` addresses the PAM8403 + TEAX13C02-8/RH audio-exciter prototype.
 - `haptell-04-triple-dc-shape` addresses the three-DC-motor shape-only prototype.
+- `haptell-05-servo-shape` addresses the weighted servo shape-only prototype.
 - `all` broadcasts a command to every Haptell device that receives the packet.
 
 ## Commands
@@ -147,6 +148,42 @@ timeMs:motor1Intensity:motor2Intensity:motor3Intensity
 
 The firmware linearly interpolates all three motor intensities independently.
 The matching web tool is `tools/haptell_04_triple_shape_designer/`.
+
+### Haptell 05 Servo Shape
+
+The haptell-05 weighted servo firmware uses a separate `servo-shape` command
+because each point contains angle and easing instead of vibration intensity.
+
+The primary direct command is:
+
+```text
+servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
+```
+
+The firmware also accepts addressed forms:
+
+```text
+haptell-05-servo-shape servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
+haptell-05 stop
+```
+
+Each point is:
+
+```text
+timeMs:angleDeg:easing
+```
+
+Parameters:
+
+- `duration`: total pattern duration in milliseconds, `1` to `15000`
+- `angleDeg`: servo angle from `0` to `270`
+- `easing`: `linear`, `easeIn`, `easeOut`, or `easeInOut`
+
+The first point must be at `0 ms`, and the last point must be at `duration`.
+The first point's easing value is stored for readability. Each later point's
+easing value controls the segment from the previous point to that point.
+
+The matching web tool is `tools/haptell_05_servo_shape_designer/`.
 
 The simple blocking haptell-02 firmware example also supports:
 
@@ -290,3 +327,19 @@ node tools/haptell_04_triple_shape_designer/server.js
 
 Then open `http://127.0.0.1:8083`. This UI designs one shared time envelope
 with separate intensity curves for three DC motors.
+
+The haptell-05 servo shape designer is available at:
+
+```text
+tools/haptell_05_servo_shape_designer/server.js
+```
+
+Start it from the repository root:
+
+```powershell
+node tools/haptell_05_servo_shape_designer/server.js
+```
+
+Then open `http://127.0.0.1:8084`. This UI designs angle-vs-time servo
+patterns, calculates pulse widths, shows speed warnings, saves/loads JSON, and
+previews a small servo horn animation.

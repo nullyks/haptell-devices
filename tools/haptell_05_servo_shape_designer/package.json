@@ -1,0 +1,9 @@
+{
+  "name": "haptell-05-servo-shape-designer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local web UI for designing haptell-05 servo angle patterns.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

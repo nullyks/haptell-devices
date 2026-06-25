@@ -16,6 +16,7 @@ motor, LRA, or exciter driver.
 | `haptell-02` | PAM8403 + VG2230001H 70 Hz actuator | 70 Hz actuator path when DRV2605L is not a good fit | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
 | `haptell-03` | PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | Experimental amplitude and frequency control | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
 | `haptell-04` | Three DC vibration motors + MOSFET drivers | Three independent DC motor envelopes | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
+| `haptell-05` | Weighted 270 degree servo | Angle-over-time servo haptic patterns | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
 
 Shared defaults:
 
@@ -33,6 +34,7 @@ Shared defaults:
 | `tools/haptell_shape_designer/` | `http://127.0.0.1:8082` | Large amplitude-only shape editor with JSON save/load |
 | `tools/haptell_03_frequency_web_sender/` | `http://127.0.0.1:8081` | haptell-03 amplitude and frequency pattern editor |
 | `tools/haptell_04_triple_shape_designer/` | `http://127.0.0.1:8083` | haptell-04 three-motor shape editor |
+| `tools/haptell_05_servo_shape_designer/` | `http://127.0.0.1:8084` | haptell-05 servo angle shape editor |
 
 Start a web tool from the repository root:
 
@@ -104,6 +106,7 @@ only custom `shape` playback from the focused Shape Designer and an idle-state
 | DRV2605L + VG1040003D LRA | `haptell-02-drv2605l-shape` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` |
 | PAM8403 + VG2230001H 70 Hz actuator | `haptell-02-pam8403-shape` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` |
 | Three DC motors + MOSFET drivers | `haptell-04-triple-dc-shape` | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
+| Weighted 270 degree servo | `haptell-05-servo-shape` | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
 
 The unique target IDs let multiple haptell-02 variants share one WiFi network
 without both reacting to the same blocking command.
@@ -134,6 +137,7 @@ Focused Shape Designer command:
 ```text
 haptell-02-drv2605l-shape shape duration=15000 points=0:80,500:180,12000:80,15000:0
 haptell-04-triple-dc-shape shape duration=3000 points=0:0:0:0,500:180:60:0,2200:80:180:140,3000:0:0:0
+servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
 ```
 
 haptell-03 frequency pattern command:
@@ -155,6 +159,7 @@ Full protocol documentation: `docs/command-protocol.md`.
 | `docs/firmware-variants.md` | Firmware family matrix and blocking/non-blocking behavior |
 | `docs/custom-shape-designer.md` | Large Shape Designer workflow, JSON format, and shape-only firmware |
 | `docs/haptell-04-triple-shape-designer.md` | haptell-04 three-motor shape workflow |
+| `docs/haptell-05-servo-shape-designer.md` | haptell-05 servo angle shape workflow |
 | `docs/lra-shape-designer.md` | Original shared shape designer for DC/LRA amplitude envelopes |
 | `docs/haptell-03-frequency-patterns.md` | haptell-03 amplitude/frequency pattern workflow |
 | `docs/hardware-notes.md` | Hardware decisions, wiring cautions, and power notes |
@@ -191,6 +196,9 @@ Do not drive vibration motors directly from an Arduino GPIO pin.
   Do not connect either PAM8403 output pin to ground.
 - haptell-04 triple DC path: use three separate MOSFET driver stages, one per
   motor, with one flyback diode per motor.
+- haptell-05 weighted servo path: power the servo from a separate `4.8-6.8 V`
+  supply sized for stall current, connect common ground to Arduino ground, and
+  do not power the servo from the Arduino 5 V pin.
 
 The first prototype can use the available IRF3205 MOSFET with Arduino UNO R4
 WiFi 5 V logic for small-motor bench testing. For future 3.3 V boards, use a
@@ -207,6 +215,7 @@ arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm
 arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking
+arduino-cli compile --fqbn arduino:renesas_uno:unor4wifi firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking
 ```
 
 The DRV2605L firmware requires:

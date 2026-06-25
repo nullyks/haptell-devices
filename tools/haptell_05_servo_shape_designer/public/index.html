@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell 05 Servo Shape Designer</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell 05 Servo Shape Designer</h1>
+          <p>Angle over time for a 270 degree weighted servo actuator.</p>
+        </div>
+        <div class="status" id="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" min="1" max="65535" value="4444">
+        </label>
+        <input id="shapeDuration" class="hidden-field" type="hidden" value="800">
+        <button id="sendShape" type="button">Send Shape</button>
+      </section>
+
+      <section class="busy-panel hidden" id="busyPanel" aria-live="polite">
+        <strong>Blocking firmware is likely busy.</strong>
+        <span id="busyText">Waiting for playback to finish.</span>
+      </section>
+
+      <section class="designer" aria-label="Servo shape designer">
+        <div class="designer-head">
+          <div>
+            <h2>Servo Angle</h2>
+            <p class="designer-description">
+              <span>Neutral is 135 degrees. The shaded band marks the default mechanical comfort range.</span>
+              <button id="goNeutral" class="inline-action" type="button">Go to neutral</button>
+            </p>
+          </div>
+          <div class="designer-actions">
+            <button id="saveJson" class="secondary" type="button">Save JSON</button>
+            <button id="loadJsonButton" class="file-button" type="button">Load JSON</button>
+            <input id="loadJson" class="file-input" type="file" accept="application/json,.json">
+          </div>
+        </div>
+
+        <div class="designer-controls">
+          <label>
+            safe min deg
+            <input id="safeMin" type="number" min="0" max="270" value="20">
+          </label>
+          <label>
+            safe max deg
+            <input id="safeMax" type="number" min="0" max="270" value="250">
+          </label>
+          <div class="preset-buttons" aria-label="Shape presets">
+            <button data-preset="nudge" type="button">Nudge</button>
+            <button data-preset="swing" type="button">Swing</button>
+            <button data-preset="kick" type="button">Kick</button>
+            <button data-preset="recoil" type="button">Recoil</button>
+            <button data-preset="wobble" type="button">Wobble</button>
+          </div>
+        </div>
+
+        <div class="workbench">
+          <div class="graph-panel">
+            <svg id="angleGraph" viewBox="0 0 980 560" role="img" aria-label="Servo angle over time graph">
+              <rect class="graph-bg" x="78" y="28" width="842" height="430"></rect>
+              <g id="gridLayer"></g>
+              <rect id="safeBand" class="safe-band" x="78" y="0" width="842" height="0"></rect>
+              <line id="neutralLine" class="neutral-line" x1="78" y1="0" x2="920" y2="0"></line>
+              <text id="neutralLabel" class="neutral-label" x="928" y="0">135 deg neutral</text>
+              <g id="segmentLayer"></g>
+              <g id="pointLayer"></g>
+            </svg>
+          </div>
+
+          <aside class="side-panel">
+            <div class="preview-card">
+              <div class="preview-head">
+                <h3>Preview</h3>
+                <div class="preview-buttons">
+                  <button id="playPreview" type="button">Play</button>
+                  <button id="stopPreview" class="secondary" type="button">Stop</button>
+                </div>
+              </div>
+              <svg class="servo-preview" viewBox="0 0 280 220" aria-label="Servo horn preview">
+                <rect class="servo-case" x="86" y="76" width="108" height="82" rx="8"></rect>
+                <circle class="servo-hub" cx="140" cy="117" r="14"></circle>
+                <g id="hornGroup" transform="rotate(0 140 117)">
+                  <rect class="servo-horn" x="136" y="34" width="8" height="86" rx="4"></rect>
+                  <circle class="horn-hole" cx="140" cy="54" r="4"></circle>
+                  <circle class="horn-hole" cx="140" cy="80" r="4"></circle>
+                </g>
+                <text id="previewAngle" class="preview-angle" x="140" y="194" text-anchor="middle">135 deg / 1500 us</text>
+              </svg>
+              <label>
+                time
+                <input id="previewScrub" type="range" min="0" max="800" step="1" value="0">
+              </label>
+            </div>
+
+            <div class="warnings-card">
+              <h3>Speed Warnings</h3>
+              <div id="warningsList" class="warnings-list"></div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="table-panel">
+          <div class="add-point-controls">
+            <label>
+              shape duration ms
+              <input id="tableShapeDuration" type="text" inputmode="numeric" pattern="[0-9]*" value="800">
+            </label>
+            <button id="addPoint" type="button">Add Keyframe</button>
+            <label>
+              after
+              <select id="addAfterPoint"></select>
+            </label>
+          </div>
+          <div id="pointsList" class="points-list"></div>
+        </div>
+      </section>
+
+      <section class="preview" aria-label="Command and JSON preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly>
+        </label>
+        <label>
+          JSON preview
+          <textarea id="dataPreview" readonly rows="10"></textarea>
+        </label>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

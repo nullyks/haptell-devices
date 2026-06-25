@@ -182,3 +182,37 @@ MOSFET gate -> 10k pulldown -> GND
 Do not drive any motor directly from an Arduino GPIO pin. All three driver
 stages must share common ground with the Arduino.
 
+## haptell-05 Weighted Servo Variant
+
+This variant uses a 270 degree digital hobby servo with an offset weight on the
+horn. It is a position-controlled actuator rather than a vibration motor.
+
+Servo specification used by the firmware and designer:
+
+```text
+500 us  -> 0 deg
+1500 us -> 135 deg neutral
+2500 us -> 270 deg
+operating voltage: 4.8-6.8 V
+stall current: about 2.1 A at 4.8 V, about 2.7 A at 6.8 V
+no-load speed: about 0.18 s / 60 deg at 4.8 V
+```
+
+Control and power wiring:
+
+```text
+Arduino D9 -> servo signal lead
+external 4.8-6.8 V supply + -> servo V+
+external supply GND -> servo GND
+external supply GND -> Arduino GND
+Arduino USB-C -> Arduino power
+```
+
+Do not power the servo from the Arduino 5 V pin. The servo supply must be sized
+for high current during stalls and sudden direction changes. Keep the common
+ground wire short and reliable.
+
+For first tests, keep the motion inside a conservative safe range such as
+`60..210 deg` and confirm that the offset weight cannot hit the enclosure,
+wiring, or the user's hand.
+
