@@ -349,7 +349,7 @@ button:disabled {
   fill: #fff;
   stroke: var(--angle);
   stroke-width: 4;
-  cursor: grab;
+  cursor: ns-resize;
 }
 
 .shape-point.warn {
@@ -360,7 +360,21 @@ button:disabled {
   stroke: var(--red);
 }
 
-.shape-point-label {
+.time-guide {
+  stroke: #94a3b8;
+  stroke-dasharray: 4 5;
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+
+.time-handle {
+  fill: #f8fafc;
+  stroke: #334155;
+  stroke-width: 2;
+  cursor: ew-resize;
+}
+
+.time-point-label {
   fill: var(--ink);
   font-size: 12px;
   font-weight: 800;

@@ -398,7 +398,7 @@ button:disabled {
 .shape-point {
   fill: #fff;
   stroke-width: 4;
-  cursor: grab;
+  cursor: ns-resize;
 }
 
 .shape-point.motor-1 {
@@ -418,6 +418,24 @@ button:disabled {
   cursor: default;
 }
 
+.time-guide {
+  stroke: #91a1b5;
+  stroke-dasharray: 5 5;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.time-handle {
+  fill: #fff;
+  stroke: #425466;
+  stroke-width: 2;
+  cursor: ew-resize;
+}
+
+.time-handle:hover {
+  fill: #e4f5f2;
+}
+
 .shape-point-label {
   fill: var(--ink);
   font-size: 12px;
@@ -427,6 +445,25 @@ button:disabled {
   stroke: #fff;
   stroke-linejoin: round;
   stroke-width: 4px;
+}
+
+.shape-point-label.motor-label.motor-1 {
+  fill: var(--m1);
+}
+
+.shape-point-label.motor-label.motor-2 {
+  fill: var(--m2);
+}
+
+.shape-point-label.motor-label.motor-3 {
+  fill: var(--m3);
+}
+
+.time-point-label {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  pointer-events: none;
 }
 
 .points-panel {

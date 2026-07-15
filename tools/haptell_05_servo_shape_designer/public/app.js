@@ -99,15 +99,26 @@ const presets = {
   },
 };
 
+let nextPointId = 1;
+
+function createPoint(timeMs, angleDeg, easing, id) {
+  return {
+    id: id || `point-${nextPointId++}`,
+    timeMs: Math.round(Number(timeMs) || 0),
+    angleDeg: clamp(Math.round(Number(angleDeg) || NEUTRAL_ANGLE), ANGLE_MIN, ANGLE_MAX),
+    easing: EASINGS.includes(easing) ? easing : "linear",
+  };
+}
+
 let shapePoints = [
   { timeMs: 0, angleDeg: 135, easing: "linear" },
   { timeMs: 120, angleDeg: 175, easing: "easeOut" },
   { timeMs: 260, angleDeg: 95, easing: "easeInOut" },
   { timeMs: 800, angleDeg: 135, easing: "easeOut" },
-];
+].map((point) => createPoint(point.timeMs, point.angleDeg, point.easing));
 let currentDurationMs = 800;
 let activePoint = null;
-let addAfterIndex = 0;
+let addAfterPointId = shapePoints[0].id;
 let busyTimer = null;
 let previewAnimation = null;
 let previewStartedAt = 0;
@@ -152,12 +163,14 @@ function setShapeDuration(nextDurationMs, scalePoints) {
     shapePoints = shapePoints.map((point, index) => {
       const isFirst = index === 0;
       const isLast = index === shapePoints.length - 1;
-      return {
-        timeMs: isFirst ? 0 : isLast ? nextDurationMs : clamp(Math.round(point.timeMs * ratio), 0, nextDurationMs),
-        angleDeg: clamp(Math.round(point.angleDeg), ANGLE_MIN, ANGLE_MAX),
-        easing: point.easing,
-      };
+      return createPoint(
+        isFirst ? 0 : isLast ? nextDurationMs : clamp(Math.round(point.timeMs * ratio), 0, nextDurationMs),
+        point.angleDeg,
+        point.easing,
+        point.id,
+      );
     });
+    keepPointTimesOrdered(nextDurationMs);
   }
 
   currentDurationMs = nextDurationMs;
@@ -181,43 +194,31 @@ function getSafeRange() {
   return { safeMin, safeMax };
 }
 
-function normalizeShapePoints() {
-  const durationMs = currentDurationMs;
+function keepPointTimesOrdered(durationMs = currentDurationMs) {
   inputs.shapeDuration.value = durationMs;
   inputs.tableShapeDuration.value = durationMs;
 
   shapePoints = shapePoints
-    .map(copyPoint)
-    .map((point) => ({
-      ...point,
-      timeMs: clamp(point.timeMs, 0, durationMs),
-      angleDeg: clamp(point.angleDeg, ANGLE_MIN, ANGLE_MAX),
-    }))
-    .sort((a, b) => a.timeMs - b.timeMs);
+    .map((point) => createPoint(
+      clamp(Math.round(Number(point.timeMs) || 0), 0, durationMs),
+      point.angleDeg,
+      point.easing,
+      point.id,
+    ));
 
-  shapePoints = shapePoints.filter((point, index, points) => {
-    return index === 0 || point.timeMs !== points[index - 1].timeMs;
-  });
-
-  if (shapePoints.length === 0 || shapePoints[0].timeMs !== 0) {
-    const firstAngle = shapePoints[0]?.angleDeg ?? NEUTRAL_ANGLE;
-    shapePoints.unshift({ timeMs: 0, angleDeg: firstAngle, easing: "linear" });
-  }
-
-  if (shapePoints[shapePoints.length - 1].timeMs !== durationMs) {
-    shapePoints.push({ timeMs: durationMs, angleDeg: NEUTRAL_ANGLE, easing: "easeOut" });
-  }
-
-  shapePoints[0] = { ...shapePoints[0], timeMs: 0, easing: "linear" };
+  const lastIndex = shapePoints.length - 1;
+  shapePoints[0].timeMs = 0;
+  shapePoints[0].easing = "linear";
   shapePoints[shapePoints.length - 1] = {
     ...shapePoints[shapePoints.length - 1],
     timeMs: durationMs,
   };
 
-  if (shapePoints.length > MAX_POINTS) {
-    const first = shapePoints[0];
-    const last = shapePoints[shapePoints.length - 1];
-    shapePoints = [first, ...shapePoints.slice(1, MAX_POINTS - 1), last];
+  for (let index = 1; index < lastIndex; index++) {
+    const minimum = shapePoints[index - 1].timeMs + 1;
+    const remainingPoints = lastIndex - index;
+    const maximum = durationMs - remainingPoints;
+    shapePoints[index].timeMs = clamp(shapePoints[index].timeMs, minimum, maximum);
   }
 }
 
@@ -230,13 +231,11 @@ function pointToText(point) {
 }
 
 function buildCommand() {
-  normalizeShapePoints();
   const pointText = shapePoints.map(pointToText).join(",");
   return `servo-shape duration=${currentDurationMs} points=${pointText}`;
 }
 
 function buildPatternJson() {
-  normalizeShapePoints();
   const { safeMin, safeMax } = getSafeRange();
   return {
     schema: "haptell-servo-shape-pattern/v1",
@@ -289,7 +288,6 @@ function easeProgress(t, easing) {
 }
 
 function getAngleAtTime(timeMs) {
-  normalizeShapePoints();
   if (timeMs <= shapePoints[0].timeMs) {
     return shapePoints[0].angleDeg;
   }
@@ -362,7 +360,6 @@ function speedClass(speed) {
 }
 
 function renderGraph() {
-  normalizeShapePoints();
   const { safeMin, safeMax } = getSafeRange();
   drawGrid();
 
@@ -394,15 +391,26 @@ function renderGraph() {
   }
   segmentLayerEl.innerHTML = segments.join("");
 
+  const bottom = GRAPH.top + GRAPH.height;
   const pointMarkup = shapePoints
     .map((point, index) => {
       const coords = graphPoint(point.timeMs, point.angleDeg);
       const previous = shapePoints[index - 1];
       const cls = previous ? speedClass(segmentSpeed(previous, point)) : "ok";
-      const labelY = coords.y < GRAPH.top + 34 ? coords.y + 28 : coords.y - 14;
+      const timeControl = index > 0 && index < shapePoints.length - 1
+        ? `
+          <line class="time-guide" x1="${coords.x}" y1="${GRAPH.top}" x2="${coords.x}" y2="${bottom}"></line>
+          <rect class="time-handle" data-point-id="${point.id}" x="${coords.x - 10}" y="${bottom - 12}" width="20" height="12" rx="3">
+            <title>Drag horizontally to change this point time</title>
+          </rect>
+          <text class="time-point-label" x="${coords.x}" y="${bottom - 3}" text-anchor="middle">${index + 1}</text>
+        `
+        : "";
       return `
-        <circle class="shape-point ${cls}" data-index="${index}" cx="${coords.x}" cy="${coords.y}" r="8"></circle>
-        <text class="shape-point-label" x="${coords.x}" y="${labelY}" text-anchor="middle">${index + 1}</text>
+        <circle class="shape-point ${cls}" data-point-id="${point.id}" cx="${coords.x}" cy="${coords.y}" r="8">
+          <title>Drag vertically to change angle</title>
+        </circle>
+        ${timeControl}
       `;
     })
     .join("");
@@ -410,7 +418,6 @@ function renderGraph() {
 }
 
 function renderWarnings() {
-  normalizeShapePoints();
   const warnings = [];
   const { safeMin, safeMax } = getSafeRange();
 
@@ -457,16 +464,39 @@ function renderWarnings() {
     .join("");
 }
 
-function renderAddAfterOptions() {
-  const maxIndex = Math.max(0, shapePoints.length - 2);
-  addAfterIndex = clamp(Math.round(addAfterIndex), 0, maxIndex);
+function getPointIndex(pointId) {
+  return shapePoints.findIndex((point) => point.id === pointId);
+}
 
+function getPointTimeBounds(index) {
+  if (index === 0) {
+    return { min: 0, max: 0 };
+  }
+  if (index === shapePoints.length - 1) {
+    return { min: currentDurationMs, max: currentDurationMs };
+  }
+
+  return {
+    min: shapePoints[index - 1].timeMs + 1,
+    max: shapePoints[index + 1].timeMs - 1,
+  };
+}
+
+function getAddAfterPointId() {
+  const index = getPointIndex(addAfterPointId);
+  if (index < 0 || index >= shapePoints.length - 1) {
+    addAfterPointId = shapePoints[0].id;
+  }
+  return addAfterPointId;
+}
+
+function renderAddAfterOptions() {
   addAfterPointEl.innerHTML = shapePoints
     .slice(0, -1)
-    .map((point, index) => `<option value="${index}">#${index + 1} (${point.timeMs} ms)</option>`)
+    .map((point, index) => `<option value="${point.id}">#${index + 1} (${point.timeMs} ms)</option>`)
     .join("");
 
-  addAfterPointEl.value = String(addAfterIndex);
+  addAfterPointEl.value = getAddAfterPointId();
   addAfterPointEl.disabled = shapePoints.length >= MAX_POINTS;
   addPointButtonEl.disabled = shapePoints.length >= MAX_POINTS;
 }
@@ -479,26 +509,26 @@ function easingOptions(selected) {
 }
 
 function renderPointRows() {
-  normalizeShapePoints();
   renderAddAfterOptions();
 
   const rows = shapePoints
     .map((point, index) => {
       const isFirst = index === 0;
       const isLast = index === shapePoints.length - 1;
+      const timeBounds = getPointTimeBounds(index);
       const previous = shapePoints[index - 1];
       const cls = previous ? speedClass(segmentSpeed(previous, point)) : "ok";
       const actionCell = isFirst || isLast
         ? `<div class="point-action" aria-hidden="true"></div>`
-        : `<button class="point-action" type="button" data-remove-point="${index}">Remove</button>`;
+        : `<button class="point-action" type="button" data-remove-point="${point.id}">Remove</button>`;
 
       return `
-        <div class="point-row ${cls}">
+        <div class="point-row ${cls}" data-point-id="${point.id}">
           <div class="point-number">${index + 1}</div>
-          <input aria-label="Point ${index + 1} time" type="number" min="0" max="${currentDurationMs}" step="10" value="${point.timeMs}" data-point-time="${index}" ${isFirst || isLast ? "readonly" : ""}>
-          <input aria-label="Point ${index + 1} angle" type="number" min="0" max="270" step="1" value="${point.angleDeg}" data-point-angle="${index}">
+          <input aria-label="Point ${index + 1} time" type="number" min="${timeBounds.min}" max="${timeBounds.max}" step="10" value="${point.timeMs}" data-point-id="${point.id}" data-point-time ${isFirst || isLast ? "readonly" : ""}>
+          <input aria-label="Point ${index + 1} angle" type="number" min="0" max="270" step="1" value="${point.angleDeg}" data-point-id="${point.id}" data-point-angle>
           <input aria-label="Point ${index + 1} pulse" type="text" value="${angleToPulseUs(point.angleDeg)}" readonly>
-          <select aria-label="Point ${index + 1} easing" data-point-easing="${index}" ${isFirst ? "disabled" : ""}>${easingOptions(point.easing)}</select>
+          <select aria-label="Point ${index + 1} easing" data-point-id="${point.id}" data-point-easing ${isFirst ? "disabled" : ""}>${easingOptions(point.easing)}</select>
           ${actionCell}
         </div>
       `;
@@ -519,7 +549,6 @@ function renderPointRows() {
 }
 
 function renderDesigner() {
-  normalizeShapePoints();
   previewScrubEl.max = String(currentDurationMs);
   renderGraph();
   renderWarnings();
@@ -529,14 +558,12 @@ function renderDesigner() {
 }
 
 function addPoint() {
-  normalizeShapePoints();
-
   if (shapePoints.length >= MAX_POINTS) {
     setStatus("Max 30 points", "error");
     return;
   }
 
-  const afterIndex = clamp(Number(addAfterPointEl.value) || 0, 0, shapePoints.length - 2);
+  const afterIndex = getPointIndex(getAddAfterPointId());
   const previous = shapePoints[afterIndex];
   const next = shapePoints[afterIndex + 1];
   if (!next || next.timeMs - previous.timeMs <= 1) {
@@ -546,18 +573,20 @@ function addPoint() {
 
   const timeMs = previous.timeMs + Math.round((next.timeMs - previous.timeMs) / 2);
   const angleDeg = Math.round(getAngleAtTime(timeMs));
-  shapePoints.splice(afterIndex + 1, 0, { timeMs, angleDeg, easing: next.easing });
-  addAfterIndex = afterIndex + 1;
+  const point = createPoint(timeMs, angleDeg, next.easing);
+  shapePoints.splice(afterIndex + 1, 0, point);
+  addAfterPointId = point.id;
   renderDesigner();
 }
 
-function removePoint(index) {
-  normalizeShapePoints();
+function removePoint(pointId) {
+  const index = getPointIndex(pointId);
   if (index <= 0 || index >= shapePoints.length - 1) {
     return;
   }
 
   shapePoints.splice(index, 1);
+  addAfterPointId = shapePoints[Math.max(0, index - 1)].id;
   renderDesigner();
 }
 
@@ -568,7 +597,7 @@ function applyPreset(name) {
   }
 
   setShapeDuration(preset.durationMs, false);
-  shapePoints = preset.points.map(copyPoint);
+  shapePoints = preset.points.map((point) => createPoint(point.timeMs, point.angleDeg, point.easing));
   previewScrubEl.value = "0";
   stopPreview();
   renderDesigner();
@@ -584,22 +613,60 @@ function graphCoordinatesFromEvent(event) {
   };
 }
 
-function updatePointFromGraph(active, event) {
-  const index = active.index;
-  const isFirst = index === 0;
-  const isLast = index === shapePoints.length - 1;
+function updateAngleFromGraph(pointId, event) {
+  const index = getPointIndex(pointId);
+  if (index < 0) {
+    return;
+  }
+
   const coords = graphCoordinatesFromEvent(event);
-  const minTime = isFirst ? 0 : shapePoints[index - 1].timeMs + 10;
-  const maxTime = isLast ? currentDurationMs : shapePoints[index + 1].timeMs - 10;
-  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * currentDurationMs);
   const angleDeg = Math.round(((GRAPH.top + GRAPH.height - coords.y) / GRAPH.height) * ANGLE_MAX);
 
   shapePoints[index] = {
     ...shapePoints[index],
-    timeMs: clamp(timeMs, minTime, maxTime),
     angleDeg: clamp(angleDeg, ANGLE_MIN, ANGLE_MAX),
   };
 
+  renderDesigner();
+}
+
+function updateTimeFromGraph(pointId, event) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= shapePoints.length - 1) {
+    return;
+  }
+
+  const coords = graphCoordinatesFromEvent(event);
+  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * currentDurationMs);
+  const bounds = getPointTimeBounds(index);
+  shapePoints[index].timeMs = clamp(timeMs, bounds.min, bounds.max);
+  renderDesigner();
+}
+
+function updateAngleFromTable(pointId, rawValue) {
+  const index = getPointIndex(pointId);
+  const angleDeg = Number(rawValue);
+  if (index < 0 || !Number.isFinite(angleDeg)) {
+    return;
+  }
+
+  shapePoints[index].angleDeg = clamp(Math.round(angleDeg), ANGLE_MIN, ANGLE_MAX);
+  renderGraph();
+  renderWarnings();
+  updatePreview();
+  updateServoPreview(Number(previewScrubEl.value || 0));
+}
+
+function commitTimeFromTable(pointId, rawValue) {
+  const index = getPointIndex(pointId);
+  const timeMs = Number(rawValue);
+  if (index <= 0 || index >= shapePoints.length - 1 || !Number.isFinite(timeMs)) {
+    renderPointRows();
+    return;
+  }
+
+  const bounds = getPointTimeBounds(index);
+  shapePoints[index].timeMs = clamp(Math.round(timeMs), bounds.min, bounds.max);
   renderDesigner();
 }
 
@@ -826,7 +893,7 @@ async function loadJsonFile(file) {
   try {
     const loaded = validateLoadedPattern(JSON.parse(await file.text()));
     setShapeDuration(loaded.durationMs, false);
-    shapePoints = loaded.points;
+    shapePoints = loaded.points.map((point) => createPoint(point.timeMs, point.angleDeg, point.easing));
     if (Number.isFinite(Number(loaded.servo.safeMinAngleDeg))) {
       inputs.safeMin.value = clamp(Math.round(Number(loaded.servo.safeMinAngleDeg)), ANGLE_MIN, ANGLE_MAX);
     }
@@ -890,7 +957,7 @@ document.querySelectorAll("button[data-preset]").forEach((button) => {
 });
 
 addAfterPointEl.addEventListener("change", () => {
-  addAfterIndex = Number(addAfterPointEl.value);
+  addAfterPointId = addAfterPointEl.value;
 });
 
 previewScrubEl.addEventListener("input", () => {
@@ -899,46 +966,48 @@ previewScrubEl.addEventListener("input", () => {
 });
 
 pointsListEl.addEventListener("input", (event) => {
-  const timeIndex = event.target.dataset.pointTime;
-  const angleIndex = event.target.dataset.pointAngle;
-
-  if (timeIndex !== undefined) {
-    shapePoints[Number(timeIndex)].timeMs = Number(event.target.value);
+  if (event.target.dataset.pointAngle !== undefined) {
+    updateAngleFromTable(event.target.dataset.pointId, event.target.value);
   }
-
-  if (angleIndex !== undefined) {
-    shapePoints[Number(angleIndex)].angleDeg = Number(event.target.value);
-  }
-
-  renderGraph();
-  renderWarnings();
-  updatePreview();
-  updateServoPreview(Number(previewScrubEl.value || 0));
 });
 
 pointsListEl.addEventListener("change", (event) => {
-  const easingIndex = event.target.dataset.pointEasing;
-  if (easingIndex !== undefined) {
-    shapePoints[Number(easingIndex)].easing = event.target.value;
+  if (event.target.dataset.pointTime !== undefined) {
+    commitTimeFromTable(event.target.dataset.pointId, event.target.value);
+    return;
+  }
+
+  if (event.target.dataset.pointEasing !== undefined) {
+    const index = getPointIndex(event.target.dataset.pointId);
+    if (index >= 0) {
+      shapePoints[index].easing = event.target.value;
+    }
   }
   renderDesigner();
 });
 
+pointsListEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && event.target.dataset.pointTime !== undefined) {
+    event.target.blur();
+  }
+});
+
 pointsListEl.addEventListener("click", (event) => {
-  const removeIndex = event.target.dataset.removePoint;
-  if (removeIndex !== undefined) {
-    removePoint(Number(removeIndex));
+  const pointId = event.target.dataset.removePoint;
+  if (pointId !== undefined) {
+    removePoint(pointId);
   }
 });
 
 graphEl.addEventListener("pointerdown", (event) => {
-  const target = event.target.closest(".shape-point");
+  const target = event.target.closest(".shape-point, .time-handle");
   if (!target) {
     return;
   }
 
   activePoint = {
-    index: Number(target.dataset.index),
+    id: target.dataset.pointId,
+    mode: target.classList.contains("time-handle") ? "time" : "angle",
   };
   graphEl.setPointerCapture(event.pointerId);
 });
@@ -948,12 +1017,20 @@ graphEl.addEventListener("pointermove", (event) => {
     return;
   }
 
-  updatePointFromGraph(activePoint, event);
+  if (activePoint.mode === "time") {
+    updateTimeFromGraph(activePoint.id, event);
+  } else {
+    updateAngleFromGraph(activePoint.id, event);
+  }
 });
 
 graphEl.addEventListener("pointerup", (event) => {
   activePoint = null;
   graphEl.releasePointerCapture(event.pointerId);
+});
+
+graphEl.addEventListener("pointercancel", () => {
+  activePoint = null;
 });
 
 Object.values(inputs).forEach((input) => {

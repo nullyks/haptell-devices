@@ -86,12 +86,23 @@ const presets = {
   },
 };
 
+let nextPointId = 1;
+
+function createPoint(timeMs, amplitude, frequencyHz, id) {
+  return {
+    id: id || `point-${nextPointId++}`,
+    timeMs,
+    amplitude: clamp(Math.round(Number(amplitude) || 0), 0, 255),
+    frequencyHz: clamp(Math.round(Number(frequencyHz) || 560), MIN_FREQUENCY_HZ, MAX_FREQUENCY_HZ),
+  };
+}
+
 let patternPoints = [
   { timeMs: 0, amplitude: 0, frequencyHz: 560 },
   { timeMs: 80, amplitude: 150, frequencyHz: 560 },
   { timeMs: 900, amplitude: 150, frequencyHz: 760 },
   { timeMs: 1200, amplitude: 0, frequencyHz: 560 },
-];
+].map((point) => createPoint(point.timeMs, point.amplitude, point.frequencyHz));
 let activeDrag = null;
 
 function getTarget() {
@@ -111,11 +122,12 @@ function normalizePatternPoints() {
   inputs.patternDuration.value = durationMs;
 
   patternPoints = patternPoints
-    .map((point) => ({
-      timeMs: clamp(Math.round(Number(point.timeMs) || 0), 0, durationMs),
-      amplitude: clamp(Math.round(Number(point.amplitude) || 0), 0, 255),
-      frequencyHz: clamp(Math.round(Number(point.frequencyHz) || 560), MIN_FREQUENCY_HZ, MAX_FREQUENCY_HZ),
-    }))
+    .map((point) => createPoint(
+      clamp(Math.round(Number(point.timeMs) || 0), 0, durationMs),
+      point.amplitude,
+      point.frequencyHz,
+      point.id,
+    ))
     .sort((a, b) => a.timeMs - b.timeMs);
 
   patternPoints = patternPoints.filter((point, index, points) => {
@@ -124,20 +136,21 @@ function normalizePatternPoints() {
 
   if (patternPoints.length === 0 || patternPoints[0].timeMs !== 0) {
     const frequencyHz = patternPoints[0]?.frequencyHz || 560;
-    patternPoints.unshift({ timeMs: 0, amplitude: 0, frequencyHz });
+    patternPoints.unshift(createPoint(0, 0, frequencyHz));
   }
 
   if (patternPoints[patternPoints.length - 1].timeMs !== durationMs) {
     const frequencyHz = patternPoints[patternPoints.length - 1]?.frequencyHz || 560;
-    patternPoints.push({ timeMs: durationMs, amplitude: 0, frequencyHz });
+    patternPoints.push(createPoint(durationMs, 0, frequencyHz));
   }
 
-  patternPoints[0] = { ...patternPoints[0], timeMs: 0, amplitude: 0 };
-  patternPoints[patternPoints.length - 1] = {
-    ...patternPoints[patternPoints.length - 1],
-    timeMs: durationMs,
-    amplitude: 0,
-  };
+  patternPoints[0] = createPoint(0, 0, patternPoints[0].frequencyHz, patternPoints[0].id);
+  patternPoints[patternPoints.length - 1] = createPoint(
+    durationMs,
+    0,
+    patternPoints[patternPoints.length - 1].frequencyHz,
+    patternPoints[patternPoints.length - 1].id,
+  );
 
   if (patternPoints.length > MAX_POINTS) {
     const first = patternPoints[0];
@@ -170,7 +183,6 @@ function buildCommand(action) {
   }
 
   if (action === "pattern") {
-    normalizePatternPoints();
     const durationMs = getDuration();
     const pointText = patternPoints
       .map((point) => `${point.timeMs}:${point.amplitude}:${point.frequencyHz}`)
@@ -209,8 +221,6 @@ function buildDataArray(action = "pattern") {
       ["command", action],
     ];
   }
-
-  normalizePatternPoints();
 
   return [
     ["target", getTarget()],
@@ -320,7 +330,6 @@ function drawGrid() {
 }
 
 function renderGraph() {
-  normalizePatternPoints();
   drawGrid();
 
   const amplitudePoints = patternPoints.map(graphPointForAmplitude);
@@ -341,42 +350,51 @@ function renderGraph() {
   const amplitudeMarkers = amplitudePoints
     .map((point, index) => {
       const fixedClass = index === 0 || index === amplitudePoints.length - 1 ? " fixed" : "";
-      return `<circle class="amp-point${fixedClass}" data-mode="amplitude" data-index="${index}" cx="${point.x}" cy="${point.y}" r="8"></circle>`;
+      return `<circle class="amp-point${fixedClass}" data-mode="amplitude" data-point-id="${patternPoints[index].id}" cx="${point.x}" cy="${point.y}" r="8"><title>Drag vertically to change amplitude</title></circle>`;
     })
     .join("");
 
   const frequencyMarkers = frequencyPoints
     .map((point, index) => {
-      return `<rect class="freq-point" data-mode="frequency" data-index="${index}" x="${point.x - 7}" y="${point.y - 7}" width="14" height="14" rx="3"></rect>`;
+      return `<rect class="freq-point" data-mode="frequency" data-point-id="${patternPoints[index].id}" x="${point.x - 7}" y="${point.y - 7}" width="14" height="14" rx="3"><title>Drag vertically to change frequency</title></rect>`;
     })
     .join("");
 
-  pointLayerEl.innerHTML = amplitudeMarkers + frequencyMarkers;
+  const bottom = GRAPH.top + GRAPH.height;
+  const timeMarkers = amplitudePoints
+    .map((point, index) => ({ point, index }))
+    .filter(({ index }) => index > 0 && index < patternPoints.length - 1)
+    .map(({ point, index }) => `
+      <line class="time-guide" x1="${point.x}" y1="${GRAPH.top}" x2="${point.x}" y2="${bottom}"></line>
+      <rect class="time-handle" data-mode="time" data-point-id="${patternPoints[index].id}" x="${point.x - 9}" y="${bottom - 12}" width="18" height="12" rx="3"><title>Drag horizontally to change this point time</title></rect>
+      <text class="time-point-label" x="${point.x}" y="${bottom - 3}" text-anchor="middle">${index + 1}</text>
+    `)
+    .join("");
+  pointLayerEl.innerHTML = amplitudeMarkers + frequencyMarkers + timeMarkers;
 }
 
 function renderPointRows() {
-  normalizePatternPoints();
-
   pointsListEl.innerHTML = patternPoints
     .map((point, index) => {
       const isEndpoint = index === 0 || index === patternPoints.length - 1;
+      const timeBounds = getPointTimeBounds(index);
       const removeButton = isEndpoint
         ? `<button type="button" disabled>Keep</button>`
-        : `<button type="button" data-remove-point="${index}">Remove</button>`;
+        : `<button type="button" data-remove-point="${point.id}">Remove</button>`;
 
       return `
-        <div class="point-row">
+        <div class="point-row" data-point-id="${point.id}">
           <label>
             time
-            <input type="number" min="0" max="${getDuration()}" step="10" value="${point.timeMs}" data-point-time="${index}" ${isEndpoint ? "readonly" : ""}>
+            <input type="number" min="${timeBounds.min}" max="${timeBounds.max}" step="10" value="${point.timeMs}" data-point-id="${point.id}" data-point-time ${isEndpoint ? "readonly" : ""}>
           </label>
           <label>
             amplitude
-            <input type="number" min="0" max="255" value="${point.amplitude}" data-point-amplitude="${index}" ${isEndpoint ? "readonly" : ""}>
+            <input type="number" min="0" max="255" value="${point.amplitude}" data-point-id="${point.id}" data-point-amplitude ${isEndpoint ? "readonly" : ""}>
           </label>
           <label>
             frequency
-            <input type="number" min="${MIN_FREQUENCY_HZ}" max="${MAX_FREQUENCY_HZ}" value="${point.frequencyHz}" data-point-frequency="${index}">
+            <input type="number" min="${MIN_FREQUENCY_HZ}" max="${MAX_FREQUENCY_HZ}" value="${point.frequencyHz}" data-point-id="${point.id}" data-point-frequency>
           </label>
           ${removeButton}
         </div>
@@ -389,6 +407,22 @@ function renderDesigner() {
   renderGraph();
   renderPointRows();
   updatePreview("pattern");
+}
+
+function getPointIndex(pointId) {
+  return patternPoints.findIndex((point) => point.id === pointId);
+}
+
+function getPointTimeBounds(index) {
+  if (index === 0) return { min: 0, max: 0 };
+  if (index === patternPoints.length - 1) {
+    const durationMs = getDuration();
+    return { min: durationMs, max: durationMs };
+  }
+  return {
+    min: patternPoints[index - 1].timeMs + 1,
+    max: patternPoints[index + 1].timeMs - 1,
+  };
 }
 
 function addPoint() {
@@ -405,12 +439,13 @@ function addPoint() {
     timeMs += 20;
   }
 
-  patternPoints.push({ timeMs, amplitude: 128, frequencyHz: 560 });
+  patternPoints.push(createPoint(timeMs, 128, 560));
+  normalizePatternPoints();
   renderDesigner();
 }
 
-function removePoint(index) {
-  normalizePatternPoints();
+function removePoint(pointId) {
+  const index = getPointIndex(pointId);
   if (index <= 0 || index >= patternPoints.length - 1) {
     return;
   }
@@ -426,7 +461,7 @@ function applyPreset(name) {
   }
 
   inputs.patternDuration.value = preset.durationMs;
-  patternPoints = preset.points.map((point) => ({ ...point }));
+  patternPoints = preset.points.map((point) => createPoint(point.timeMs, point.amplitude, point.frequencyHz));
   renderDesigner();
 }
 
@@ -440,20 +475,18 @@ function graphCoordinatesFromEvent(event) {
   };
 }
 
-function updatePointFromGraph(index, mode, event) {
+function updateValueFromGraph(pointId, mode, event) {
+  const index = getPointIndex(pointId);
+  if (index < 0) return;
   const coords = graphCoordinatesFromEvent(event);
-  const durationMs = getDuration();
   const isEndpoint = index === 0 || index === patternPoints.length - 1;
-  const minTime = isEndpoint ? patternPoints[index].timeMs : patternPoints[index - 1].timeMs + 10;
-  const maxTime = isEndpoint ? patternPoints[index].timeMs : patternPoints[index + 1].timeMs - 10;
-  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * durationMs);
   const amplitude = Math.round(((GRAPH.top + GRAPH.height - coords.y) / GRAPH.height) * 255);
   const frequencyHz = Math.round(
     MIN_FREQUENCY_HZ +
       ((GRAPH.top + GRAPH.height - coords.y) / GRAPH.height) * (MAX_FREQUENCY_HZ - MIN_FREQUENCY_HZ)
   );
 
-  const nextPoint = { ...patternPoints[index], timeMs: clamp(timeMs, minTime, maxTime) };
+  const nextPoint = { ...patternPoints[index] };
 
   if (mode === "amplitude" && !isEndpoint) {
     nextPoint.amplitude = clamp(amplitude, 0, 255);
@@ -464,6 +497,42 @@ function updatePointFromGraph(index, mode, event) {
   }
 
   patternPoints[index] = nextPoint;
+  renderGraph();
+  renderPointRows();
+  updatePreview("pattern");
+}
+
+function updateTimeFromGraph(pointId, event) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= patternPoints.length - 1) return;
+  const coords = graphCoordinatesFromEvent(event);
+  const requestedTime = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * getDuration());
+  const bounds = getPointTimeBounds(index);
+  patternPoints[index] = { ...patternPoints[index], timeMs: clamp(requestedTime, bounds.min, bounds.max) };
+  renderDesigner();
+}
+
+function updateValueFromTable(pointId, field, value) {
+  const index = getPointIndex(pointId);
+  if (index < 0) return;
+  if (field === "amplitude" && (index === 0 || index === patternPoints.length - 1)) return;
+  const limits = field === "amplitude" ? [0, 255] : [MIN_FREQUENCY_HZ, MAX_FREQUENCY_HZ];
+  patternPoints[index][field] = clamp(Math.round(Number(value) || limits[0]), limits[0], limits[1]);
+  renderGraph();
+  updatePreview("pattern");
+}
+
+function commitTimeFromTable(pointId, value) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= patternPoints.length - 1) return;
+  const timeText = String(value).trim();
+  if (!/^\d+$/.test(timeText)) {
+    setStatus("Point time must be a number", "error");
+    renderPointRows();
+    return;
+  }
+  const bounds = getPointTimeBounds(index);
+  patternPoints[index].timeMs = clamp(Math.round(Number(timeText)), bounds.min, bounds.max);
   renderDesigner();
 }
 
@@ -514,46 +583,45 @@ document.querySelectorAll("button[data-preset]").forEach((button) => {
 document.querySelector("#addPoint").addEventListener("click", addPoint);
 
 pointsListEl.addEventListener("input", (event) => {
-  const timeIndex = event.target.dataset.pointTime;
-  const amplitudeIndex = event.target.dataset.pointAmplitude;
-  const frequencyIndex = event.target.dataset.pointFrequency;
-
-  if (timeIndex !== undefined) {
-    patternPoints[Number(timeIndex)].timeMs = Number(event.target.value);
+  const pointId = event.target.dataset.pointId;
+  if (!pointId || event.target.dataset.pointTime !== undefined) return;
+  if (event.target.dataset.pointAmplitude !== undefined) {
+    updateValueFromTable(pointId, "amplitude", event.target.value);
+  } else if (event.target.dataset.pointFrequency !== undefined) {
+    updateValueFromTable(pointId, "frequencyHz", event.target.value);
   }
-
-  if (amplitudeIndex !== undefined) {
-    patternPoints[Number(amplitudeIndex)].amplitude = Number(event.target.value);
-  }
-
-  if (frequencyIndex !== undefined) {
-    patternPoints[Number(frequencyIndex)].frequencyHz = Number(event.target.value);
-  }
-
-  renderGraph();
-  updatePreview("pattern");
 });
 
-pointsListEl.addEventListener("change", () => {
-  renderDesigner();
+pointsListEl.addEventListener("change", (event) => {
+  const pointId = event.target.dataset.pointId;
+  if (!pointId) return;
+  if (event.target.dataset.pointTime !== undefined) {
+    commitTimeFromTable(pointId, event.target.value);
+  } else if (event.target.dataset.pointAmplitude !== undefined || event.target.dataset.pointFrequency !== undefined) {
+    renderDesigner();
+  }
+});
+
+pointsListEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && event.target.dataset.pointTime !== undefined) event.target.blur();
 });
 
 pointsListEl.addEventListener("click", (event) => {
-  const removeIndex = event.target.dataset.removePoint;
-  if (removeIndex !== undefined) {
-    removePoint(Number(removeIndex));
+  const pointId = event.target.dataset.removePoint;
+  if (pointId !== undefined) {
+    removePoint(pointId);
   }
 });
 
 graphEl.addEventListener("pointerdown", (event) => {
-  const target = event.target.closest("[data-index][data-mode]");
+  const target = event.target.closest("[data-point-id][data-mode]");
   if (!target) {
     return;
   }
 
   activeDrag = {
-    index: Number(target.dataset.index),
     mode: target.dataset.mode,
+    pointId: target.dataset.pointId,
   };
   graphEl.setPointerCapture(event.pointerId);
 });
@@ -563,7 +631,15 @@ graphEl.addEventListener("pointermove", (event) => {
     return;
   }
 
-  updatePointFromGraph(activeDrag.index, activeDrag.mode, event);
+  if (activeDrag.mode === "time") {
+    updateTimeFromGraph(activeDrag.pointId, event);
+  } else {
+    updateValueFromGraph(activeDrag.pointId, activeDrag.mode, event);
+  }
+});
+
+graphEl.addEventListener("pointercancel", () => {
+  activeDrag = null;
 });
 
 graphEl.addEventListener("pointerup", (event) => {
@@ -574,7 +650,6 @@ graphEl.addEventListener("pointerup", (event) => {
 Object.values(inputs).forEach((input) => {
   input.addEventListener("input", () => {
     if (input === inputs.patternDuration) {
-      renderDesigner();
       return;
     }
 
@@ -582,6 +657,7 @@ Object.values(inputs).forEach((input) => {
   });
   input.addEventListener("change", () => {
     if (input === inputs.patternDuration) {
+      normalizePatternPoints();
       renderDesigner();
       return;
     }

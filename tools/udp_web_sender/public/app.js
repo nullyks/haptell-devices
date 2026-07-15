@@ -85,14 +85,24 @@ const presets = {
   },
 };
 
+let nextPointId = 1;
+
+function createPoint(timeMs, intensity, id) {
+  return {
+    id: id || `point-${nextPointId++}`,
+    timeMs,
+    intensity: clamp(Math.round(Number(intensity) || 0), 0, 255),
+  };
+}
+
 let shapePoints = [
   { timeMs: 0, intensity: 0 },
   { timeMs: 100, intensity: 180 },
   { timeMs: 700, intensity: 180 },
   { timeMs: 1200, intensity: 60 },
   { timeMs: 1600, intensity: 0 },
-];
-let activePointIndex = null;
+].map((point) => createPoint(point.timeMs, point.intensity));
+let activePoint = null;
 let lastPointerCommandButton = null;
 let lastPointerCommandAt = 0;
 
@@ -113,10 +123,11 @@ function normalizeShapePoints() {
   inputs.shapeDuration.value = durationMs;
 
   shapePoints = shapePoints
-    .map((point) => ({
-      timeMs: clamp(Math.round(Number(point.timeMs) || 0), 0, durationMs),
-      intensity: clamp(Math.round(Number(point.intensity) || 0), 0, 255),
-    }))
+    .map((point) => createPoint(
+      clamp(Math.round(Number(point.timeMs) || 0), 0, durationMs),
+      point.intensity,
+      point.id,
+    ))
     .sort((a, b) => a.timeMs - b.timeMs);
 
   shapePoints = shapePoints.filter((point, index, points) => {
@@ -124,15 +135,15 @@ function normalizeShapePoints() {
   });
 
   if (shapePoints.length === 0 || shapePoints[0].timeMs !== 0) {
-    shapePoints.unshift({ timeMs: 0, intensity: 0 });
+    shapePoints.unshift(createPoint(0, 0));
   }
 
   if (shapePoints[shapePoints.length - 1].timeMs !== durationMs) {
-    shapePoints.push({ timeMs: durationMs, intensity: 0 });
+    shapePoints.push(createPoint(durationMs, 0));
   }
 
-  shapePoints[0] = { timeMs: 0, intensity: 0 };
-  shapePoints[shapePoints.length - 1] = { timeMs: durationMs, intensity: 0 };
+  shapePoints[0] = createPoint(0, 0, shapePoints[0].id);
+  shapePoints[shapePoints.length - 1] = createPoint(durationMs, 0, shapePoints[shapePoints.length - 1].id);
 
   if (shapePoints.length > MAX_POINTS) {
     const first = shapePoints[0];
@@ -157,7 +168,6 @@ function buildCommand(action) {
   }
 
   if (action === "shape") {
-    normalizeShapePoints();
     const durationMs = getDuration();
     const pointText = shapePoints.map((point) => `${point.timeMs}:${point.intensity}`).join(",");
     return `${target} shape duration=${durationMs} points=${pointText}`;
@@ -173,8 +183,6 @@ function buildDataArray(action = "shape") {
       ["command", action],
     ];
   }
-
-  normalizeShapePoints();
 
   return [
     ["target", getTarget()],
@@ -262,7 +270,6 @@ function drawGrid() {
 }
 
 function renderGraph() {
-  normalizeShapePoints();
   drawGrid();
 
   const graphPoints = shapePoints.map(graphPoint);
@@ -277,33 +284,43 @@ function renderGraph() {
   envelopeLineEl.setAttribute("points", linePoints);
   envelopeFillEl.setAttribute("d", `M ${fillPoints.replaceAll(" ", " L ")} Z`);
 
-  pointLayerEl.innerHTML = graphPoints
+  const valueMarkup = graphPoints
     .map((point, index) => {
       const fixedClass = index === 0 || index === graphPoints.length - 1 ? " fixed" : "";
-      return `<circle class="shape-point${fixedClass}" data-index="${index}" cx="${point.x}" cy="${point.y}" r="8"></circle>`;
+      return `<circle class="shape-point${fixedClass}" data-point-id="${shapePoints[index].id}" cx="${point.x}" cy="${point.y}" r="8"><title>Drag vertically to change intensity</title></circle>`;
     })
     .join("");
+  const bottom = GRAPH.top + GRAPH.height;
+  const timeMarkup = graphPoints
+    .map((point, index) => ({ point, index }))
+    .filter(({ index }) => index > 0 && index < shapePoints.length - 1)
+    .map(({ point, index }) => `
+      <line class="time-guide" x1="${point.x}" y1="${GRAPH.top}" x2="${point.x}" y2="${bottom}"></line>
+      <rect class="time-handle" data-point-id="${shapePoints[index].id}" x="${point.x - 9}" y="${bottom - 12}" width="18" height="12" rx="3"><title>Drag horizontally to change this point time</title></rect>
+      <text class="time-point-label" x="${point.x}" y="${bottom - 3}" text-anchor="middle">${index + 1}</text>
+    `)
+    .join("");
+  pointLayerEl.innerHTML = valueMarkup + timeMarkup;
 }
 
 function renderPointRows() {
-  normalizeShapePoints();
-
   pointsListEl.innerHTML = shapePoints
     .map((point, index) => {
       const isEndpoint = index === 0 || index === shapePoints.length - 1;
+      const timeBounds = getPointTimeBounds(index);
       const removeButton = isEndpoint
         ? `<button type="button" disabled>Keep</button>`
-        : `<button type="button" data-remove-point="${index}">Remove</button>`;
+        : `<button type="button" data-remove-point="${point.id}">Remove</button>`;
 
       return `
-        <div class="point-row">
+        <div class="point-row" data-point-id="${point.id}">
           <label>
             time
-            <input type="number" min="0" max="${getDuration()}" step="10" value="${point.timeMs}" data-point-time="${index}" ${isEndpoint ? "readonly" : ""}>
+            <input type="number" min="${timeBounds.min}" max="${timeBounds.max}" step="10" value="${point.timeMs}" data-point-id="${point.id}" data-point-time ${isEndpoint ? "readonly" : ""}>
           </label>
           <label>
             intensity
-            <input type="number" min="0" max="255" value="${point.intensity}" data-point-intensity="${index}" ${isEndpoint ? "readonly" : ""}>
+            <input type="number" min="0" max="255" value="${point.intensity}" data-point-id="${point.id}" data-point-intensity ${isEndpoint ? "readonly" : ""}>
           </label>
           ${removeButton}
         </div>
@@ -316,6 +333,22 @@ function renderDesigner() {
   renderGraph();
   renderPointRows();
   updatePreview("shape");
+}
+
+function getPointIndex(pointId) {
+  return shapePoints.findIndex((point) => point.id === pointId);
+}
+
+function getPointTimeBounds(index) {
+  if (index === 0) return { min: 0, max: 0 };
+  if (index === shapePoints.length - 1) {
+    const durationMs = getDuration();
+    return { min: durationMs, max: durationMs };
+  }
+  return {
+    min: shapePoints[index - 1].timeMs + 1,
+    max: shapePoints[index + 1].timeMs - 1,
+  };
 }
 
 function addPoint() {
@@ -332,12 +365,13 @@ function addPoint() {
     timeMs += 20;
   }
 
-  shapePoints.push({ timeMs, intensity: 128 });
+  shapePoints.push(createPoint(timeMs, 128));
+  normalizeShapePoints();
   renderDesigner();
 }
 
-function removePoint(index) {
-  normalizeShapePoints();
+function removePoint(pointId) {
+  const index = getPointIndex(pointId);
   if (index <= 0 || index >= shapePoints.length - 1) {
     return;
   }
@@ -353,7 +387,7 @@ function applyPreset(name) {
   }
 
   inputs.shapeDuration.value = preset.durationMs;
-  shapePoints = preset.points.map((point) => ({ ...point }));
+  shapePoints = preset.points.map((point) => createPoint(point.timeMs, point.intensity));
   renderDesigner();
 }
 
@@ -367,23 +401,54 @@ function graphCoordinatesFromEvent(event) {
   };
 }
 
-function updatePointFromGraph(index, event) {
+function updateIntensityFromGraph(pointId, event) {
+  const index = getPointIndex(pointId);
   if (index <= 0 || index >= shapePoints.length - 1) {
     return;
   }
 
   const coords = graphCoordinatesFromEvent(event);
-  const durationMs = getDuration();
-  const minTime = shapePoints[index - 1].timeMs + 10;
-  const maxTime = shapePoints[index + 1].timeMs - 10;
-  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * durationMs);
   const intensity = Math.round(((GRAPH.top + GRAPH.height - coords.y) / GRAPH.height) * 255);
 
   shapePoints[index] = {
-    timeMs: clamp(timeMs, minTime, maxTime),
+    ...shapePoints[index],
     intensity: clamp(intensity, 0, 255),
   };
 
+  renderGraph();
+  renderPointRows();
+  updatePreview("shape");
+}
+
+function updateTimeFromGraph(pointId, event) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= shapePoints.length - 1) return;
+  const coords = graphCoordinatesFromEvent(event);
+  const timeMs = Math.round(((coords.x - GRAPH.left) / GRAPH.width) * getDuration());
+  const bounds = getPointTimeBounds(index);
+  shapePoints[index] = { ...shapePoints[index], timeMs: clamp(timeMs, bounds.min, bounds.max) };
+  renderDesigner();
+}
+
+function updateIntensityFromTable(pointId, value) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= shapePoints.length - 1) return;
+  shapePoints[index].intensity = clamp(Math.round(Number(value) || 0), 0, 255);
+  renderGraph();
+  updatePreview("shape");
+}
+
+function commitTimeFromTable(pointId, value) {
+  const index = getPointIndex(pointId);
+  if (index <= 0 || index >= shapePoints.length - 1) return;
+  const timeText = String(value).trim();
+  if (!/^\d+$/.test(timeText)) {
+    setStatus("Point time must be a number", "error");
+    renderPointRows();
+    return;
+  }
+  const bounds = getPointTimeBounds(index);
+  shapePoints[index].timeMs = clamp(Math.round(Number(timeText)), bounds.min, bounds.max);
   renderDesigner();
 }
 
@@ -456,59 +521,71 @@ document.querySelectorAll("button[data-preset]").forEach((button) => {
 document.querySelector("#addPoint").addEventListener("click", addPoint);
 
 pointsListEl.addEventListener("input", (event) => {
-  const timeIndex = event.target.dataset.pointTime;
-  const intensityIndex = event.target.dataset.pointIntensity;
-
-  if (timeIndex !== undefined) {
-    shapePoints[Number(timeIndex)].timeMs = Number(event.target.value);
+  const pointId = event.target.dataset.pointId;
+  if (pointId && event.target.dataset.pointTime === undefined && event.target.dataset.pointIntensity !== undefined) {
+    updateIntensityFromTable(pointId, event.target.value);
   }
-
-  if (intensityIndex !== undefined) {
-    shapePoints[Number(intensityIndex)].intensity = Number(event.target.value);
-  }
-
-  renderGraph();
-  updatePreview("shape");
 });
 
-pointsListEl.addEventListener("change", () => {
-  renderDesigner();
+pointsListEl.addEventListener("change", (event) => {
+  const pointId = event.target.dataset.pointId;
+  if (!pointId) return;
+  if (event.target.dataset.pointTime !== undefined) {
+    commitTimeFromTable(pointId, event.target.value);
+  } else if (event.target.dataset.pointIntensity !== undefined) {
+    renderDesigner();
+  }
+});
+
+pointsListEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && event.target.dataset.pointTime !== undefined) event.target.blur();
 });
 
 pointsListEl.addEventListener("click", (event) => {
-  const removeIndex = event.target.dataset.removePoint;
-  if (removeIndex !== undefined) {
-    removePoint(Number(removeIndex));
+  const pointId = event.target.dataset.removePoint;
+  if (pointId !== undefined) {
+    removePoint(pointId);
   }
 });
 
 graphEl.addEventListener("pointerdown", (event) => {
-  const target = event.target.closest(".shape-point");
+  const intensityHandle = event.target.closest(".shape-point");
+  const timeHandle = event.target.closest(".time-handle");
+  const target = intensityHandle || timeHandle;
   if (!target) {
     return;
   }
 
-  activePointIndex = Number(target.dataset.index);
+  activePoint = intensityHandle
+    ? { kind: "intensity", pointId: target.dataset.pointId }
+    : { kind: "time", pointId: target.dataset.pointId };
   graphEl.setPointerCapture(event.pointerId);
 });
 
 graphEl.addEventListener("pointermove", (event) => {
-  if (activePointIndex === null) {
+  if (activePoint === null) {
     return;
   }
 
-  updatePointFromGraph(activePointIndex, event);
+  if (activePoint.kind === "time") {
+    updateTimeFromGraph(activePoint.pointId, event);
+  } else {
+    updateIntensityFromGraph(activePoint.pointId, event);
+  }
 });
 
 graphEl.addEventListener("pointerup", (event) => {
-  activePointIndex = null;
+  activePoint = null;
   graphEl.releasePointerCapture(event.pointerId);
+});
+
+graphEl.addEventListener("pointercancel", () => {
+  activePoint = null;
 });
 
 Object.values(inputs).forEach((input) => {
   input.addEventListener("input", () => {
     if (input === inputs.shapeDuration) {
-      renderDesigner();
       return;
     }
 
@@ -516,6 +593,7 @@ Object.values(inputs).forEach((input) => {
   });
   input.addEventListener("change", () => {
     if (input === inputs.shapeDuration) {
+      normalizeShapePoints();
       renderDesigner();
       return;
     }
