@@ -1,6 +1,7 @@
 # Command Protocol
 
-Haptell devices listen for UDP text commands on port `4444`.
+Haptell devices listen for UDP text commands on port `4444`, except the Peltier
+device `haptell-06-peltier-shape`, which uses **4445**.
 
 The initial command format is intentionally simple:
 
@@ -16,7 +17,9 @@ Targets:
 - `haptell-03` addresses the PAM8403 + TEAX13C02-8/RH audio-exciter prototype.
 - `haptell-04-triple-dc-shape` addresses the three-DC-motor shape-only prototype.
 - `haptell-05-servo-shape` addresses the weighted servo shape-only prototype.
-- `all` broadcasts a command to every Haptell device that receives the packet.
+- `haptell-06-peltier-shape` addresses the Peltier prototype on port 4445.
+- `all` addresses firmware that accepts the shared target; shape-only devices
+  including haptell-06 do not accept it.
 
 ## Commands
 
@@ -343,3 +346,10 @@ node tools/haptell_05_servo_shape_designer/server.js
 Then open `http://127.0.0.1:8084`. This UI designs angle-vs-time servo
 patterns, calculates pulse widths, shows speed warnings, saves/loads JSON, and
 previews a small servo horn animation.
+
+## Peltier port exception
+
+The new `haptell-06-peltier-shape` device listens on **UDP 4445**, independently
+of the existing 4444 devices. It accepts only its exact device ID, `shape` and
+`stop`, with 500–60000 ms duration in 500 ms steps and 2–30 PWM points. See the
+[Peltier protocol](haptell-06-peltier-shape-designer.md#udp-protocol).

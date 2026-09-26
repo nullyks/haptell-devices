@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell Peltier Shape Designer</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div>
+          <h1>Haptell Peltier Shape Designer</h1>
+          <p>Peltier PWM patterns on Arduino UNO R4 WiFi · D3 gate control.</p>
+        </div>
+        <div class="status" id="status" role="status">Ready</div>
+      </header>
+
+      <section class="settings" aria-label="Device settings">
+        <label>
+          Device IP
+          <input id="ipAddress" type="text" inputmode="decimal" value="192.168.1.42">
+        </label>
+        <label>
+          UDP port
+          <input id="port" type="number" value="4445" readonly>
+        </label>
+        <label>
+          Target firmware
+          <select id="target"><option value="haptell-06-peltier-shape">Peltier MOSFET · D3</option></select>
+        </label>
+        <button id="sendShape" type="button">Send Shape</button>
+        <button id="stopShape" type="button">Stop</button>
+      </section>
+
+      <section class="busy-panel hidden" id="busyPanel" aria-live="polite">
+        <strong>Estimated playback</strong>
+        <span id="busyText">Waiting for playback to finish.</span>
+      </section>
+
+      <p class="device-note">PWM controls electrical drive, not temperature. No temperature feedback is configured. Use a suitable heatsink and a verified power supply.</p>
+
+      <section class="designer" aria-label="Shape designer">
+        <div class="designer-head">
+          <div>
+            <h2>MOSFET PWM envelope</h2>
+            <p>0 = off · 255 = 100% duty. Points are joined by linear ramps; the final point is always zero.</p>
+          </div>
+          <div class="designer-actions">
+            <button id="saveJson" class="secondary" type="button">Save Shape</button>
+            <button id="loadJsonButton" class="file-button" type="button">Load Shape</button>
+            <input id="loadJson" class="file-input" type="file" accept="application/json,.json">
+          </div>
+        </div>
+
+        <div class="designer-controls">
+          <label>
+            duration seconds (0.5–60)
+            <input id="shapeDuration" type="number" inputmode="decimal" min="0.5" max="60" step="0.5" value="10">
+          </label>
+          <label>
+            max points
+            <input type="text" value="30" readonly>
+          </label>
+          <div class="preset-buttons" aria-label="Shape presets">
+            <button data-preset="softStart" type="button" title="50 s: gradual rise to PWM 192 with long holds">Soft Start</button>
+            <button data-preset="longPulse" type="button" title="45 s: ramp to PWM 192 and hold for 35 seconds">Long Pulse</button>
+            <button data-preset="steps" type="button" title="60 s: distinct PWM 64, 144 and 224 stages">Steps</button>
+            <button data-preset="off" type="button">All Off</button>
+          </div>
+        </div>
+
+        <div class="workbench">
+          <div class="graph-panel">
+            <div class="graph-toolbar" aria-label="Graph zoom controls">
+              <button id="zoomOut" class="zoom-button" type="button" aria-label="Zoom out">-</button>
+              <div id="zoomDisplay" class="zoom-display">100%</div>
+              <button id="zoomIn" class="zoom-button" type="button" aria-label="Zoom in">+</button>
+              <button id="zoomFit" class="zoom-fit" type="button">Fit</button>
+              <label class="zoom-pan">
+                view
+                <input id="zoomPan" type="range" min="0" max="1000" step="1" value="0">
+              </label>
+              <div id="zoomRange" class="zoom-range">0–10 s</div>
+            </div>
+            <svg id="envelopeGraph" viewBox="0 0 960 500" role="img" aria-label="MOSFET PWM level 0 to 255 over time in seconds">
+              <rect class="graph-bg" x="86" y="34" width="804" height="374"></rect>
+              <g id="gridLayer"></g>
+              <path id="envelopeFill"></path>
+              <polyline id="envelopeLine"></polyline>
+              <g id="pointLayer"></g>
+            </svg>
+          </div>
+
+          <aside class="points-panel">
+            <div class="add-point-controls">
+              <button id="addPoint" type="button">Add Point</button>
+              <label>
+                after
+                <select id="addAfterPoint"></select>
+              </label>
+            </div>
+            <div class="points-head">
+              <h3>Points</h3>
+            </div>
+            <div id="pointsList" class="points-list"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="preview" aria-label="Command and data preview">
+        <label>
+          Command preview
+          <input id="commandPreview" type="text" readonly>
+        </label>
+        <label>
+          Data array preview
+          <textarea id="dataPreview" readonly rows="10"></textarea>
+        </label>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

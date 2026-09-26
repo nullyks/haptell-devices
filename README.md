@@ -4,8 +4,8 @@ Firmware, wiring notes, and local sender tools for **Haptell** wireless haptic
 artifacts.
 
 Each device uses an Arduino UNO R4 WiFi, joins a local WiFi network, listens for
-UDP text commands on port `4444`, and plays haptic patterns through the selected
-motor, LRA, or exciter driver.
+UDP text commands on port `4444` (`4445` for the Peltier device), and plays
+patterns through the selected motor, LRA, exciter, or Peltier driver.
 
 ## At a Glance
 
@@ -17,11 +17,12 @@ motor, LRA, or exciter driver.
 | `haptell-03` | PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | Experimental amplitude and frequency control | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
 | `haptell-04` | Three DC vibration motors + MOSFET drivers | Three independent DC motor envelopes | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
 | `haptell-05` | Weighted 270 degree servo | Angle-over-time servo haptic patterns | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
+| `haptell-06` | IRLZ44N + SP1848-27145 Peltier, D3 PWM | Single-channel thermal drive envelope | `firmware/haptell_06_uno_r4_wifi_peltier_shape/` |
 
 Shared defaults:
 
 - Board: Arduino UNO R4 WiFi
-- UDP port: `4444`
+- UDP port: `4444` for existing devices; `4445` for haptell-06 Peltier
 - WiFi credentials: local `secrets.h`, not committed
 - Public repository: https://github.com/nullyks/haptell-devices
 
@@ -35,6 +36,7 @@ Shared defaults:
 | `tools/haptell_03_frequency_web_sender/` | `http://127.0.0.1:8081` | haptell-03 amplitude and frequency pattern editor |
 | `tools/haptell_04_triple_shape_designer/` | `http://127.0.0.1:8083` | haptell-04 three-motor shape editor |
 | `tools/haptell_05_servo_shape_designer/` | `http://127.0.0.1:8084` | haptell-05 servo angle shape editor |
+| `tools/haptell_06_peltier_shape_designer/` | `http://127.0.0.1:8085` | haptell-06 Peltier PWM editor, 0–255, up to 60 seconds |
 
 Start a web tool from the repository root:
 
@@ -51,7 +53,7 @@ node tools/haptell_shape_designer/server.js
 5. Select **Arduino UNO R4 WiFi**.
 6. Upload the sketch.
 7. Open Serial Monitor and note the Arduino IP address.
-8. Send UDP commands to that IP address on port `4444`.
+8. Send UDP commands to that IP address on port `4444` (`4445` for haptell-06).
 
 Example command:
 
@@ -67,6 +69,10 @@ python tools/udp_sender/send_haptell_command.py 192.168.1.42 pulse intensity=180
 
 ## Firmware Families
 
+For the Peltier device, see the [haptell-06 workflow and battery estimate](docs/haptell-06-peltier-shape-designer.md)
+and [IRLZ44N wiring](schematics/haptell-06-peltier/README.md). Start its editor
+with `node tools/haptell_06_peltier_shape_designer/server.js`.
+
 The repository keeps firmware variants separate so each hardware path stays
 easy to inspect and upload.
 
@@ -81,6 +87,7 @@ an active pattern after startup WiFi connection has completed.
 | DRV2605L + VG1040003D LRA | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` |
 | PAM8403 + VG2230001H 70 Hz actuator | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
 | PAM8403 + TEAX13C02-8/RH audio exciter | `haptell-03` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
+| IRLZ44N + SP1848-27145 Peltier | `haptell-06-peltier-shape` | `firmware/haptell_06_uno_r4_wifi_peltier_shape/` |
 
 ### Simple Blocking Firmware
 

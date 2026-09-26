@@ -31,6 +31,40 @@ https://github.com/nullyks/haptell-models
 
 ## Hardware Context
 
+### Haptell-06 Peltier (September 2026)
+
+User-confirmed hardware: Arduino UNO R4 WiFi, IRLZ44N MOSFET gate on D3,
+FTVOGUE TEG SP1848-27145, 3.7 V 2000 mAh LiPo and LiPo Rider Plus 5 V output.
+No temperature sensor yet; sensing is planned for a later version. User has
+observed heating/cooling on battery power. Actual current remains unmeasured.
+
+- Device ID: `haptell-06-peltier-shape`; dedicated **UDP 4445**.
+- Firmware: `firmware/haptell_06_uno_r4_wifi_peltier_shape/`.
+- Editor: `tools/haptell_06_peltier_shape_designer/`; HTTP **8085**.
+- Workflow/battery estimate: `docs/haptell-06-peltier-shape-designer.md`.
+- Wiring and editable diagram: `schematics/haptell-06-peltier/`.
+- User chose up to **60 seconds**; the UI uses 0.5–60 s in 0.5 s steps,
+  serialized as 500–60000 ms, with 2–30 points and PWM 0–255.
+- UI derives from the existing single-channel editor, with JSON, zoom and
+  numbered points. Starts all off; final point always zero. Dedicated JSON
+  schema `haptell-peltier-shape-pattern/v1` retains the `intensity` point field.
+- Firmware is non-blocking; Stop and new shapes interrupt. Completion and
+  detected WiFi loss turn output off. No `all` target; no temperature control.
+- Gate wiring specifies 1 kohm series and 10 kohm pulldown. Verify the power
+  budget and temperatures on the real hardware. One MOSFET cannot reverse polarity.
+- Compiled successfully with installed UNO R4 core 1.5.3 using a temporary
+  sketch copy with dummy credentials. Node tests cover protocol, JSON editor
+  validation and loopback UDP sends. No board upload or thermal test performed.
+- Battery estimates use 7.4 Wh nominal and assumed 85% conversion efficiency;
+  1 A total average on the 5 V rail gives about 75 minutes. TEG generation
+  ratings must not be used as the module's powered input-current specification.
+- PWM alone cannot predict surface temperature. Model data found for
+  SP1848-27145 is inconsistent and mainly describes generator operation.
+  Temperature preview should be added only after measuring hot/cold sides and
+  current on the final thermal assembly, then fitting steady changes and time
+  constants for 0, 32, 64 ... 255 PWM levels. The workflow doc contains the
+  proposed calibration method and first-order approximation.
+
 ### Available Development Boards
 
 - Arduino UNO R4 WiFi
