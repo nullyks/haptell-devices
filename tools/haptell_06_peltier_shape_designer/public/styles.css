@@ -350,7 +350,7 @@ button:disabled {
   fill: #fff;
   stroke: var(--teal);
   stroke-width: 4;
-  cursor: grab;
+  cursor: ns-resize;
 }
 
 .shape-point.end {
@@ -368,6 +368,31 @@ button:disabled {
   stroke: #fff;
   stroke-linejoin: round;
   stroke-width: 4px;
+}
+
+.time-guide {
+  stroke: #91a1b5;
+  stroke-dasharray: 5 5;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.time-handle {
+  fill: #fff;
+  stroke: #425466;
+  stroke-width: 2;
+  cursor: ew-resize;
+}
+
+.time-handle:hover {
+  fill: #e4f5f2;
+}
+
+.time-point-label {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+  pointer-events: none;
 }
 
 .points-panel {
