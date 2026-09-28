@@ -3,7 +3,7 @@
 - Arduino UNO R4 WiFi; D3 PWM -> IRLZ44N gate through a resistor.
 - FTVOGUE SP1848-27145, powered from LiPo Rider Plus 5 V.
 - Device ID `haptell-06-peltier-shape`; UDP port **4445**.
-- Shape duration 500–60000 ms in 500 ms steps, 2–30 points, PWM 0–255.
+- Shape duration 500–90000 ms in 500 ms steps, 2–30 points, PWM 0–255.
 - No temperature sensor or temperature control in this version.
 
 Copy `secrets.example.h` to `secrets.h` and enter local WiFi credentials.

@@ -1,6 +1,6 @@
 const DEVICE_ID = "haptell-06-peltier-shape";
 const UDP_PORT = 4445;
-const MAX_DURATION_MS = 60000;
+const MAX_DURATION_MS = 90000;
 const TIME_STEP_MS = 500;
 
 function validateCommand(command) {

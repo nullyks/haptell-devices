@@ -11,16 +11,16 @@ const { validateCommand, DEVICE_ID } = require("../protocol");
 const shape = (duration, points) => `${DEVICE_ID} shape duration=${duration} points=${points}`;
 
 test("full range and maximum duration remain valid", () => {
-  assert.ok(validateCommand(shape(60000, "0:255,30000:128,60000:0")));
+  assert.ok(validateCommand(shape(90000, "0:255,45000:128,90000:0")));
   assert.ok(validateCommand(`${DEVICE_ID} stop`));
-  const points = Array.from({ length: 30 }, (_, i) => `${i * 2000}:${i === 29 ? 0 : 255}`);
-  assert.ok(validateCommand(shape(58000, points.join(","))));
+  const points = Array.from({ length: 30 }, (_, i) => `${i * 3000}:${i === 29 ? 0 : 255}`);
+  assert.ok(validateCommand(shape(87000, points.join(","))));
 });
 
 test("reject commands that could address the wrong device or violate drive bounds", () => {
   const invalid = [
     "all stop", "haptell-01-dc-shape stop", `${DEVICE_ID} pulse`,
-    shape(60001, "0:0,60001:0"), shape(499, "0:0,499:0"),
+    shape(90001, "0:0,90001:0"), shape(499, "0:0,499:0"),
     shape(1250, "0:0,1250:0"), shape(1000, "0:0,750:10,1000:0"),
     shape("1000junk", "0:0,1000:0"), shape(1000, "0:256,1000:0"),
     shape(1000, "0:-1,1000:0"), shape(1000, "1:10,1000:0"),
@@ -54,11 +54,11 @@ function editorContext() {
 
 test("editor JSON roundtrip and duration scaling preserve endpoint constraints", () => {
   const context = editorContext();
-  vm.runInContext('applyPreset("softStart"); setShapeDuration(60000, true); renderDesigner();', context);
+  vm.runInContext('applyPreset("softStart"); setShapeDuration(90000, true); renderDesigner();', context);
   const command = vm.runInContext("buildCommand()", context);
-  assert.equal(command, shape(60000, "0:0,12000:96,24000:96,36000:192,54000:192,60000:0"));
+  assert.equal(command, shape(90000, "0:0,18000:96,36000:96,54000:192,81000:192,90000:0"));
   assert.ok(validateCommand(command));
-  assert.equal(vm.runInContext("validateLoadedPattern(JSON.parse(JSON.stringify(buildPatternJson()))).durationMs", context), 60000);
+  assert.equal(vm.runInContext("validateLoadedPattern(JSON.parse(JSON.stringify(buildPatternJson()))).durationMs", context), 90000);
 });
 
 test("all perceptibility presets produce valid half-second commands", () => {
@@ -70,12 +70,20 @@ test("all perceptibility presets produce valid half-second commands", () => {
   }
 });
 
+test("graph labels every point with its number and time in seconds", () => {
+  const context = editorContext();
+  const markup = vm.runInContext('applyPreset("steps"); renderGraph(); document.querySelector("#pointLayer").innerHTML', context);
+  assert.match(markup, /#1 · 0 s/);
+  assert.match(markup, /#2 · 5 s/);
+  assert.match(markup, /#8 · 60 s/);
+});
+
 test("editor rejects wrong schema, null points and malformed JSON data", () => {
   const context = editorContext();
   const valid = JSON.parse(vm.runInContext("JSON.stringify(buildPatternJson())", context));
   const invalid = [
     { ...valid, schema: "haptell-shape-pattern/v1" },
-    { ...valid, durationMs: 60001 }, { ...valid, durationMs: 10250 }, { ...valid, durationMs: "10000" },
+    { ...valid, durationMs: 90001 }, { ...valid, durationMs: 10250 }, { ...valid, durationMs: "10000" },
     { ...valid, points: [null, valid.points[1]] },
     { ...valid, points: [{ timeMs: 0, intensity: 256 }, valid.points[1]] },
     { ...valid, points: [{ timeMs: 0, intensity: 0 }, { timeMs: 9750, intensity: 0 }] },
@@ -112,7 +120,7 @@ test("HTTP sends exact shape and stop datagrams on 4445; rejects other ports", a
   const post = (body) => fetch(`${url}/api/send`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
-  for (const command of [shape(60000, "0:255,60000:0"), `${DEVICE_ID} stop`]) {
+  for (const command of [shape(90000, "0:255,90000:0"), `${DEVICE_ID} stop`]) {
     const received = once(socket, "message", { signal: AbortSignal.timeout(3000) });
     const response = await post({ ipAddress: "127.0.0.1", port: 4445, command });
     assert.equal(response.status, 200);
@@ -121,7 +129,7 @@ test("HTTP sends exact shape and stop datagrams on 4445; rejects other ports", a
   for (const body of [
     { port: 4444, command: `${DEVICE_ID} stop` },
     { port: 4445, command: "all stop" },
-    { port: 4445, command: shape(60001, "0:0,60001:0") },
+    { port: 4445, command: shape(90001, "0:0,90001:0") },
   ]) assert.equal((await post({ ipAddress: "127.0.0.1", ...body })).status, 400);
   assert.equal((await fetch(`${url}/api/send`, { method: "POST", body: "{" })).status, 400);
   assert.equal((await fetch(url)).status, 200);

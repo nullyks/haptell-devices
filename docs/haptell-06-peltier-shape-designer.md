@@ -10,13 +10,14 @@ Temperature sensing is planned for a later version.
 1. Upload `firmware/haptell_06_uno_r4_wifi_peltier_shape/` with local `secrets.h`.
 2. Run `node tools/haptell_06_peltier_shape_designer/server.js`.
 3. Open <http://127.0.0.1:8085> and enter the Arduino IP from Serial Monitor.
-4. Set duration (0.5–60 seconds). Drag a circle vertically to change PWM; drag
+4. Set duration (0.5–90 seconds). Drag a circle vertically to change PWM; drag
    its numbered handle on the x-axis horizontally to change time. The point
    table provides the same controls.
 5. Save/load JSON as needed, then select **Send Shape**.
 6. Select **Stop** to send an interrupt command to the last attempted device.
 
-The x-axis and point table show seconds in 0.5-second steps; the y-axis is PWM
+The x-axis and point table show seconds in 0.5-second steps; each graph point
+also shows its point number and time in seconds. The y-axis is PWM
 0–255. PWM 0 is off,
 128 is approximately 50% duty, and 255 is continuously on. This controls
 the duty of switching pulses, not an analog gate voltage or a temperature.

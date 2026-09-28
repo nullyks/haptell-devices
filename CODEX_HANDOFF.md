@@ -43,11 +43,12 @@ observed heating/cooling on battery power. Actual current remains unmeasured.
 - Editor: `tools/haptell_06_peltier_shape_designer/`; HTTP **8085**.
 - Workflow/battery estimate: `docs/haptell-06-peltier-shape-designer.md`.
 - Wiring and editable diagram: `schematics/haptell-06-peltier/`.
-- User chose up to **60 seconds**; the UI uses 0.5–60 s in 0.5 s steps,
-  serialized as 500–60000 ms, with 2–30 points and PWM 0–255.
+- User chose up to **90 seconds**; the UI uses 0.5–90 s in 0.5 s steps,
+  serialized as 500–90000 ms, with 2–30 points and PWM 0–255.
 - UI derives from the latest shape editors, with separate vertical PWM circles
   and horizontal 0.5-second time handles, stable point IDs, JSON, zoom and
-  numbered points. Starts all off; final point always zero. Dedicated JSON
+  labels showing each point number and time in seconds. Starts all off; final
+  point always zero. Dedicated JSON
   schema `haptell-peltier-shape-pattern/v1` retains the `intensity` point field.
 - Firmware is non-blocking; Stop and new shapes interrupt. Completion and
   detected WiFi loss turn output off. No `all` target; no temperature control.

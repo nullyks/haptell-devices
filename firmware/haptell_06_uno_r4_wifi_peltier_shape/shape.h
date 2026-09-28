@@ -4,7 +4,7 @@
 
 namespace Peltier {
 const char DEVICE_ID[] = "haptell-06-peltier-shape";
-const uint32_t MAX_DURATION_MS = 60000;
+const uint32_t MAX_DURATION_MS = 90000;
 const uint32_t TIME_STEP_MS = 500;
 const uint8_t MAX_POINTS = 30;
 

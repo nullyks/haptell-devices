@@ -12,8 +12,8 @@ UDP **4445**, exclusively for `haptell-06-peltier-shape`.
 The editor follows the latest Shape Designer interaction: graph circles drag
 vertically for PWM, while numbered x-axis handles drag horizontally for time.
 It also provides numbered point rows, zoom/pan, insertion after a selected
-point, presets, and JSON save/load. Duration is **0.5–60 seconds**, with **2–30 points**.
-Time is edited in seconds at **0.5-second precision** (0.5–60 s). The UDP and
+point, presets, and JSON save/load. Duration is **0.5–90 seconds**, with **2–30 points**.
+Time is edited in seconds at **0.5-second precision** (0.5–90 s). The UDP and
 JSON formats keep integer milliseconds; every time value is divisible by 500.
 PWM is **0–255**; the final point is always zero. Changing duration scales
 point times proportionally. The initial pattern is all off.

@@ -361,7 +361,7 @@ button:disabled {
 
 .shape-point-label {
   fill: var(--ink);
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 800;
   paint-order: stroke;
   pointer-events: none;

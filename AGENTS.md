@@ -55,7 +55,7 @@ Read `CODEX_HANDOFF.md` before making larger changes. It contains the project me
 - Device ID for the fourth three-DC-motor shape prototype is `haptell-04-triple-dc-shape`.
 - Device ID for the fifth weighted-servo shape prototype is `haptell-05-servo-shape`.
 - Peltier prototype: `haptell-06-peltier-shape`, **UDP 4445**, IRLZ44N gate on D3, SP1848-27145 powered from LiPo Rider Plus 5 V. No temperature sensor yet.
-- Peltier editor: `tools/haptell_06_peltier_shape_designer/`, HTTP 8085, 0.5–60 s in 0.5 s steps, 2–30 points, PWM 0–255. Firmware: `firmware/haptell_06_uno_r4_wifi_peltier_shape/` (non-blocking, supports interrupting Stop).
+- Peltier editor: `tools/haptell_06_peltier_shape_designer/`, HTTP 8085, 0.5–90 s in 0.5 s steps, 2–30 points, PWM 0–255. Firmware: `firmware/haptell_06_uno_r4_wifi_peltier_shape/` (non-blocking, supports interrupting Stop).
 - Prefer non-blocking firmware behavior so the device can receive new commands while a pattern is playing.
 - Do not drive motors directly from GPIO pins. Document and use a driver stage.
 - When adding hardware, include both human-readable documentation and schematic source files.

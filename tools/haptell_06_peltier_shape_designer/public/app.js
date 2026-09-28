@@ -1,4 +1,4 @@
-const MAX_DURATION_MS = 60000;
+const MAX_DURATION_MS = 90000;
 const MIN_DURATION_MS = 500;
 const TIME_STEP_MS = 500;
 const MAX_POINTS = 30;
@@ -201,7 +201,7 @@ function buildDataArray() {
     ["command", "shape"],
     ["target", getTarget()],
     ["durationMs", getDuration()],
-    ["limits", [["durationMs", "500..60000, step 500"], ["points", "2..30"], ["intensity", "0..255"]]],
+    ["limits", [["durationMs", "500..90000, step 500"], ["points", "2..30"], ["intensity", "0..255"]]],
     [
       "points",
       [
@@ -477,13 +477,13 @@ function renderGraph() {
 
     const point = graphPoint(shapePoint);
     const endClass = index === shapePoints.length - 1 ? " end" : "";
-    const labelX = clamp(point.x, GRAPH.left + 16, GRAPH.left + GRAPH.width - 16);
+    const labelX = clamp(point.x, GRAPH.left + 52, GRAPH.left + GRAPH.width - 52);
     const labelY = point.y < GRAPH.top + 34 ? point.y + 26 : point.y - 14;
     pointMarkup.push(`
       <circle class="shape-point${endClass}" data-point-id="${shapePoint.id}" cx="${point.x}" cy="${point.y}" r="9">
-        <title>Drag vertically to change PWM level</title>
+        <title>Point ${index + 1} at ${formatSeconds(shapePoint.timeMs)} seconds. Drag vertically to change PWM level.</title>
       </circle>
-      <text class="shape-point-label" x="${labelX}" y="${labelY}" text-anchor="middle">${index + 1}</text>
+      <text class="shape-point-label" x="${labelX}" y="${labelY}" text-anchor="middle">#${index + 1} · ${formatSeconds(shapePoint.timeMs)} s</text>
     `);
 
     if (index > 0 && index < shapePoints.length - 1) {
@@ -743,7 +743,7 @@ function validateLoadedPattern(pattern) {
   }
   const durationMs = pattern.durationMs;
   if (!Number.isInteger(durationMs) || durationMs < MIN_DURATION_MS || durationMs > MAX_DURATION_MS || durationMs % TIME_STEP_MS !== 0) {
-    throw new Error("Duration must be 500-60000 ms in 500 ms steps.");
+    throw new Error("Duration must be 500-90000 ms in 500 ms steps.");
   }
   if (!Array.isArray(pattern.points) || pattern.points.length < 2 || pattern.points.length > MAX_POINTS) {
     throw new Error("Pattern must contain 2-30 points.");

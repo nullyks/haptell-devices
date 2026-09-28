@@ -351,5 +351,5 @@ previews a small servo horn animation.
 
 The new `haptell-06-peltier-shape` device listens on **UDP 4445**, independently
 of the existing 4444 devices. It accepts only its exact device ID, `shape` and
-`stop`, with 500–60000 ms duration in 500 ms steps and 2–30 PWM points. See the
+`stop`, with 500–90000 ms duration in 500 ms steps and 2–30 PWM points. See the
 [Peltier protocol](haptell-06-peltier-shape-designer.md#udp-protocol).

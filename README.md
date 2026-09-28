@@ -36,7 +36,7 @@ Shared defaults:
 | `tools/haptell_03_frequency_web_sender/` | `http://127.0.0.1:8081` | haptell-03 amplitude and frequency pattern editor |
 | `tools/haptell_04_triple_shape_designer/` | `http://127.0.0.1:8083` | haptell-04 three-motor shape editor |
 | `tools/haptell_05_servo_shape_designer/` | `http://127.0.0.1:8084` | haptell-05 servo angle shape editor |
-| `tools/haptell_06_peltier_shape_designer/` | `http://127.0.0.1:8085` | haptell-06 Peltier PWM editor, 0–255, up to 60 seconds |
+| `tools/haptell_06_peltier_shape_designer/` | `http://127.0.0.1:8085` | haptell-06 Peltier PWM editor, 0–255, up to 90 seconds |
 
 Start a web tool from the repository root:
 
