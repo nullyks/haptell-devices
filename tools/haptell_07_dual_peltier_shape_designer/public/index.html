@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Haptell-07 Shape Designer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="pattern.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Haptell-07 Shape Designer</h1>
+        <p>Two Peltier outputs on a shared timeline.</p>
+      </header>
+      <section class="device" aria-label="Device controls">
+        <form id="sendForm">
+          <label>Arduino IP <input id="ip" inputmode="decimal" placeholder="192.168.1.42" required></label>
+          <button id="send" type="submit">Send Shape</button>
+          <button id="stop" class="stop" type="button">Stop Both</button>
+        </form>
+        <p id="status" role="status">UDP 4444 · Ready</p>
+        <p id="playback" hidden></p>
+      </section>
+      <section class="editor" aria-labelledby="editorTitle">
+        <h2 id="editorTitle">PWM envelopes</h2>
+        <p>PWM sets electrical drive. 0 turns a channel off and 255 is full duty.</p>
+        <div class="toolbar">
+          <label>Duration (s) <input id="duration" type="number" min="0.5" max="90" step="0.5" value="10"></label>
+          <button id="add" type="button">Add Point</button>
+          <button id="clear" type="button">Clear Pattern</button>
+          <button id="save" type="button">Save JSON</button>
+          <label class="file-button">Load JSON <input id="load" type="file" accept=".json,application/json"></label>
+        </div>
+        <div class="workbench">
+          <div class="plots">
+            <p>Drag a point vertically to change PWM. Edit the shared times in the table.</p>
+            <figure class="d3">
+              <figcaption>Peltier 1 · D3</figcaption>
+              <svg id="graphD3" viewBox="0 0 640 152" role="img" aria-label="D3 PWM versus time"></svg>
+            </figure>
+            <figure class="d5">
+              <figcaption>Peltier 2 · D5</figcaption>
+              <svg id="graphD5" viewBox="0 0 640 152" role="img" aria-label="D5 PWM versus time"></svg>
+            </figure>
+          </div>
+          <div class="point-table">
+            <table>
+              <thead><tr><th scope="col">Point</th><th scope="col">Time (s)</th><th scope="col">D3</th><th scope="col">D5</th><th scope="col">Edit</th></tr></thead>
+              <tbody id="points"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <details>
+        <summary>UDP command preview</summary>
+        <textarea id="command" rows="3" readonly aria-label="UDP command preview"></textarea>
+      </details>
+    </main>
+  </body>
+</html>

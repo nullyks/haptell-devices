@@ -4,7 +4,7 @@
 #include "shape.h"
 
 const unsigned int UDP_PORT = 4445;
-const int PELTIER_PWM_PIN = 3; // D3 -> gate resistor -> N-channel MOSFET gate
+const int PELTIER_PWM_PIN = 3; // D3 -> IRLZ44N gate
 const uint32_t UPDATE_INTERVAL_MS = 10;
 const uint32_t WIFI_CHECK_INTERVAL_MS = 1000;
 const uint32_t WIFI_RETRY_INTERVAL_MS = 10000;

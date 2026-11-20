@@ -18,6 +18,7 @@ patterns through the selected motor, LRA, exciter, or Peltier driver.
 | `haptell-04` | Three DC vibration motors + MOSFET drivers | Three independent DC motor envelopes | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` |
 | `haptell-05` | Weighted 270 degree servo | Angle-over-time servo haptic patterns | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
 | `haptell-06` | IRLZ44N + SP1848-27145 Peltier, D3 PWM | Single-channel thermal drive envelope | `firmware/haptell_06_uno_r4_wifi_peltier_shape/` |
+| `haptell-07` | Two IRLZ44N switches and two Peltier modules, D3/D5 PWM | Two independent thermal drive envelopes | `firmware/haptell_07_uno_r4_wifi_dual_peltier_shape/` |
 
 Shared defaults:
 
@@ -37,6 +38,7 @@ Shared defaults:
 | `tools/haptell_04_triple_shape_designer/` | `http://127.0.0.1:8083` | haptell-04 three-motor shape editor |
 | `tools/haptell_05_servo_shape_designer/` | `http://127.0.0.1:8084` | haptell-05 servo angle shape editor |
 | `tools/haptell_06_peltier_shape_designer/` | `http://127.0.0.1:8085` | haptell-06 Peltier PWM editor, 0–255, up to 90 seconds |
+| `tools/haptell_07_dual_peltier_shape_designer/` | `http://127.0.0.1:8086` | haptell-07 dual Peltier PWM editor |
 
 Start a web tool from the repository root:
 
@@ -73,6 +75,9 @@ For the Peltier device, see the [haptell-06 workflow and battery estimate](docs/
 and [IRLZ44N wiring](schematics/haptell-06-peltier/README.md). Start its editor
 with `node tools/haptell_06_peltier_shape_designer/server.js`.
 
+For two Peltier modules, see the [haptell-07 workflow](docs/haptell-07-dual-peltier-shape-designer.md)
+and [D3/D5 wiring](schematics/haptell-07-dual-peltier/diagram.md).
+
 The repository keeps firmware variants separate so each hardware path stays
 easy to inspect and upload.
 
@@ -88,6 +93,7 @@ an active pattern after startup WiFi connection has completed.
 | PAM8403 + VG2230001H 70 Hz actuator | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` |
 | PAM8403 + TEAX13C02-8/RH audio exciter | `haptell-03` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` |
 | IRLZ44N + SP1848-27145 Peltier | `haptell-06-peltier-shape` | `firmware/haptell_06_uno_r4_wifi_peltier_shape/` |
+| Two IRLZ44N switches and two Peltier modules | `haptell-07-dual-peltier-shape` | `firmware/haptell_07_uno_r4_wifi_dual_peltier_shape/` |
 
 ### Simple Blocking Firmware
 

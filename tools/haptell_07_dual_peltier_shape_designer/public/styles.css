@@ -1,0 +1,67 @@
+:root {
+  color-scheme: light;
+  font: 16px/1.45 system-ui, sans-serif;
+  color: #172838;
+  background: #eef2f4;
+  --border: #c5d1da;
+  --muted: #42596b;
+  --blue: #005f83;
+  --orange: #a64216;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { width: min(1180px, 100% - 32px); margin: 36px auto; }
+header { margin-bottom: 24px; }
+h1, h2, p { margin: 0; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+h2 { font-size: 1.3rem; }
+p { color: var(--muted); }
+section, details { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 14px; }
+form, .toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.toolbar { margin: 16px 0; }
+label { display: grid; gap: 4px; font-size: .9rem; font-weight: 650; }
+button, input, textarea, .file-button { font: inherit; }
+button, input, textarea, .file-button { border: 1px solid var(--border); border-radius: 5px; }
+button, .file-button { padding: 7px 11px; background: #f4f7f9; color: inherit; cursor: pointer; }
+button:hover, .file-button:hover { background: #e6edf2; }
+button:disabled { cursor: default; opacity: .5; }
+#send { color: white; background: var(--blue); border-color: var(--blue); }
+.stop { color: #8c2525; border-color: #b76464; }
+input, textarea { padding: 6px 8px; background: white; color: inherit; min-width: 0; }
+input[readonly] { background: #f0f4f6; }
+#duration { width: 7rem; }
+#status { margin-top: 10px; overflow-wrap: anywhere; }
+#status.error { color: #982924; }
+.file-button { display: inline-block; position: relative; }
+.file-button input { position: absolute; inset: 0; opacity: 0; width: 100%; cursor: pointer; }
+.file-button:focus-within { outline: 2px solid var(--blue); outline-offset: 2px; }
+.workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(23rem, 0.72fr); gap: 20px; align-items: start; }
+.plots p { font-size: .9rem; margin-bottom: 8px; }
+figure { margin: 0 0 9px; border: 1px solid var(--border); padding: 8px 10px; border-radius: 6px; color: var(--trace); }
+figcaption { font-weight: 700; }
+.d3 { --trace: var(--blue); }
+.d5 { --trace: var(--orange); }
+svg { display: block; width: 100%; touch-action: none; }
+svg .grid line { stroke: #d2dce2; }
+svg text { fill: var(--muted); font-size: 13px; }
+svg polyline { fill: none; stroke: currentColor; stroke-width: 2.5; }
+svg circle { fill: white; stroke: currentColor; stroke-width: 2.5; }
+svg circle[data-index] { cursor: ns-resize; }
+.point-table { max-height: 405px; overflow: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+th, td { text-align: left; padding: 4px; }
+thead { position: sticky; top: 0; background: white; }
+td input { width: 100%; }
+td button { padding: 5px 7px; }
+summary { cursor: pointer; font-weight: 600; }
+textarea { margin-top: 8px; width: 100%; }
+@media (max-width: 850px) {
+  .workbench { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  main { width: calc(100% - 16px); margin-top: 18px; }
+  section, details { padding: 10px; }
+  th, td { padding-inline: 2px; }
+  td input { padding-inline: 3px; }
+}

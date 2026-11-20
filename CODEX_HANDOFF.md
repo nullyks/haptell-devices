@@ -35,6 +35,8 @@ https://github.com/nullyks/haptell-models
 
 User-confirmed hardware: Arduino UNO R4 WiFi, IRLZ44N MOSFET gate on D3,
 FTVOGUE TEG SP1848-27145, 3.7 V 2000 mAh LiPo and LiPo Rider Plus 5 V output.
+The Rider Plus powers the Peltier module. Arduino has a separate power supply
+and shares ground with the Rider Plus.
 No temperature sensor yet; sensing is planned for a later version. User has
 observed heating/cooling on battery power. Actual current remains unmeasured.
 
@@ -52,8 +54,9 @@ observed heating/cooling on battery power. Actual current remains unmeasured.
   schema `haptell-peltier-shape-pattern/v1` retains the `intensity` point field.
 - Firmware is non-blocking; Stop and new shapes interrupt. Completion and
   detected WiFi loss turn output off. No `all` target; no temperature control.
-- Gate wiring specifies 1 kohm series and 10 kohm pulldown. Verify the power
-  budget and temperatures on the real hardware. One MOSFET cannot reverse polarity.
+- On the current prototype, D3 connects directly to the gate without a series
+  resistor or a pulldown. Verify the power budget and temperatures on the real
+  hardware. One MOSFET cannot reverse polarity.
 - Compiled successfully with installed UNO R4 core 1.5.3 using a temporary
   sketch copy with dummy credentials. Node tests cover protocol, JSON editor
   validation and loopback UDP sends. No board upload or thermal test performed.

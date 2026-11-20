@@ -2,7 +2,8 @@
 
 This device uses an Arduino UNO R4 WiFi, an IRLZ44N low-side MOSFET on D3,
 and a FTVOGUE TEG SP1848-27145 module. A 3.7 V, 2000 mAh LiPo supplies a
-LiPo Rider Plus whose 5 V output powers both the module and Arduino.
+LiPo Rider Plus whose 5 V output powers the Peltier module. Arduino has a
+separate power supply and shares ground with the Rider Plus.
 Temperature sensing is planned for a later version.
 
 ## Start and edit
@@ -103,8 +104,9 @@ efficiency** (an estimate, not a measured Rider Plus specification), available
 | 2.0 A | 10.0 W | 38 minutes |
 
 These are scenarios, not measured consumption for SP1848-27145. Include the
-Arduino, WiFi and any fan in the total. Battery condition, cutoff voltage,
-temperature, conversion efficiency and wiring losses affect real runtime.
+Peltier module and any fan powered by the Rider Plus in the total. Battery
+condition, cutoff voltage, temperature, conversion efficiency and wiring
+losses affect real runtime.
 At 2 A on the 5 V output, the approximate battery current at nominal 3.7 V is
 `10 W / (0.85 × 3.7 V) = 3.18 A`; 2000 mAh capacity alone does not establish
 the battery's allowed discharge current.

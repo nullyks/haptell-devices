@@ -1,38 +1,25 @@
 # Haptell-06 connection diagram
 
-Editable wiring source for the single-polarity, low-side IRLZ44N prototype.
-
-```text
-3.7 V / 2000 mAh LiPo -> LiPo Rider Plus BAT
-
-Rider Plus 5 V ----+----> Arduino UNO R4 WiFi USB-C power
-                  |
-                  +----> SP1848-27145 (+)
-                         SP1848-27145 (-) ----> IRLZ44N drain
-
-Arduino D3 PWM -- 1k resistor --> IRLZ44N gate
-                                      |
-                                     10k
-                                      |
-Rider Plus GND ----+-------------------+------> IRLZ44N source
-                  +----> Arduino GND
-
-SP1848-27145 hot side -> thermal interface -> heatsink
-```
+Each box is one physical component. Read each connection label from the
+starting box to the destination box.
 
 ```mermaid
-flowchart LR
-  battery["LiPo 3.7 V / 2000 mAh"] --> rider["LiPo Rider Plus"]
-  rider -->|"5 V"| usb["UNO R4 WiFi USB-C"]
-  rider -->|"5 V"| tec["SP1848-27145 positive"]
-  tec -->|"negative lead"| drain["IRLZ44N drain"]
-  d3["UNO D3 PWM"] --> resistor["1 kohm"] --> gate["IRLZ44N gate"]
-  gate --> pulldown["10 kohm"] --> ground["Common GND"]
-  source["IRLZ44N source"] --> ground
-  rider -->|"GND"| ground
-  unoGround["UNO GND"] --> ground
+flowchart TB
+  battery["LiPo battery (3.7 V / 2000 mAh)"]
+  charger["LiPo Rider Plus charger / 5 V supply"]
+  arduino["Arduino UNO R4 WiFi"]
+  peltier["Peltier module (SP1848-27145)"]
+  mosfet["MOSFET (IRLZ44N)"]
+
+  battery -->|"Battery plug to BAT input"| charger
+  charger -->|"GND to GND"| arduino
+  charger -->|"5 V to positive lead (+)"| peltier
+  charger -->|"GND to Source (S)"| mosfet
+  arduino -->|"D3 (PWM) directly to Gate (G)"| mosfet
+  peltier -->|"Negative lead (-) to Drain (D)"| mosfet
 ```
 
-This is a connection diagram, not a PCB layout. Drain, gate and source are
-terminals of the same MOSFET. See [hardware notes](README.md) for load-current
-and thermal requirements. Temperature sensing is reserved for a later version.
+Arduino has a separate power supply. Arduino GND, LiPo Rider Plus GND and the
+MOSFET source share a common ground.
+The Peltier module's hot side contacts the heatsink through a thermal interface.
+See [hardware notes](README.md) for the component list and wiring details.

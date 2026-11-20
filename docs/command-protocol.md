@@ -18,8 +18,9 @@ Targets:
 - `haptell-04-triple-dc-shape` addresses the three-DC-motor shape-only prototype.
 - `haptell-05-servo-shape` addresses the weighted servo shape-only prototype.
 - `haptell-06-peltier-shape` addresses the Peltier prototype on port 4445.
-- `all` addresses firmware that accepts the shared target; shape-only devices
-  including haptell-06 do not accept it.
+- `haptell-07-dual-peltier-shape` addresses both Haptell-07 channels on port 4444.
+- `all` addresses firmware that accepts the shared target. Shape-only devices
+  require their exact target IDs.
 
 ## Commands
 
@@ -353,3 +354,10 @@ The new `haptell-06-peltier-shape` device listens on **UDP 4445**, independently
 of the existing 4444 devices. It accepts only its exact device ID, `shape` and
 `stop`, with 500–90000 ms duration in 500 ms steps and 2–30 PWM points. See the
 [Peltier protocol](haptell-06-peltier-shape-designer.md#udp-protocol).
+
+## Dual Peltier shapes
+
+Haptell-07 uses UDP 4444. Its `shape` points are `timeMs:pwmD3:pwmD5`.
+The final point turns off both channels. A `stop` command interrupts both.
+See the [Haptell-07 protocol](haptell-07-dual-peltier-shape-designer.md#udp-protocol)
+for the complete payload and validation rules.
