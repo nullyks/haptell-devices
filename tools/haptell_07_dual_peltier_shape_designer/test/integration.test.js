@@ -86,10 +86,8 @@ test("HTTP serves the editor and sends validated Shape and Stop to UDP 4444", as
   assert.deepEqual(sent, [[ipAddress, PORT, command], [ipAddress, PORT, STOP]]);
 });
 
-test("browser initializes both graphs and keeps the active destination for Stop", async () => {
+function loadBrowser(globals = {}) {
   const elements = new Map();
-  const requests = [];
-  let releaseSend;
   const context = vm.createContext({
     document: {
       getElementById(id) {
@@ -106,6 +104,18 @@ test("browser initializes both graphs and keeps the active destination for Stop"
     performance: { now: () => 1 },
     setInterval() {},
     AbortSignal,
+    ...globals,
+  });
+  for (const filename of ["pattern.js", "app.js"]) {
+    vm.runInContext(readFileSync(path.join(__dirname, "../public", filename), "utf8"), context);
+  }
+  return (id) => elements.get(id);
+}
+
+test("browser initializes both graphs and keeps the active destination for Stop", async () => {
+  const requests = [];
+  let releaseSend;
+  const get = loadBrowser({
     fetch(_url, { body }) {
       requests.push(JSON.parse(body));
       const response = { ok: true, json: async () => ({}) };
@@ -114,10 +124,6 @@ test("browser initializes both graphs and keeps the active destination for Stop"
       }) : Promise.resolve(response);
     },
   });
-  for (const filename of ["pattern.js", "app.js"]) {
-    vm.runInContext(readFileSync(path.join(__dirname, "../public", filename), "utf8"), context);
-  }
-  const get = (id) => elements.get(id);
   for (const graph of ["graphD3", "graphD5"]) assert.match(get(graph).innerHTML, /<polyline/);
   get("ip").value = "192.0.2.7";
   await get("load").listeners.change({ target: { files: [{ name: "test.json", text: async () => JSON.stringify(sample) }] } });
@@ -136,4 +142,57 @@ test("browser initializes both graphs and keeps the active destination for Stop"
     { ipAddress: "192.0.2.7", command: edited },
     { ipAddress: "192.0.2.7", command: STOP },
   ]);
+});
+
+test("dragging a time handle updates both graphs and clamps to adjacent points", async () => {
+  const get = loadBrowser({
+    DOMPoint: class {
+      constructor(x, y) { this.x = x; this.y = y; }
+      matrixTransform() { return this; }
+    },
+  });
+  const pattern = {
+    ...sample,
+    durationMs: 10000,
+    points: [
+      sample.points[0],
+      { timeMs: 5000, pwmD3: 64, pwmD5: 220 },
+      { timeMs: 8000, pwmD3: 100, pwmD5: 50 },
+      { ...sample.points.at(-1), timeMs: 10000 },
+    ],
+  };
+  await get("load").listeners.change({ target: { files: [{ name: "test.json", text: async () => JSON.stringify(pattern) }] } });
+  const graphs = [get("graphD3"), get("graphD5")];
+  for (const graph of graphs) {
+    const handles = Array.from(graph.innerHTML.matchAll(/class="time-handle" data-index="(\d+)"/g), (match) => match[1]);
+    assert.deepEqual(handles, ["1", "2"]);
+  }
+
+  const graph = graphs[1];
+  graph.getScreenCTM = () => ({ inverse() {} });
+  graph.setPointerCapture = () => {};
+  const input = {};
+  get("points").querySelector = (selector) => {
+    assert.equal(selector, 'input[data-index="1"][data-field="timeMs"]');
+    return input;
+  };
+  graph.listeners.pointerdown({
+    button: 0, pointerId: 1, clientX: 340, clientY: 131,
+    target: { dataset: { index: "1", field: "timeMs" } },
+    preventDefault() {},
+  });
+  const move = (clientX) => graph.listeners.pointermove({ clientX, clientY: 50, pointerId: 1 });
+  move(387);
+  assert.equal(input.value, 6);
+  assert.match(get("command").value, /,6000:64:220,8000:100:50,/);
+  for (const updatedGraph of graphs) {
+    assert.match(updatedGraph.innerHTML, /Point 2 · 6 s · Drag horizontally/);
+  }
+  move(622);
+  assert.equal(input.value, 7.5);
+  move(48);
+  assert.equal(input.value, 0.5);
+  graph.listeners.lostpointercapture({ pointerId: 1 });
+  move(387);
+  assert.equal(input.value, 0.5);
 });

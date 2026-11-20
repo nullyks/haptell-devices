@@ -22,6 +22,13 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const snapTime = (timeMs) => Math.round(timeMs / STEP) * STEP;
 const zeroPoint = (timeMs) => ({ timeMs, pwmD3: 0, pwmD5: 0 });
 
+function pointTime(index, requestedMs) {
+  const { points } = pattern;
+  const min = points[index - 1].timeMs + STEP;
+  const max = points[index + 1].timeMs - STEP;
+  return clamp(snapTime(requestedMs), min, max);
+}
+
 function blankPattern(durationMs) {
   return { schema: SCHEMA, durationMs, points: [
     { timeMs: 0, pwmD3: 0, pwmD5: 0 },
@@ -75,7 +82,7 @@ function refreshGraph(graph, channel) {
   const x = (timeMs) => left + timeMs / pattern.durationMs * (right - left);
   const y = (value) => bottom - value / 255 * (bottom - top);
   const guide = (label, vertical, pos) => vertical
-    ? `<line x1="${pos}" x2="${pos}" y1="${top}" y2="${bottom}"/><text x="${pos}" y="140" text-anchor="middle">${label}</text>`
+    ? `<line x1="${pos}" x2="${pos}" y1="${top}" y2="${bottom}"/><text x="${pos}" y="160" text-anchor="middle">${label}</text>`
     : `<line x1="${left}" x2="${right}" y1="${pos}" y2="${pos}"/><text x="40" y="${pos + 4}" text-anchor="end">${label}</text>`;
   const grid = [255, 128, 0].map((value) => guide(value, false, y(value)));
   for (const ratio of [0, 0.25, 0.5, 0.75, 1]) {
@@ -85,9 +92,15 @@ function refreshGraph(graph, channel) {
   const line = pattern.points.map((point) => `${x(point.timeMs)},${y(point[channel])}`).join(" ");
   const markers = pattern.points.map((point, i) => {
     const locked = i === pattern.points.length - 1;
-    return `<circle ${locked ? "" : `data-index="${i}"`} cx="${x(point.timeMs)}" cy="${y(point[channel])}" r="5"><title>Point ${i + 1} · ${point.timeMs / 1000} s · PWM ${point[channel]}${locked ? " (fixed)" : ""}</title></circle>`;
+    return `<circle ${locked ? "" : `data-index="${i}" data-field="${channel}"`} cx="${x(point.timeMs)}" cy="${y(point[channel])}" r="5"><title>Point ${i + 1} · ${point.timeMs / 1000} s · PWM ${point[channel]}${locked ? " (fixed)" : ""}</title></circle>`;
   }).join("");
-  graph.innerHTML = `<g class="grid">${grid.join("")}</g><polyline points="${line}"/>${markers}`;
+  const handles = pattern.points.slice(1, -1).map((point, offset) => {
+    const i = offset + 1;
+    const center = x(point.timeMs);
+    const width = Math.min(20, center - x(pattern.points[i - 1].timeMs), x(pattern.points[i + 1].timeMs) - center);
+    return `<rect class="time-handle" data-index="${i}" data-field="timeMs" x="${center - width / 2}" y="122" width="${width}" height="18" rx="3"><title>Point ${i + 1} · ${point.timeMs / 1000} s · Drag horizontally to change time</title></rect>`;
+  }).join("");
+  graph.innerHTML = `<g class="grid">${grid.join("")}</g><polyline points="${line}"/>${markers}${handles}`;
 }
 
 function refreshPreview() {
@@ -98,6 +111,7 @@ function refreshPreview() {
 }
 
 function render() {
+  drag = null;
   durationInput.min = (pattern.points.length - 1) * STEP / 1000;
   durationInput.value = pattern.durationMs / 1000;
   rows.innerHTML = pattern.points.map((point, i) => {
@@ -122,11 +136,7 @@ rows.addEventListener("change", (event) => {
   if (!point || !field || input.readOnly) return;
   const requested = input.valueAsNumber;
   if (field === "timeMs") {
-    if (Number.isFinite(requested)) {
-      const min = pattern.points[index - 1].timeMs + STEP;
-      const max = pattern.points[index + 1].timeMs - STEP;
-      point.timeMs = clamp(snapTime(requested * 1000), min, max);
-    }
+    if (Number.isFinite(requested)) point.timeMs = pointTime(index, requested * 1000);
     input.value = point.timeMs / 1000;
   } else {
     if (Number.isFinite(requested)) point[field] = clamp(Math.round(requested), 0, 255);
@@ -141,26 +151,43 @@ rows.addEventListener("click", ({ target }) => {
   render();
 });
 
-graphs.forEach((graph, channelIndex) => {
+function graphPosition(graph, event) {
+  const matrix = graph.getScreenCTM();
+  return matrix && new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
+}
+
+graphs.forEach((graph) => {
   graph.addEventListener("pointerdown", (event) => {
-    if (drag || event.button !== 0 || event.target.dataset.index === undefined) return;
+    const { index, field } = event.target.dataset;
+    if (drag || event.button !== 0 || index === undefined) return;
+    const position = graphPosition(graph, event);
+    if (!position) return;
     event.preventDefault();
-    drag = { graph, index: Number(event.target.dataset.index), pointerId: event.pointerId };
+    drag = {
+      graph, index: Number(index), field, pointerId: event.pointerId,
+      startX: position.x, startTime: pattern.points[index].timeMs,
+    };
     graph.setPointerCapture(event.pointerId);
   });
   graph.addEventListener("pointermove", (event) => {
     if (drag?.graph !== graph || drag.pointerId !== event.pointerId) return;
-    const matrix = graph.getScreenCTM();
-    if (!matrix) return;
-    const { y } = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse());
-    const pwm = clamp(Math.round(255 * (bounds.bottom - y) / (bounds.bottom - bounds.top)), 0, 255);
-    const field = channels[channelIndex];
-    pattern.points[drag.index][field] = pwm;
-    rows.querySelector(`input[data-index="${drag.index}"][data-field="${field}"]`).value = pwm;
+    const position = graphPosition(graph, event);
+    if (!position) return;
+    const { index, field, startX, startTime } = drag;
+    const point = pattern.points[index];
+    const input = rows.querySelector(`input[data-index="${index}"][data-field="${field}"]`);
+    if (field === "timeMs") {
+      const deltaMs = (position.x - startX) * pattern.durationMs / (bounds.right - bounds.left);
+      point.timeMs = pointTime(index, startTime + deltaMs);
+      input.value = point.timeMs / 1000;
+    } else {
+      point[field] = clamp(Math.round(255 * (bounds.bottom - position.y) / (bounds.bottom - bounds.top)), 0, 255);
+      input.value = point[field];
+    }
     refreshPreview();
   });
   graph.addEventListener("lostpointercapture", (event) => {
-    if (drag?.pointerId === event.pointerId) drag = null;
+    if (drag?.graph === graph && drag.pointerId === event.pointerId) drag = null;
   });
 });
 

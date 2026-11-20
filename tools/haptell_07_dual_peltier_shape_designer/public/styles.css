@@ -48,6 +48,8 @@ svg text { fill: var(--muted); font-size: 13px; }
 svg polyline { fill: none; stroke: currentColor; stroke-width: 2.5; }
 svg circle { fill: white; stroke: currentColor; stroke-width: 2.5; }
 svg circle[data-index] { cursor: ns-resize; }
+.time-handle { fill: currentColor; cursor: ew-resize; }
+.time-handle:hover { fill: var(--muted); }
 .point-table { max-height: 405px; overflow: auto; }
 table { border-collapse: collapse; width: 100%; font-size: .875rem; }
 th, td { text-align: left; padding: 4px; }

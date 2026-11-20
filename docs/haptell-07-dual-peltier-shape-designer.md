@@ -28,10 +28,12 @@ The editor opens with a 10-second pattern and both outputs set to zero.
 - Set the duration to 0.5–90 seconds. The editor snaps time to 0.5-second
   increments and scales existing point times when the duration changes. The
   shortest available duration depends on the number of points.
-- **Add Point** inserts a point into the largest gap. Edit times in the
-  shared point table and PWM in either the table or the individual plots.
-  Both channels use the same point times. Set one channel's values to zero
-  to run the other by itself.
+- **Add Point** inserts a point into the largest gap. Drag a handle below
+  either curve horizontally to move an interior point on both graphs in
+  0.5-second steps. The start and end times are fixed during dragging.
+  Drag a circle vertically to change that channel's PWM. The shared table
+  also supports time and PWM edits. Set one channel's values to zero to run
+  the other by itself.
 - Each channel accepts integer PWM from 0 to 255. Both curves start at time
   zero and must end at PWM 0. Firmware interpolates between points.
 - **Send Shape** starts playback or replaces the current pattern.
