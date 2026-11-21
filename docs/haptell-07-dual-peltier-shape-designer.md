@@ -2,13 +2,13 @@
 
 Haptell-07 runs two independent PWM envelopes on one shared timeline.
 **D3** controls Peltier 1 and **D5** controls Peltier 2 through their respective
-IRLZ44N MOSFETs. See the [connection diagram](../schematics/haptell-07-dual-peltier/diagram.md)
+IRLZ44N MOSFETs. See the [connection diagram](./devices/haptell-07.md#wire-the-circuit)
 for separate Arduino power and common ground. The shared Peltier supply in
 that diagram is provisional until its combined on-state load is measured.
 
 ## Start the editor
 
-1. Upload the [Haptell-07 firmware](../firmware/haptell_07_uno_r4_wifi_dual_peltier_shape/README.md)
+1. Upload the [Haptell-07 firmware](./devices/haptell-07.md#upload-the-firmware)
    and copy the device's IPv4 address from Serial Monitor at 115200 baud.
 2. With Node.js 18 or later, run this command from the repository root.
 

@@ -1,37 +1,26 @@
 # haptell-04 Triple DC Motor Wiring
 
-Each motor is wired like the haptell-01 DC motor prototype. The only difference
-is that haptell-04 has three independent MOSFET-switched motor channels.
+Build the motor driver shown below three times. Connect M1 to D9, M2 to D10,
+and M3 to D11. All three channels share the 5 V and ground rails.
 
 ```mermaid
-flowchart LR
-  BT1["BT1 3.7 V 1S LiPo"] --> U2["LiPo Rider Plus charger / booster"]
-  U2 -->|"5 V output"| USB["Arduino UNO R4 WiFi USB-C 5 V input"]
-  U2 -->|"5 V rail"| M1P["M1 positive"]
-  U2 -->|"5 V rail"| M2P["M2 positive"]
-  U2 -->|"5 V rail"| M3P["M3 positive"]
-  U2 -->|"GND"| GND["common GND"]
-
-  Arduino["Arduino UNO R4 WiFi"] -->|"D9 PWM"| Q1["Q1 MOSFET gate via 220R"]
-  Arduino -->|"D10 PWM"| Q2["Q2 MOSFET gate via 220R"]
-  Arduino -->|"D11 PWM"| Q3["Q3 MOSFET gate via 220R"]
-  Arduino -->|"GND"| GND
-
-  M1P --> M1["M1 DC vibration motor"]
-  M2P --> M2["M2 DC vibration motor"]
-  M3P --> M3["M3 DC vibration motor"]
-
-  M1 --> Q1D["Q1 drain"]
-  M2 --> Q2D["Q2 drain"]
-  M3 --> Q3D["Q3 drain"]
-
-  Q1D --> Q1S["Q1 source"]
-  Q2D --> Q2S["Q2 source"]
-  Q3D --> Q3S["Q3 source"]
-
-  Q1S --> GND
-  Q2S --> GND
-  Q3S --> GND
+flowchart TB
+  Battery["3.7 V protected 1S LiPo"] -->|"BAT input"| Power["LiPo Rider Plus"]
+  Power -->|"5 V to USB-C"| Arduino["Arduino UNO R4 WiFi"]
+  Power -->|"5 V"| Rail["5 V rail"]
+  Power --- Ground["Common GND"]
+  Arduino --- Ground
+  Arduino -->|"D9 for M1 · D10 for M2 · D11 for M3"| Resistor["220 Ω series resistor"]
+  Resistor -->|"Gate"| Switch["N-channel MOSFET"]
+  Resistor ---|"Gate side through 10 kΩ"| Ground
+  Rail -->|"+ lead"| Motor["DC coin motor"]
+  Motor -->|"− lead to drain"| Switch
+  Switch ---|"Source"| Ground
+  Rail ---|"Cathode (striped end)"| Diode["1N5819 flyback diode"]
+  Diode ---|"Anode to drain"| Switch
+  linkStyle 0,1,2,8 stroke:#a83227,stroke-width:2px
+  linkStyle 3,4,7,10 stroke:#35465a,stroke-width:2px
+  linkStyle 5,6 stroke:#067083,stroke-width:2px
 ```
 
 Add one 10k pulldown from each MOSFET gate to GND. Add one 1N5819 diode across

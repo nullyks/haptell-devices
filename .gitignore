@@ -10,3 +10,6 @@ __pycache__/
 *.kicad_prl
 .DS_Store
 Thumbs.db
+node_modules/
+/docs/.vitepress/cache/
+/docs/.vitepress/dist/

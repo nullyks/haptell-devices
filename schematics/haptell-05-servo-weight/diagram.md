@@ -4,7 +4,8 @@ The Arduino sends a servo control pulse on `D9`. The servo power path is
 separate from the Arduino logic power path, but both grounds must be connected.
 
 ```mermaid
-flowchart LR
+flowchart TB
+  USB["USB power"] -->|"USB-C"| Arduino
   Arduino["Arduino UNO R4 WiFi"]
   Servo["M1 270 degree servo"]
   Supply["PS1 4.8-6.8 V servo supply"]
@@ -15,6 +16,9 @@ flowchart LR
   Supply -- "GND" --> Servo
   Supply -- "common GND" --- Arduino
   Servo --- Weight
+  linkStyle 0,2 stroke:#a83227,stroke-width:2px
+  linkStyle 1 stroke:#067083,stroke-width:2px
+  linkStyle 3,4 stroke:#35465a,stroke-width:2px
 ```
 
 ## Signal and Power

@@ -1,0 +1,60 @@
+:root {
+  --vp-c-brand-1: #126879;
+  --vp-c-brand-2: #0c596b;
+  --vp-c-brand-3: #075065;
+  --vp-c-brand-soft: #1268791c;
+  --vp-home-hero-name-color: #132d44;
+}
+
+.dark {
+  --vp-c-brand-1: #77cbd6;
+  --vp-c-brand-2: #99dce5;
+  --vp-c-brand-3: #a9e3ea;
+  --vp-c-brand-soft: #77cbd620;
+  --vp-button-brand-text: #132d44;
+  --vp-button-brand-hover-text: #132d44;
+  --vp-button-brand-active-text: #132d44;
+  --vp-home-hero-name-color: #edf5f9;
+}
+
+.wiring-diagram {
+  margin: 20px 0 24px;
+}
+
+.wiring-diagram > div {
+  overflow: auto;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: white;
+}
+
+.wiring-diagram img {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: clamp(8px, 2vw, 18px);
+}
+
+.wiring-diagram .wiring-zoomed img {
+  width: max(100%, 56rem);
+  max-width: none;
+}
+
+.wiring-diagram figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  margin-top: 8px;
+  font-size: 0.875rem;
+}
+
+.wiring-diagram button {
+  padding: 5px 10px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+}
+
+.wiring-diagram button[aria-pressed="true"] {
+  background: var(--vp-c-brand-soft);
+}

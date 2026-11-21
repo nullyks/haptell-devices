@@ -128,7 +128,7 @@ Its quoted generated voltage/current must not be treated as its input current
 when powered as a Peltier device. The user has confirmed heating/cooling in
 bench tests; a verified FTVOGUE input-current specification is still missing.
 
-See [hardware notes](../schematics/haptell-06-peltier/README.md) for connections
+See the [Haptell-06 wiring guide](./devices/haptell-06.md#wire-the-circuit) for connections
 and the power budget.
 
 ## PWM and temperature estimation

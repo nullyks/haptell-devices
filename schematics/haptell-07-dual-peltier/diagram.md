@@ -13,6 +13,7 @@ flowchart TB
   q1["MOSFET 1 (IRLZ44N)"]
   q2["MOSFET 2 (IRLZ44N)"]
 
+  usb["Separate USB power"] -->|"USB-C"| arduino
   battery -->|"Battery plug to BAT"| rider
   rider -->|"GND to GND"| arduino
   rider -->|"5 V to positive lead (+)"| tec1
@@ -23,6 +24,9 @@ flowchart TB
   tec2 -->|"Negative lead (-) to Drain (D)"| q2
   rider -->|"GND to Source (S)"| q1
   rider -->|"GND to Source (S)"| q2
+  linkStyle 0,1,3,4 stroke:#a83227,stroke-width:2px
+  linkStyle 2,9,10 stroke:#35465a,stroke-width:2px
+  linkStyle 5,6 stroke:#067083,stroke-width:2px
 ```
 
 Both MOSFET sources and Arduino GND connect to Rider Plus GND. The draft

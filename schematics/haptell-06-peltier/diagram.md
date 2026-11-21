@@ -11,12 +11,16 @@ flowchart TB
   peltier["Peltier module (SP1848-27145)"]
   mosfet["MOSFET (IRLZ44N)"]
 
+  usb["Separate USB power"] -->|"USB-C"| arduino
   battery -->|"Battery plug to BAT input"| charger
   charger -->|"GND to GND"| arduino
   charger -->|"5 V to positive lead (+)"| peltier
   charger -->|"GND to Source (S)"| mosfet
   arduino -->|"D3 (PWM) directly to Gate (G)"| mosfet
   peltier -->|"Negative lead (-) to Drain (D)"| mosfet
+  linkStyle 0,1,3 stroke:#a83227,stroke-width:2px
+  linkStyle 2,4 stroke:#35465a,stroke-width:2px
+  linkStyle 5 stroke:#067083,stroke-width:2px
 ```
 
 Arduino has a separate power supply. Arduino GND, LiPo Rider Plus GND and the

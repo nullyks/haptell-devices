@@ -3,6 +3,9 @@
 Firmware, wiring notes, and local sender tools for **Haptell** wireless haptic
 artifacts.
 
+Start with the [Haptell device guides](https://nullyks.github.io/haptell-devices/)
+for wiring diagrams, firmware selection and a first test for each device.
+
 Each device uses an Arduino UNO R4 WiFi, joins a local WiFi network, listens for
 UDP text commands on port `4444` (`4445` for the Peltier device), and plays
 patterns through the selected motor, LRA, exciter, or Peltier driver.
@@ -166,6 +169,19 @@ Full protocol documentation: `docs/command-protocol.md`.
 
 ## Documentation Guide
 
+The [documentation site](https://nullyks.github.io/haptell-devices/) is built
+from Markdown in `docs/`. To preview it locally with Node.js 24 and npm:
+
+```powershell
+npm ci
+npm run docs:dev
+```
+
+Run `npm run docs:build` and `npm run docs:check` to validate the production
+site. GitHub Actions publishes the checked build from `main`.
+When changing a wiring diagram, update its editable source and the PNG or
+SVG shown in the device guide. Both files live together under `schematics/`.
+
 | Document | Contents |
 | --- | --- |
 | `docs/command-protocol.md` | UDP command format and examples |
@@ -173,6 +189,8 @@ Full protocol documentation: `docs/command-protocol.md`.
 | `docs/custom-shape-designer.md` | Large Shape Designer workflow, JSON format, and shape-only firmware |
 | `docs/haptell-04-triple-shape-designer.md` | haptell-04 three-motor shape workflow |
 | `docs/haptell-05-servo-shape-designer.md` | haptell-05 servo angle shape workflow |
+| `docs/haptell-06-peltier-shape-designer.md` | haptell-06 single Peltier workflow |
+| `docs/haptell-07-dual-peltier-shape-designer.md` | haptell-07 dual Peltier workflow |
 | `docs/lra-shape-designer.md` | Original shared shape designer for DC/LRA amplitude envelopes |
 | `docs/haptell-03-frequency-patterns.md` | haptell-03 amplitude/frequency pattern workflow |
 | `docs/hardware-notes.md` | Hardware decisions, wiring cautions, and power notes |

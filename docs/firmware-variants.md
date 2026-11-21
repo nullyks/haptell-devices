@@ -1,116 +1,70 @@
-# Firmware Variants
+# Firmware compatibility
 
-Each motor/actuator hardware path has two firmware styles:
+Use the sketch recommended by your [device guide](./devices/index.md) for a
+first test. All sketches in the table target the Arduino UNO R4 WiFi. The three
+DRV2605L sketches also need **Adafruit DRV2605 Library** and **Adafruit BusIO**.
+The weighted servo sketch needs the **Servo** library.
 
-- A main non-blocking firmware for interactive use.
-- A simple blocking firmware for reading, teaching, and first bench tests.
+**Yes** in the last column means the firmware checks for UDP while playing and
+can act on a valid Stop. **After playback** means the sketch is blocking. It
+finishes the pattern before it processes another command. The first WiFi
+connection occurs during setup.
 
-## Variant Matrix
+To start a sender, see [Tools](./tools.md). The target and UDP port below
+refer to the Arduino, separate from the sender's local browser address.
 
-| Hardware path | Device ID | Main non-blocking firmware | Simple blocking firmware |
-| --- | --- | --- | --- |
-| DC coin motor + MOSFET | `haptell-01` | `firmware/haptell_01_uno_r4_wifi_dc_coin/` | `firmware/haptell_01_uno_r4_wifi_dc_coin_simple_blocking/` |
-| DRV2605L + VG1040003D 170 Hz LRA | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra/` | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/` |
-| PAM8403 + VG2230001H 70 Hz actuator | `haptell-02` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/` | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/` |
-| PAM8403 + TEAX13C02-8/RH 8 ohm audio exciter | `haptell-03` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/` | `firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/` |
-| Weighted 270 degree servo | `haptell-05-servo-shape` | - | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` |
+## Haptell-01
 
-## Non-Blocking Firmware
+| Sketch | UDP target | UDP port | Matching tool | Stop during playback |
+| --- | --- | --- | --- | --- |
+| [Coin motor · main](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_01_uno_r4_wifi_dc_coin/haptell_01_uno_r4_wifi_dc_coin.ino) | `haptell-01` | 4444 | UDP Web Sender | Yes |
+| [Coin motor · simple](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_01_uno_r4_wifi_dc_coin_simple_blocking/haptell_01_uno_r4_wifi_dc_coin_simple_blocking.ino) | `haptell-01` | 4444 | UDP Web Sender | After playback |
+| [Coin motor · shape-only](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/haptell_01_uno_r4_wifi_dc_coin_shape_blocking.ino) | `haptell-01-dc-shape` | 4444 | Custom Shape Designer | After playback |
 
-The main firmware variants keep playback state in variables and return to
-`loop()` quickly. This lets the device keep reading UDP packets while a pattern
-is active, so a later `stop` command or new pattern can interrupt playback.
+## Haptell-02
 
-Startup WiFi connection is still blocking in these sketches: `setup()` waits for
-the first WiFi connection before starting the UDP listener.
+| Sketch | UDP target | UDP port | Matching tool | Stop during playback |
+| --- | --- | --- | --- | --- |
+| [DRV2605L · main](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_drv2605l_lra/haptell_02_uno_r4_wifi_drv2605l_lra.ino) | `haptell-02` | 4444 | UDP Web Sender | Yes |
+| [DRV2605L · simple](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_simple_blocking.ino) | `haptell-02` | 4444 | UDP Web Sender | After playback |
+| [DRV2605L · shape-only](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking.ino) | `haptell-02-drv2605l-shape` | 4444 | Custom Shape Designer | After playback |
+| [PAM8403 70 Hz · main](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h/haptell_02_uno_r4_wifi_pam8403_vg2230001h.ino) | `haptell-02` | 4444 | UDP Web Sender | Yes |
+| [PAM8403 70 Hz · simple](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking/haptell_02_uno_r4_wifi_pam8403_vg2230001h_simple_blocking.ino) | `haptell-02` | 4444 | UDP Web Sender | After playback |
+| [PAM8403 70 Hz · shape-only](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking.ino) | `haptell-02-pam8403-shape` | 4444 | Custom Shape Designer | After playback |
 
-## Simple Blocking Firmware
+## Haptell-03
 
-The blocking variants are intentionally easier to read. They play the requested
-pattern inside the pattern function and return to `loop()` only after playback
-has finished.
+| Sketch | UDP target | UDP port | Matching tool | Stop during playback |
+| --- | --- | --- | --- | --- |
+| [Audio exciter · main](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm.ino) | `haptell-03` | 4444 | Frequency Sender | Yes |
+| [Audio exciter · simple](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking/haptell_03_uno_r4_wifi_pam8403_teax13c02_8ohm_simple_blocking.ino) | `haptell-03` | 4444 | Frequency Sender | After playback |
 
-This means a `stop` command cannot interrupt an active `pulse`, `double`,
-`ramp`, or `shape` playback. The command can only be handled after the blocking
-function returns.
+## Haptell-04 through Haptell-07
 
-## Shape Command Support
+| Sketch | UDP target | UDP port | Matching tool | Stop during playback |
+| --- | --- | --- | --- | --- |
+| [Haptell-04 · three coin motors](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/haptell_04_uno_r4_wifi_triple_dc_shape_blocking.ino) | `haptell-04-triple-dc-shape` | 4444 | Triple Shape Designer | After playback |
+| [Haptell-05 · weighted servo](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/haptell_05_uno_r4_wifi_servo_weight_shape_blocking.ino) | `haptell-05-servo-shape`¹ | 4444 | Servo Shape Designer | After playback |
+| [Haptell-06 · single Peltier](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_06_uno_r4_wifi_peltier_shape/haptell_06_uno_r4_wifi_peltier_shape.ino) | `haptell-06-peltier-shape` | 4445 | Peltier Shape Designer | Yes |
+| [Haptell-07 · dual Peltier](https://github.com/nullyks/haptell-devices/blob/main/firmware/haptell_07_uno_r4_wifi_dual_peltier_shape/haptell_07_uno_r4_wifi_dual_peltier_shape.ino) | `haptell-07-dual-peltier-shape` | 4444 | Dual Peltier Shape Designer | Yes |
 
-The haptell-01 and haptell-02 firmware variants support the same `shape`
-command:
+¹ The Haptell-05 editor sends `servo-shape` without a target prefix. For
+addressed commands, the sketch accepts `haptell-05-servo-shape` and
+`haptell-05`. The editor's preview Stop stops only the animation.
 
-```text
-<target> shape duration=<duration_ms> points=<time:intensity,time:intensity,...>
-```
+## What each pattern controls
 
-The meaning of `intensity` depends on the hardware path:
+- Haptell-01 uses PWM to switch a DC motor. Haptell-02 uses real-time drive
+  values with the DRV2605L, or changes the amplitude of a 70 Hz waveform with
+  the PAM8403. The [Custom Shape Designer](./custom-shape-designer.md)
+  targets the three dedicated shape-only sketches for these hardware paths.
+- [Haptell-03](./haptell-03-frequency-patterns.md) accepts tone, sweep and
+  pattern commands. Pattern points specify amplitude and frequency.
+- [Haptell-04](./haptell-04-triple-shape-designer.md) uses three independent
+  motor intensities. [Haptell-05](./haptell-05-servo-shape-designer.md)
+  uses an angle and easing for each servo point.
+- [Haptell-06](./haptell-06-peltier-shape-designer.md) uses one PWM value
+  per point. [Haptell-07](./haptell-07-dual-peltier-shape-designer.md) uses
+  two PWM values at each shared point time. Both accept the exact target only.
 
-- DC coin motor: PWM value sent to the MOSFET gate output, `0..255`.
-- DRV2605L LRA: unsigned realtime playback value, `0..255`.
-- PAM8403 / VG2230001H: envelope value that scales the 70 Hz DAC sine carrier.
-
-The Shape Designer in `tools/udp_web_sender/` generates this command. Select
-`haptell-01` to send a DC motor PWM envelope, or `haptell-02` for either LRA
-hardware path.
-
-## Shape-Only Blocking Firmware
-
-The repository also includes focused beginner-friendly shape-only blocking
-sketches for the amplitude-only designer:
-
-| Hardware path | Shape-only firmware | UDP target |
-| --- | --- | --- |
-| DC coin motor + MOSFET | `firmware/haptell_01_uno_r4_wifi_dc_coin_shape_blocking/` | `haptell-01-dc-shape` |
-| DRV2605L + VG1040003D LRA | `firmware/haptell_02_uno_r4_wifi_drv2605l_lra_shape_blocking/` | `haptell-02-drv2605l-shape` |
-| PAM8403 + VG2230001H 70 Hz actuator | `firmware/haptell_02_uno_r4_wifi_pam8403_vg2230001h_shape_blocking/` | `haptell-02-pam8403-shape` |
-| Three DC motors + MOSFET drivers | `firmware/haptell_04_uno_r4_wifi_triple_dc_shape_blocking/` | `haptell-04-triple-dc-shape` |
-| Weighted 270 degree servo | `firmware/haptell_05_uno_r4_wifi_servo_weight_shape_blocking/` | `haptell-05-servo-shape` |
-
-These sketches remove `pulse`, `double`, and `ramp` from the command surface.
-They support only `shape` and idle-state `stop`, with up to `15000 ms` duration
-and `30` points. They do not accept `all`, because blocking playback prevents
-the device from receiving new commands until the current shape is finished.
-
-## Haptell 03 Frequency Pattern Support
-
-The `haptell-03` audio-exciter firmware uses a separate command because each
-point must include both amplitude and frequency:
-
-```text
-haptell-03 pattern duration=<duration_ms> points=<time:amplitude:frequency,time:amplitude:frequency,...>
-```
-
-The dedicated web sender in `tools/haptell_03_frequency_web_sender/` generates
-this command and visualizes both curves on the same time axis.
-
-## Haptell 04 Triple DC Shape Support
-
-The `haptell-04` firmware is a shape-only blocking sketch for three DC vibration
-motors. It uses one shared time axis and three independent motor intensities:
-
-```text
-haptell-04-triple-dc-shape shape duration=<duration_ms> points=<time:m1:m2:m3,time:m1:m2:m3,...>
-```
-
-The dedicated web tool in `tools/haptell_04_triple_shape_designer/` generates
-this command and visualizes all three motor envelopes on one graph.
-
-## Haptell 05 Servo Shape Support
-
-The `haptell-05` firmware is a shape-only blocking sketch for a weighted 270
-degree servo. It uses a separate command because each point contains angle and
-easing rather than intensity:
-
-```text
-servo-shape duration=<duration_ms> points=<time:angle:easing,time:angle:easing,...>
-```
-
-Example:
-
-```text
-servo-shape duration=800 points=0:135:linear,120:175:easeOut,260:95:easeInOut,800:135:easeOut
-```
-
-The dedicated web tool in `tools/haptell_05_servo_shape_designer/` generates
-this command, calculates pulse widths, shows speed warnings, and previews the
-servo horn motion.
+See the [UDP command protocol](./command-protocol.md) for syntax and examples.
