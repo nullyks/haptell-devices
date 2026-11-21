@@ -16,9 +16,10 @@ specific circuit.
 1. Install [Arduino IDE](https://www.arduino.cc/en/software/). Open **Boards
    Manager**, find **Arduino UNO R4 Boards** and install it. Install any
    additional libraries listed in your device guide through **Library Manager**.
-2. [Download the project ZIP](https://github.com/nullyks/haptell-devices/archive/refs/heads/main.zip)
-   and extract it, or clone the [repository](https://github.com/nullyks/haptell-devices).
-   Keep the complete folder so the Arduino code and the sender tools are
+2. On macOS, follow [Clone and update Haptell](./macos-git.md) to get a local
+   copy you can update. You can also
+   [download and extract the project ZIP](https://github.com/nullyks/haptell-devices/archive/refs/heads/main.zip).
+   Keep the complete folder so the Arduino code and sender tools are
    available together.
 3. If you plan to use a browser sender, install [Node.js LTS](https://nodejs.org/en/download).
    The project's sender tools start directly with `node`, with no npm

@@ -5,6 +5,8 @@ artifacts.
 
 Start with the [Haptell device guides](https://nullyks.github.io/haptell-devices/)
 for wiring diagrams, firmware selection and a first test for each device.
+On macOS, see [Clone and update Haptell](docs/macos-git.md) to download the
+repository and pull future updates.
 
 Each device uses an Arduino UNO R4 WiFi, joins a local WiFi network, listens for
 UDP text commands on port `4444` (`4445` for the Peltier device), and plays

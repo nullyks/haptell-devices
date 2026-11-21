@@ -21,6 +21,7 @@ export default defineConfig({
         text: "Get started",
         items: [
           { text: "Arduino and WiFi setup", link: "/start" },
+          { text: "Clone and update on macOS", link: "/macos-git" },
           { text: "Compare devices", link: "/devices/" },
         ],
       },
